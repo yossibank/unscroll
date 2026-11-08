@@ -5,10 +5,12 @@ import SwiftUI
 
 public struct MainView: View {
     @State private var room: RoomModel
+    @State private var journeyMap: JourneyMapModel
     @State private var settings: SettingsModel
 
     public init(database: AppDatabase) {
         _room = State(initialValue: RoomModel(database: database))
+        _journeyMap = State(initialValue: JourneyMapModel(database: database))
         _settings = State(initialValue: SettingsModel(database: database))
     }
 
@@ -19,7 +21,7 @@ public struct MainView: View {
                     Label("部屋", systemImage: "house")
                 }
 
-            JourneyMapView()
+            JourneyMapView(model: journeyMap)
                 .tabItem {
                     Label("地図", systemImage: "map")
                 }
