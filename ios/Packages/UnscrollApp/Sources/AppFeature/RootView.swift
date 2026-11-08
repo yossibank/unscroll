@@ -23,7 +23,7 @@ public struct RootView: View {
 private extension RootView {
     enum Phase {
         case loading
-        case ready(FocusPrototypeModel)
+        case ready(AppDatabase)
         case failed(String)
     }
 }
@@ -35,8 +35,8 @@ private extension RootView {
         case .loading:
             ProgressView()
 
-        case let .ready(model):
-            FocusPrototypeView(model: model)
+        case let .ready(database):
+            MainView(database: database)
 
         case let .failed(message):
             ContentUnavailableView(
@@ -50,7 +50,7 @@ private extension RootView {
     func openDatabase() {
         do {
             let database = try AppDatabase.appGroup()
-            phase = .ready(FocusPrototypeModel(database: database))
+            phase = .ready(database)
         } catch {
             phase = .failed(error.localizedDescription)
         }
