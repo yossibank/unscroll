@@ -1,0 +1,1019 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 110;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		78875D743079D400005422E3 /* AppFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 78875D723079D400005422E3 /* AppFeature */; };
+		78875DB23079D500005422E3 /* UnscrollMonitorExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 78875DB13079D500005422E3 /* UnscrollMonitorExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		78875DB33079D500005422E3 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = 78875DB43079D500005422E3 /* Core */; };
+		78875DC13079D500005422E3 /* UnscrollReportExtension.appex in Embed ExtensionKit Extensions */ = {isa = PBXBuildFile; fileRef = 78875DC03079D500005422E3 /* UnscrollReportExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		78875DC23079D500005422E3 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = 78875DC33079D500005422E3 /* Core */; };
+		78875DD03079D500005422E3 /* UnscrollShieldExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 78875DCF3079D500005422E3 /* UnscrollShieldExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		78875DDF3079D500005422E3 /* UnscrollShieldActionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 78875DDE3079D500005422E3 /* UnscrollShieldActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		78875DE03079D500005422E3 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = 78875DE13079D500005422E3 /* Core */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		78875DB53079D500005422E3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 78875D2C3079D362005422E3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 78875DBC3079D500005422E3;
+			remoteInfo = UnscrollMonitorExtension;
+		};
+		78875DC43079D500005422E3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 78875D2C3079D362005422E3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 78875DCB3079D500005422E3;
+			remoteInfo = UnscrollReportExtension;
+		};
+		78875DD33079D500005422E3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 78875D2C3079D362005422E3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 78875DDA3079D500005422E3;
+			remoteInfo = UnscrollShieldExtension;
+		};
+		78875DE23079D500005422E3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 78875D2C3079D362005422E3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 78875DE93079D500005422E3;
+			remoteInfo = UnscrollShieldActionExtension;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		78875DB03079D500005422E3 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			dstPath = "";
+			dstSubfolder = PlugIns;
+			files = (
+				78875DB23079D500005422E3 /* UnscrollMonitorExtension.appex in Embed Foundation Extensions */,
+				78875DD03079D500005422E3 /* UnscrollShieldExtension.appex in Embed Foundation Extensions */,
+				78875DDF3079D500005422E3 /* UnscrollShieldActionExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+		};
+		78875DF13079D500005422E3 /* Embed ExtensionKit Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
+			dstSubfolderSpec = 16;
+			files = (
+				78875DC13079D500005422E3 /* UnscrollReportExtension.appex in Embed ExtensionKit Extensions */,
+			);
+			name = "Embed ExtensionKit Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		78875D343079D362005422E3 /* Unscroll.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Unscroll.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		78875DB13079D500005422E3 /* UnscrollMonitorExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = UnscrollMonitorExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		78875DC03079D500005422E3 /* UnscrollReportExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.extensionkit-extension"; includeInIndex = 0; path = UnscrollReportExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		78875DCF3079D500005422E3 /* UnscrollShieldExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = UnscrollShieldExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		78875DDE3079D500005422E3 /* UnscrollShieldActionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = UnscrollShieldActionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		78875D9A3079D3D2005422E3 /* Exceptions for "Unscroll" folder in "Unscroll" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 78875D333079D362005422E3 /* Unscroll */;
+		};
+		78875DB73079D500005422E3 /* Exceptions for "UnscrollMonitor" folder in "UnscrollMonitorExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 78875DBC3079D500005422E3 /* UnscrollMonitorExtension */;
+		};
+		78875DC63079D500005422E3 /* Exceptions for "UnscrollReport" folder in "UnscrollReportExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 78875DCB3079D500005422E3 /* UnscrollReportExtension */;
+		};
+		78875DD53079D500005422E3 /* Exceptions for "UnscrollShield" folder in "UnscrollShieldExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 78875DDA3079D500005422E3 /* UnscrollShieldExtension */;
+		};
+		78875DE43079D500005422E3 /* Exceptions for "UnscrollShieldAction" folder in "UnscrollShieldActionExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 78875DE93079D500005422E3 /* UnscrollShieldActionExtension */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		78875D363079D362005422E3 /* Unscroll */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				78875D9A3079D3D2005422E3 /* Exceptions for "Unscroll" folder in "Unscroll" target */,
+			);
+			path = Unscroll;
+			sourceTree = "<group>";
+		};
+		78875DB83079D500005422E3 /* UnscrollMonitor */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				78875DB73079D500005422E3 /* Exceptions for "UnscrollMonitor" folder in "UnscrollMonitorExtension" target */,
+			);
+			path = UnscrollMonitor;
+			sourceTree = "<group>";
+		};
+		78875DC73079D500005422E3 /* UnscrollReport */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				78875DC63079D500005422E3 /* Exceptions for "UnscrollReport" folder in "UnscrollReportExtension" target */,
+			);
+			path = UnscrollReport;
+			sourceTree = "<group>";
+		};
+		78875DD63079D500005422E3 /* UnscrollShield */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				78875DD53079D500005422E3 /* Exceptions for "UnscrollShield" folder in "UnscrollShieldExtension" target */,
+			);
+			path = UnscrollShield;
+			sourceTree = "<group>";
+		};
+		78875DE53079D500005422E3 /* UnscrollShieldAction */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				78875DE43079D500005422E3 /* Exceptions for "UnscrollShieldAction" folder in "UnscrollShieldActionExtension" target */,
+			);
+			path = UnscrollShieldAction;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		78875D313079D362005422E3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				78875D743079D400005422E3 /* AppFeature in Frameworks */,
+			);
+		};
+		78875DB93079D500005422E3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				78875DB33079D500005422E3 /* Core in Frameworks */,
+			);
+		};
+		78875DC83079D500005422E3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				78875DC23079D500005422E3 /* Core in Frameworks */,
+			);
+		};
+		78875DD73079D500005422E3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+			);
+		};
+		78875DE63079D500005422E3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			files = (
+				78875DE03079D500005422E3 /* Core in Frameworks */,
+			);
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		78875D2B3079D362005422E3 = {
+			isa = PBXGroup;
+			children = (
+				78875D363079D362005422E3 /* Unscroll */,
+				78875D353079D362005422E3 /* Products */,
+				78875DB83079D500005422E3 /* UnscrollMonitor */,
+				78875DC73079D500005422E3 /* UnscrollReport */,
+				78875DD63079D500005422E3 /* UnscrollShield */,
+				78875DE53079D500005422E3 /* UnscrollShieldAction */,
+			);
+			sourceTree = "<group>";
+		};
+		78875D353079D362005422E3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				78875D343079D362005422E3 /* Unscroll.app */,
+				78875DB13079D500005422E3 /* UnscrollMonitorExtension.appex */,
+				78875DC03079D500005422E3 /* UnscrollReportExtension.appex */,
+				78875DCF3079D500005422E3 /* UnscrollShieldExtension.appex */,
+				78875DDE3079D500005422E3 /* UnscrollShieldActionExtension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		78875D333079D362005422E3 /* Unscroll */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 78875D3F3079D363005422E3 /* Build configuration list for PBXNativeTarget "Unscroll" */;
+			buildPhases = (
+				78875D303079D362005422E3 /* Sources */,
+				78875D313079D362005422E3 /* Frameworks */,
+				78875D323079D362005422E3 /* Resources */,
+				78875DB03079D500005422E3 /* Embed Foundation Extensions */,
+				78875DF13079D500005422E3 /* Embed ExtensionKit Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				78875DB63079D500005422E3 /* PBXTargetDependency */,
+				78875DC53079D500005422E3 /* PBXTargetDependency */,
+				78875DD43079D500005422E3 /* PBXTargetDependency */,
+				78875DE33079D500005422E3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				78875D363079D362005422E3 /* Unscroll */,
+			);
+			name = Unscroll;
+			packageProductDependencies = (
+				78875D723079D400005422E3 /* AppFeature */,
+			);
+			productName = Unscroll;
+			productReference = 78875D343079D362005422E3 /* Unscroll.app */;
+			productType = "com.apple.product-type.application";
+		};
+		78875DBC3079D500005422E3 /* UnscrollMonitorExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 78875DBF3079D500005422E3 /* Build configuration list for PBXNativeTarget "UnscrollMonitorExtension" */;
+			buildPhases = (
+				78875DBA3079D500005422E3 /* Sources */,
+				78875DB93079D500005422E3 /* Frameworks */,
+				78875DBB3079D500005422E3 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				78875DB83079D500005422E3 /* UnscrollMonitor */,
+			);
+			name = UnscrollMonitorExtension;
+			packageProductDependencies = (
+				78875DB43079D500005422E3 /* Core */,
+			);
+			productName = UnscrollMonitorExtension;
+			productReference = 78875DB13079D500005422E3 /* UnscrollMonitorExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		78875DCB3079D500005422E3 /* UnscrollReportExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 78875DCE3079D500005422E3 /* Build configuration list for PBXNativeTarget "UnscrollReportExtension" */;
+			buildPhases = (
+				78875DC93079D500005422E3 /* Sources */,
+				78875DC83079D500005422E3 /* Frameworks */,
+				78875DCA3079D500005422E3 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				78875DC73079D500005422E3 /* UnscrollReport */,
+			);
+			name = UnscrollReportExtension;
+			packageProductDependencies = (
+				78875DC33079D500005422E3 /* Core */,
+			);
+			productName = UnscrollReportExtension;
+			productReference = 78875DC03079D500005422E3 /* UnscrollReportExtension.appex */;
+			productType = "com.apple.product-type.extensionkit-extension";
+		};
+		78875DDA3079D500005422E3 /* UnscrollShieldExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 78875DDD3079D500005422E3 /* Build configuration list for PBXNativeTarget "UnscrollShieldExtension" */;
+			buildPhases = (
+				78875DD83079D500005422E3 /* Sources */,
+				78875DD73079D500005422E3 /* Frameworks */,
+				78875DD93079D500005422E3 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				78875DD63079D500005422E3 /* UnscrollShield */,
+			);
+			name = UnscrollShieldExtension;
+			packageProductDependencies = (
+			);
+			productName = UnscrollShieldExtension;
+			productReference = 78875DCF3079D500005422E3 /* UnscrollShieldExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		78875DE93079D500005422E3 /* UnscrollShieldActionExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 78875DEC3079D500005422E3 /* Build configuration list for PBXNativeTarget "UnscrollShieldActionExtension" */;
+			buildPhases = (
+				78875DE73079D500005422E3 /* Sources */,
+				78875DE63079D500005422E3 /* Frameworks */,
+				78875DE83079D500005422E3 /* Resources */,
+			);
+			buildRules = (
+			);
+			fileSystemSynchronizedGroups = (
+				78875DE53079D500005422E3 /* UnscrollShieldAction */,
+			);
+			name = UnscrollShieldActionExtension;
+			packageProductDependencies = (
+				78875DE13079D500005422E3 /* Core */,
+			);
+			productName = UnscrollShieldActionExtension;
+			productReference = 78875DDE3079D500005422E3 /* UnscrollShieldActionExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		78875D2C3079D362005422E3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2700;
+				LastUpgradeCheck = 2700;
+				TargetAttributes = {
+					78875D333079D362005422E3 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					78875DBC3079D500005422E3 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					78875DCB3079D500005422E3 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					78875DDA3079D500005422E3 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+					78875DE93079D500005422E3 = {
+						CreatedOnToolsVersion = 27.0;
+					};
+				};
+			};
+			buildConfigurationList = 78875D2F3079D362005422E3 /* Build configuration list for PBXProject "Unscroll" */;
+			developmentRegion = ja;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				ja,
+				Base,
+			);
+			mainGroup = 78875D2B3079D362005422E3;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				78875D703079D400005422E3 /* XCLocalSwiftPackageReference "Packages/UnscrollApp" */,
+				78875D713079D400005422E3 /* XCLocalSwiftPackageReference "Packages/UnscrollKit" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 78875D353079D362005422E3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				78875D333079D362005422E3 /* Unscroll */,
+				78875DBC3079D500005422E3 /* UnscrollMonitorExtension */,
+				78875DCB3079D500005422E3 /* UnscrollReportExtension */,
+				78875DDA3079D500005422E3 /* UnscrollShieldExtension */,
+				78875DE93079D500005422E3 /* UnscrollShieldActionExtension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		78875D323079D362005422E3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		78875DBB3079D500005422E3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		78875DCA3079D500005422E3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		78875DD93079D500005422E3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+		78875DE83079D500005422E3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		78875D303079D362005422E3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		78875DBA3079D500005422E3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		78875DC93079D500005422E3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		78875DD83079D500005422E3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+		78875DE73079D500005422E3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			files = (
+			);
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		78875DB63079D500005422E3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 78875DBC3079D500005422E3 /* UnscrollMonitorExtension */;
+			targetProxy = 78875DB53079D500005422E3 /* PBXContainerItemProxy */;
+		};
+		78875DC53079D500005422E3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 78875DCB3079D500005422E3 /* UnscrollReportExtension */;
+			targetProxy = 78875DC43079D500005422E3 /* PBXContainerItemProxy */;
+		};
+		78875DD43079D500005422E3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 78875DDA3079D500005422E3 /* UnscrollShieldExtension */;
+			targetProxy = 78875DD33079D500005422E3 /* PBXContainerItemProxy */;
+		};
+		78875DE33079D500005422E3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 78875DE93079D500005422E3 /* UnscrollShieldActionExtension */;
+			targetProxy = 78875DE23079D500005422E3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		78875D3D3079D363005422E3 /* Debug configuration for PBXProject "Unscroll" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = 6WHPY5MQSB;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		78875D3E3079D363005422E3 /* Release configuration for PBXProject "Unscroll" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 6WHPY5MQSB;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		78875D403079D363005422E3 /* Debug configuration for PBXNativeTarget "Unscroll" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Unscroll/Unscroll.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6WHPY5MQSB;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Unscroll/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yossibank.unscroll;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		78875D413079D363005422E3 /* Release configuration for PBXNativeTarget "Unscroll" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Unscroll/Unscroll.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6WHPY5MQSB;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Unscroll/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yossibank.unscroll;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		78875DBD3079D500005422E3 /* Debug configuration for PBXNativeTarget "UnscrollMonitorExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = UnscrollMonitor/UnscrollMonitorExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6WHPY5MQSB;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = UnscrollMonitor/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yossibank.unscroll.monitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		78875DBE3079D500005422E3 /* Release configuration for PBXNativeTarget "UnscrollMonitorExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = UnscrollMonitor/UnscrollMonitorExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6WHPY5MQSB;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = UnscrollMonitor/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yossibank.unscroll.monitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		78875DCC3079D500005422E3 /* Debug configuration for PBXNativeTarget "UnscrollReportExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = UnscrollReport/UnscrollReportExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6WHPY5MQSB;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = UnscrollReport/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yossibank.unscroll.report;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		78875DCD3079D500005422E3 /* Release configuration for PBXNativeTarget "UnscrollReportExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = UnscrollReport/UnscrollReportExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6WHPY5MQSB;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = UnscrollReport/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yossibank.unscroll.report;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		78875DDB3079D500005422E3 /* Debug configuration for PBXNativeTarget "UnscrollShieldExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = UnscrollShield/UnscrollShieldExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6WHPY5MQSB;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = UnscrollShield/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yossibank.unscroll.shield;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		78875DDC3079D500005422E3 /* Release configuration for PBXNativeTarget "UnscrollShieldExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = UnscrollShield/UnscrollShieldExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6WHPY5MQSB;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = UnscrollShield/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yossibank.unscroll.shield;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		78875DEA3079D500005422E3 /* Debug configuration for PBXNativeTarget "UnscrollShieldActionExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = UnscrollShieldAction/UnscrollShieldActionExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6WHPY5MQSB;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = UnscrollShieldAction/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yossibank.unscroll.shieldaction;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		78875DEB3079D500005422E3 /* Release configuration for PBXNativeTarget "UnscrollShieldActionExtension" */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = UnscrollShieldAction/UnscrollShieldActionExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6WHPY5MQSB;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = UnscrollShieldAction/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yossibank.unscroll.shieldaction;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				REGISTER_APP_GROUPS = YES;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		78875D2F3079D362005422E3 /* Build configuration list for PBXProject "Unscroll" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				78875D3D3079D363005422E3 /* Debug configuration for PBXProject "Unscroll" */,
+				78875D3E3079D363005422E3 /* Release configuration for PBXProject "Unscroll" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		78875D3F3079D363005422E3 /* Build configuration list for PBXNativeTarget "Unscroll" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				78875D403079D363005422E3 /* Debug configuration for PBXNativeTarget "Unscroll" */,
+				78875D413079D363005422E3 /* Release configuration for PBXNativeTarget "Unscroll" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		78875DBF3079D500005422E3 /* Build configuration list for PBXNativeTarget "UnscrollMonitorExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				78875DBD3079D500005422E3 /* Debug configuration for PBXNativeTarget "UnscrollMonitorExtension" */,
+				78875DBE3079D500005422E3 /* Release configuration for PBXNativeTarget "UnscrollMonitorExtension" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		78875DCE3079D500005422E3 /* Build configuration list for PBXNativeTarget "UnscrollReportExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				78875DCC3079D500005422E3 /* Debug configuration for PBXNativeTarget "UnscrollReportExtension" */,
+				78875DCD3079D500005422E3 /* Release configuration for PBXNativeTarget "UnscrollReportExtension" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		78875DDD3079D500005422E3 /* Build configuration list for PBXNativeTarget "UnscrollShieldExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				78875DDB3079D500005422E3 /* Debug configuration for PBXNativeTarget "UnscrollShieldExtension" */,
+				78875DDC3079D500005422E3 /* Release configuration for PBXNativeTarget "UnscrollShieldExtension" */,
+			);
+			defaultConfigurationName = Release;
+		};
+		78875DEC3079D500005422E3 /* Build configuration list for PBXNativeTarget "UnscrollShieldActionExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				78875DEA3079D500005422E3 /* Debug configuration for PBXNativeTarget "UnscrollShieldActionExtension" */,
+				78875DEB3079D500005422E3 /* Release configuration for PBXNativeTarget "UnscrollShieldActionExtension" */,
+			);
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		78875D703079D400005422E3 /* XCLocalSwiftPackageReference "Packages/UnscrollApp" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/UnscrollApp;
+		};
+		78875D713079D400005422E3 /* XCLocalSwiftPackageReference "Packages/UnscrollKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/UnscrollKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		78875D723079D400005422E3 /* AppFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = AppFeature;
+		};
+		78875DB43079D500005422E3 /* Core */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Core;
+		};
+		78875DC33079D500005422E3 /* Core */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Core;
+		};
+		78875DE13079D500005422E3 /* Core */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Core;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 78875D2C3079D362005422E3 /* Project object */;
+	validationLevel = 1;
+}
