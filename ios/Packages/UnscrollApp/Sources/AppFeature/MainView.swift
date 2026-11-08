@@ -35,5 +35,6 @@ public struct MainView: View {
                 }
         }
         .tint(Palette.teal)
+        .preferredColorScheme(.light)
     }
 }
