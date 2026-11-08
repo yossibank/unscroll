@@ -1,6 +1,6 @@
-# ミルモ
+# Unscroll
 
-<何のアプリかを 1 文で>
+スマホを触りすぎる人が、集中した分だけ相棒に日本を旅させて SNS を断つアプリ。
 
 <img src="docs/images/tech.svg" alt="iOS 18 以上、Swift 6、SwiftUI、GRDB">
 
