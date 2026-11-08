@@ -60,7 +60,7 @@ public struct RoomView: View {
                             model.acknowledgeFinishedTrip()
                         }
                     )
-                    .presentationDetents([.medium])
+                    .presentationDetents([.medium, .large])
                 }
             )
         }

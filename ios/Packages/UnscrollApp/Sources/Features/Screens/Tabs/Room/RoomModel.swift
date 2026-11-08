@@ -17,6 +17,7 @@ public final class RoomModel {
 
     public private(set) var progress: JourneyProgress?
     public private(set) var finishedTrip: Trip?
+    public private(set) var finishedArrivals: [Arrival] = []
     public private(set) var isAuthorized = false
     public private(set) var hasSelection = false
 
@@ -104,7 +105,9 @@ public extension RoomModel {
         hasSelection = !BlockedApps.isEmpty(BlockedApps.load())
         progress = try? database.journeyProgress(at: now())
 
+        recordArrivals()
         updateFinishedTrip()
+        updateFinishedArrivals()
     }
 
     func startTrip() {
@@ -161,6 +164,23 @@ private extension RoomModel {
     static let selectedMinutesKey = "room.selectedMinutes"
     static let acknowledgedTripKey = "room.acknowledgedTripID"
     static let shortestScheduleSeconds: TimeInterval = 15 * 60
+
+    func recordArrivals() {
+        do {
+            try database.recordArrivals(on: journey, at: now())
+        } catch {
+            EventLog.append("名所：着いた記録を保存できない（\(error.localizedDescription)）")
+        }
+    }
+
+    func updateFinishedArrivals() {
+        guard let finishedTrip else {
+            finishedArrivals = []
+            return
+        }
+
+        finishedArrivals = (try? database.arrivals(forTrip: finishedTrip.id)) ?? []
+    }
 
     func updateFinishedTrip() {
         guard

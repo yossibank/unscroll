@@ -28,6 +28,10 @@ public struct TripResultSheet: View {
                     .font(.subheadline)
                     .foregroundStyle(Palette.muted)
 
+                ForEach(model.finishedArrivals, id: \.landmark.name) { arrival in
+                    arrivalCard(arrival)
+                }
+
                 Text("+\(trip.kilometers(at: .now)) km")
                     .font(.system(size: 48, weight: .bold, design: .rounded))
                     .foregroundStyle(Palette.teal)
@@ -94,5 +98,38 @@ private extension TripResultSheet {
         }
         .padding(Spacing.medium)
         .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    func arrivalCard(_ arrival: Arrival) -> some View {
+        HStack(spacing: Spacing.small) {
+            Image(systemName: "mappin.circle.fill")
+                .font(.title2)
+                .foregroundStyle(Palette.teal)
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("\(arrival.landmark.name)に着いたよ！")
+                    .font(.headline)
+                    .foregroundStyle(Palette.ink)
+
+                Text(arrivalDetail(arrival))
+                    .font(.caption)
+                    .foregroundStyle(Palette.muted)
+            }
+
+            Spacer()
+        }
+        .padding(Spacing.medium)
+        .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    func arrivalDetail(_ arrival: Arrival) -> String {
+        let format = Date.VerbatimFormatStyle(
+            format: "\(month: .defaultDigits)/\(day: .defaultDigits) \(hour: .twoDigits(clock: .twentyFourHour, hourCycle: .zeroBased)):\(minute: .twoDigits)",
+            timeZone: .current,
+            calendar: .current
+        )
+        let time = arrival.arrivedAt.formatted(format)
+
+        return "\(arrival.landmark.kilometer) km · \(time)"
     }
 }
