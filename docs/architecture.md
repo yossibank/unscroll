@@ -9,7 +9,7 @@
 
 | フォルダ | ターゲット | Bundle ID | 役割 | App Group |
 | --- | --- | --- | --- | --- |
-| `ios/UnscrollMonitor/` | `UnscrollMonitorExtension` | `com.yossibank.unscroll.monitor` | 見張りの始まり・終わり・区切りを記録に書く。集中の終わりに止めたアプリを戻す | 使う |
+| `ios/UnscrollMonitor/` | `UnscrollMonitorExtension` | `com.yossibank.unscroll.monitor` | 見張りの始まり・終わり・区切りを記録に書く。旅の終わりに止めたアプリを戻す（15 分より短い旅は、終わる前の知らせで戻す） | 使う |
 | `ios/UnscrollReport/` | `UnscrollReportExtension` | `com.yossibank.unscroll.report` | 今日の使用時間を描く。数字はアプリに渡らない | |
 | `ios/UnscrollShield/` | `UnscrollShieldExtension` | `com.yossibank.unscroll.shield` | 止めたアプリを開いた時の画面の文字と色 | |
 | `ios/UnscrollShieldAction/` | `UnscrollShieldActionExtension` | `com.yossibank.unscroll.shieldaction` | 止めた画面のボタンを記録に書く | 使う |

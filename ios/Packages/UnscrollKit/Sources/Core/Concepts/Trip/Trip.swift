@@ -43,3 +43,5 @@ public extension Trip {
         focusedMinutes(at: now) * Self.kilometersPerMinute
     }
 }
+
+extension Trip: Identifiable {}

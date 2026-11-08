@@ -23,6 +23,16 @@ final class UnscrollMonitor: DeviceActivityMonitor {
         EventLog.append("見張り：終わり（\(activity.rawValue)）")
     }
 
+    override func intervalWillEndWarning(for activity: DeviceActivityName) {
+        super.intervalWillEndWarning(for: activity)
+
+        if activity.rawValue == ScreenTimeShared.focusActivityName {
+            store.clearAllSettings()
+        }
+
+        EventLog.append("見張り：短い旅の終わり（\(activity.rawValue)）")
+    }
+
     override func eventDidReachThreshold(
         _ event: DeviceActivityEvent.Name,
         activity: DeviceActivityName
