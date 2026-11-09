@@ -101,6 +101,29 @@ struct RoomModelTests {
     }
 
     @Test
+    func showsArrivalsOfFinishedTrip() throws {
+        let database = try AppDatabase.inMemory()
+        let model = RoomModel(database: database, defaults: makeDefaults(), now: { fixedNow })
+
+        let start = fixedNow.addingTimeInterval(-100 * 60)
+        _ = try database.startTrip(minutes: 90, at: start)
+
+        model.refresh()
+
+        #expect(model.finishedArrivals.map(\.landmark.name) == ["芦ノ湖"])
+        #expect(model.finishedArrivals.first?.arrivedAt == start.addingTimeInterval(90 * 60))
+
+        model.refresh()
+
+        #expect(model.finishedArrivals.count == 1)
+
+        model.acknowledgeFinishedTrip()
+        model.refresh()
+
+        #expect(model.finishedArrivals.isEmpty)
+    }
+
+    @Test
     func skipsExistingTripOnFirstLaunch() throws {
         let database = try AppDatabase.inMemory()
         _ = try database.startTrip(minutes: 25, at: fixedNow.addingTimeInterval(-60 * 60))

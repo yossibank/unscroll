@@ -20,4 +20,19 @@ struct TripResultSheetTests {
         _ = TripResultSheet(trip: planned, model: model, onClose: {}).body
         _ = TripResultSheet(trip: ended, model: model, onClose: {}).body
     }
+
+    @Test
+    func makesBodyWithArrivals() throws {
+        let database = try AppDatabase.inMemory()
+        let defaults = UserDefaults(suiteName: UUID().uuidString) ?? .standard
+        let model = RoomModel(database: database, defaults: defaults)
+        let start = Date.now.addingTimeInterval(-100 * 60)
+        let trip = try database.startTrip(minutes: 90, at: start)
+
+        model.refresh()
+
+        #expect(model.finishedArrivals.count == 1)
+
+        _ = TripResultSheet(trip: trip, model: model, onClose: {}).body
+    }
 }
