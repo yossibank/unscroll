@@ -18,6 +18,8 @@ public struct RoomView: View {
                 VStack(spacing: Spacing.medium) {
                     distanceCard
 
+                    wallCard
+
                     tripCard
 
                     usageCard
@@ -124,6 +126,52 @@ private extension RoomView {
             }
         }
         .font(.subheadline)
+    }
+
+    var wallCard: some View {
+        card {
+            VStack(alignment: .leading, spacing: Spacing.small) {
+                Text("飾った絵はがき")
+                    .font(.subheadline)
+                    .foregroundStyle(Palette.muted)
+
+                if model.decoratedArrivals.isEmpty {
+                    Text("名所に着くと届く絵はがきを、ここに飾れます")
+                        .font(.footnote)
+                        .foregroundStyle(Palette.muted)
+                } else {
+                    ScrollView(.horizontal) {
+                        HStack(spacing: Spacing.small) {
+                            ForEach(model.decoratedArrivals, id: \.landmark.name) { arrival in
+                                wallPostcard(arrival)
+                            }
+                        }
+                        .padding(.vertical, 4)
+                    }
+                    .scrollIndicators(.hidden)
+                }
+            }
+        }
+    }
+
+    func wallPostcard(_ arrival: Arrival) -> some View {
+        VStack(spacing: 4) {
+            PostcardArt(
+                landmark: arrival.landmark,
+                symbolFont: .title2,
+                showsProvisionalMark: false
+            )
+            .frame(width: 96)
+
+            Text(arrival.landmark.name)
+                .font(.caption2.bold())
+                .foregroundStyle(Palette.ink)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+        .padding(6)
+        .background(Palette.paper, in: RoundedRectangle(cornerRadius: 8))
+        .rotationEffect(.degrees(arrival.landmark.kilometer.isMultiple(of: 20) ? -2 : 2))
     }
 
     var tripCard: some View {

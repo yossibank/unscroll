@@ -17,6 +17,13 @@ extension Arrival {
             .order(Columns.kilometer)
             .fetchAll(db)
     }
+
+    static func fetchDecorated(_ db: Database) throws -> [Arrival] {
+        try Arrival
+            .filter(Columns.decoratedAt != nil)
+            .order(Columns.decoratedAt)
+            .fetchAll(db)
+    }
 }
 
 public extension AppDatabase {
@@ -29,6 +36,12 @@ public extension AppDatabase {
     func arrivals() throws -> [Arrival] {
         try writer.read { db in
             try Arrival.fetchAllInOrder(db)
+        }
+    }
+
+    func decoratedArrivals() throws -> [Arrival] {
+        try writer.read { db in
+            try Arrival.fetchDecorated(db)
         }
     }
 }

@@ -18,6 +18,21 @@ public struct TripResultSheet: View {
     }
 
     public var body: some View {
+        NavigationStack {
+            content
+                .navigationDestination(for: Landmark.self) { landmark in
+                    if let arrival = model.finishedArrivals.first(where: { $0.landmark == landmark }) {
+                        LandmarkArrivalView(arrival: arrival) { isDecorated in
+                            model.setDecorated(isDecorated, landmark: landmark)
+                        }
+                    }
+                }
+        }
+    }
+}
+
+private extension TripResultSheet {
+    var content: some View {
         ScrollView {
             VStack(spacing: Spacing.medium) {
                 Text("おかえり！")
@@ -29,7 +44,10 @@ public struct TripResultSheet: View {
                     .foregroundStyle(Palette.muted)
 
                 ForEach(model.finishedArrivals, id: \.landmark.name) { arrival in
-                    arrivalCard(arrival)
+                    NavigationLink(value: arrival.landmark) {
+                        arrivalCard(arrival)
+                    }
+                    .buttonStyle(.plain)
                 }
 
                 Text("+\(trip.kilometers(at: .now)) km")
@@ -37,8 +55,6 @@ public struct TripResultSheet: View {
                     .foregroundStyle(Palette.teal)
 
                 totalCard
-
-                souvenirCard
 
                 Button {
                     onClose()
@@ -54,9 +70,7 @@ public struct TripResultSheet: View {
         .scrollBounceBehavior(.basedOnSize)
         .background(Palette.paper)
     }
-}
 
-private extension TripResultSheet {
     var summary: String {
         guard trip.endedAt != nil else {
             return "\(trip.plannedMinutes) 分の旅が終わりました"
@@ -86,20 +100,6 @@ private extension TripResultSheet {
         .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
     }
 
-    var souvenirCard: some View {
-        ZStack(alignment: .topTrailing) {
-            Text("名所に着いた時の絵はがきとおみやげは、あとで届くようにします。")
-                .font(.footnote)
-                .foregroundStyle(Palette.muted)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.trailing, Spacing.large)
-
-            ProvisionalMark()
-        }
-        .padding(Spacing.medium)
-        .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
-    }
-
     func arrivalCard(_ arrival: Arrival) -> some View {
         HStack(spacing: Spacing.small) {
             Image(systemName: "mappin.circle.fill")
@@ -114,9 +114,17 @@ private extension TripResultSheet {
                 Text(arrivalDetail(arrival))
                     .font(.caption)
                     .foregroundStyle(Palette.muted)
+
+                Text("絵はがきとおみやげが届いた")
+                    .font(.caption.bold())
+                    .foregroundStyle(Palette.coral)
             }
 
             Spacer()
+
+            Image(systemName: "chevron.right")
+                .font(.footnote.bold())
+                .foregroundStyle(Palette.muted)
         }
         .padding(Spacing.medium)
         .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
