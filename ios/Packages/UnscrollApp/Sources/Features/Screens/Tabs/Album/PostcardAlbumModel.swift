@@ -39,7 +39,7 @@ public extension PostcardAlbumModel {
         journey.landmarks.dropFirst().map { landmark in
             Entry(
                 landmark: landmark,
-                arrival: arrivals.first { $0.landmark.name == landmark.name },
+                arrival: arrival(at: landmark),
                 remainingKilometers: max(0, landmark.kilometer - kilometers)
             )
         }
@@ -51,6 +51,23 @@ public extension PostcardAlbumModel {
 
     var totalCount: Int {
         entries.count
+    }
+
+    func arrival(at landmark: Landmark) -> Arrival? {
+        arrivals.first { $0.landmark.name == landmark.name }
+    }
+
+    func setDecorated(
+        _ isDecorated: Bool,
+        landmark: Landmark
+    ) {
+        do {
+            try database.setDecorated(isDecorated, landmark: landmark, at: now())
+        } catch {
+            EventLog.append("絵はがき：飾れない（\(error.localizedDescription)）")
+        }
+
+        refresh()
     }
 
     func refresh() {

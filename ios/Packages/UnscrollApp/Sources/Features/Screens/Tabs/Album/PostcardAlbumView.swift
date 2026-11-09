@@ -27,6 +27,13 @@ public struct PostcardAlbumView: View {
             }
             .background(Palette.paper)
             .navigationTitle("絵はがき")
+            .navigationDestination(for: Landmark.self) { landmark in
+                if let arrival = model.arrival(at: landmark) {
+                    LandmarkArrivalView(arrival: arrival) { isDecorated in
+                        model.setDecorated(isDecorated, landmark: landmark)
+                    }
+                }
+            }
             .onAppear {
                 model.refresh()
             }
@@ -73,7 +80,10 @@ private extension PostcardAlbumView {
     @ViewBuilder
     func postcard(_ entry: PostcardAlbumModel.Entry) -> some View {
         if let arrival = entry.arrival {
-            collected(entry.landmark, arrival: arrival)
+            NavigationLink(value: entry.landmark) {
+                collected(entry.landmark, arrival: arrival)
+            }
+            .buttonStyle(.plain)
         } else {
             uncollected(entry)
         }
@@ -84,31 +94,22 @@ private extension PostcardAlbumView {
         arrival: Arrival
     ) -> some View {
         VStack(alignment: .leading, spacing: Spacing.small) {
-            ZStack(alignment: .topTrailing) {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(
-                        LinearGradient(
-                            colors: [Palette.teal.opacity(0.25), Palette.coral.opacity(0.3)],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .overlay {
-                        Image(systemName: symbol(for: landmark))
-                            .font(.largeTitle)
-                            .foregroundStyle(Palette.ink.opacity(0.7))
-                    }
+            PostcardArt(landmark: landmark)
 
-                ProvisionalMark()
-                    .padding(4)
+            HStack(spacing: 4) {
+                Text(landmark.name)
+                    .font(.subheadline.bold())
+                    .foregroundStyle(Palette.ink)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                if arrival.isDecorated {
+                    Image(systemName: "pin.fill")
+                        .font(.caption2)
+                        .foregroundStyle(Palette.coral)
+                        .accessibilityLabel("部屋に飾っている")
+                }
             }
-            .aspectRatio(4 / 3, contentMode: .fit)
-
-            Text(landmark.name)
-                .font(.subheadline.bold())
-                .foregroundStyle(Palette.ink)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
 
             Text(arrivedDate(arrival))
                 .font(.caption)
@@ -162,24 +163,5 @@ private extension PostcardAlbumView {
         )
 
         return arrival.arrivedAt.formatted(format)
-    }
-
-    func symbol(for landmark: Landmark) -> String {
-        switch landmark.name {
-        case "芦ノ湖":
-            "mountain.2"
-        case "三保の松原":
-            "tree"
-        case "浜名湖":
-            "fish"
-        case "名古屋城":
-            "building.columns"
-        case "琵琶湖":
-            "sailboat"
-        case "清水寺":
-            "leaf"
-        default:
-            "photo"
-        }
     }
 }

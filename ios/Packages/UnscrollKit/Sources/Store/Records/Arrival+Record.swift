@@ -8,6 +8,7 @@ extension Arrival: FetchableRecord, PersistableRecord {
         case kilometer
         case tripID
         case arrivedAt
+        case decoratedAt
     }
 
     public static var databaseTableName: String {
@@ -27,7 +28,8 @@ extension Arrival: FetchableRecord, PersistableRecord {
                 kilometer: row[Columns.kilometer]
             ),
             tripID: tripID,
-            arrivedAt: row[Columns.arrivedAt]
+            arrivedAt: row[Columns.arrivedAt],
+            decoratedAt: row[Columns.decoratedAt]
         )
     }
 
@@ -36,5 +38,6 @@ extension Arrival: FetchableRecord, PersistableRecord {
         container[Columns.kilometer] = landmark.kilometer
         container[Columns.tripID] = tripID.description
         container[Columns.arrivedAt] = arrivedAt
+        container[Columns.decoratedAt] = decoratedAt
     }
 }

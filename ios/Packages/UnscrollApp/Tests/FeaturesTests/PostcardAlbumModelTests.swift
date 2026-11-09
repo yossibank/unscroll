@@ -59,4 +59,22 @@ struct PostcardAlbumModelTests {
         #expect(model.collectedCount == 6)
         #expect(model.entries.allSatisfy { $0.remainingKilometers == 0 })
     }
+
+    @Test
+    func decoratesCollectedPostcard() throws {
+        let database = try AppDatabase.inMemory()
+        _ = try database.startTrip(minutes: 100, at: start)
+        let now = start.addingTimeInterval(100 * 60)
+        let model = PostcardAlbumModel(database: database, now: { now })
+        let landmark = model.journey.landmarks[1]
+
+        model.setDecorated(true, landmark: landmark)
+
+        #expect(model.arrival(at: landmark)?.isDecorated == true)
+        #expect(try database.decoratedArrivals().count == 1)
+
+        model.setDecorated(false, landmark: landmark)
+
+        #expect(model.arrival(at: landmark)?.isDecorated == false)
+    }
 }

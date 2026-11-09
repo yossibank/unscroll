@@ -9,6 +9,21 @@ struct RoomModelTests {
     private let fixedNow = Date(timeIntervalSince1970: 1_000_000)
 
     @Test
+    func decoratesArrivalFromFinishedTrip() throws {
+        let database = try AppDatabase.inMemory()
+        _ = try database.startTrip(minutes: 90, at: fixedNow.addingTimeInterval(-100 * 60))
+        let model = RoomModel(database: database, defaults: makeDefaults(), now: { fixedNow })
+        let landmark = model.journey.landmarks[1]
+
+        model.refresh()
+        #expect(model.decoratedArrivals.isEmpty)
+
+        model.setDecorated(true, landmark: landmark)
+
+        #expect(model.decoratedArrivals.map(\.landmark.name) == ["芦ノ湖"])
+    }
+
+    @Test
     func showsActiveTrip() throws {
         let database = try AppDatabase.inMemory()
         _ = try database.startTrip(minutes: 25, at: fixedNow.addingTimeInterval(-5 * 60))

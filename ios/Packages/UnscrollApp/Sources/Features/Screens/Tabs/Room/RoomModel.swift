@@ -18,6 +18,7 @@ public final class RoomModel {
     public private(set) var progress: JourneyProgress?
     public private(set) var finishedTrip: Trip?
     public private(set) var finishedArrivals: [Arrival] = []
+    public private(set) var decoratedArrivals: [Arrival] = []
     public private(set) var isAuthorized = false
     public private(set) var hasSelection = false
 
@@ -108,6 +109,21 @@ public extension RoomModel {
         recordArrivals()
         updateFinishedTrip()
         updateFinishedArrivals()
+        decoratedArrivals = (try? database.decoratedArrivals()) ?? []
+    }
+
+    func setDecorated(
+        _ isDecorated: Bool,
+        landmark: Landmark
+    ) {
+        do {
+            try database.setDecorated(isDecorated, landmark: landmark, at: now())
+        } catch {
+            EventLog.append("絵はがき：飾れない（\(error.localizedDescription)）")
+        }
+
+        updateFinishedArrivals()
+        decoratedArrivals = (try? database.decoratedArrivals()) ?? []
     }
 
     func startTrip() {
