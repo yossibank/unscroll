@@ -14,6 +14,7 @@ struct JourneyProgressTests {
 
         #expect(progress.kilometers == 0)
         #expect(progress.activeTrip == nil)
+        #expect(progress.lastTrip == nil)
     }
 
     @Test
@@ -43,6 +44,21 @@ struct JourneyProgressTests {
         let progress = try database.journeyProgress(at: now)
 
         #expect(progress.kilometers == 32)
+        #expect(progress.activeTrip == nil)
+    }
+
+    @Test
+    func picksNewestTripAsLast() throws {
+        let database = try AppDatabase.inMemory()
+        let secondStart = start.addingTimeInterval(60 * 60)
+        let now = secondStart.addingTimeInterval(60 * 60)
+
+        _ = try database.startTrip(minutes: 25, at: start)
+        let second = try database.startTrip(minutes: 25, at: secondStart)
+
+        let progress = try database.journeyProgress(at: now)
+
+        #expect(progress.lastTrip == second)
         #expect(progress.activeTrip == nil)
     }
 }

@@ -1,8 +1,10 @@
+import Core
 import DesignSystem
 import SwiftUI
 
 public struct RoomView: View {
     @State private var model: RoomModel
+    @State private var isTripCoverShown = false
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -33,55 +35,125 @@ public struct RoomView: View {
             .refreshable {
                 model.refresh()
             }
+            .fullScreenCover(
+                isPresented: tripBinding,
+                onDismiss: {
+                    isTripCoverShown = false
+                },
+                content: {
+                    TripView(model: model)
+                        .onAppear {
+                            isTripCoverShown = true
+                        }
+                }
+            )
+            .sheet(
+                item: finishedTripBinding,
+                onDismiss: {
+                    model.acknowledgeFinishedTrip()
+                },
+                content: { trip in
+                    TripResultSheet(
+                        trip: trip,
+                        model: model,
+                        onClose: {
+                            model.acknowledgeFinishedTrip()
+                        }
+                    )
+                    .presentationDetents([.medium])
+                }
+            )
         }
     }
 }
 
 private extension RoomView {
-    static let routeKilometers = 500
+    var tripBinding: Binding<Bool> {
+        Binding(
+            get: { model.progress?.activeTrip != nil },
+            set: { _ in }
+        )
+    }
+
+    var finishedTripBinding: Binding<Trip?> {
+        Binding(
+            get: { canShowResult ? model.finishedTrip : nil },
+            set: { _ in }
+        )
+    }
+
+    var canShowResult: Bool {
+        model.progress?.activeTrip == nil && !isTripCoverShown
+    }
 }
 
 private extension RoomView {
     var distanceCard: some View {
-        let kilometers = model.progress?.kilometers ?? 0
-
-        return card {
+        card {
             VStack(alignment: .leading, spacing: Spacing.small) {
                 Text("進んだ距離")
                     .font(.subheadline)
                     .foregroundStyle(Palette.muted)
 
-                Text("\(kilometers) km")
+                Text("\(model.kilometers) km")
                     .font(.system(size: 48, weight: .bold, design: .rounded))
                     .foregroundStyle(Palette.ink)
 
-                Text("東京 → 京都")
+                Text(model.journey.name)
                     .foregroundStyle(Palette.ink)
 
-                Text("あと \(max(0, Self.routeKilometers - kilometers)) km")
-                    .font(.subheadline)
-                    .foregroundStyle(Palette.muted)
+                nextLandmarkLine
             }
         }
     }
 
+    var nextLandmarkLine: some View {
+        HStack(spacing: Spacing.small) {
+            Image(systemName: "mappin.circle.fill")
+                .foregroundStyle(Palette.teal)
+
+            if let landmark = model.nextLandmark, let remaining = model.kilometersToNext {
+                Text("次は\(landmark.name)")
+                    .foregroundStyle(Palette.ink)
+
+                Text("あと \(remaining) km")
+                    .foregroundStyle(Palette.muted)
+            } else {
+                Text("京都に着きました")
+                    .foregroundStyle(Palette.ink)
+            }
+        }
+        .font(.subheadline)
+    }
+
     var tripCard: some View {
         card {
-            ZStack(alignment: .topTrailing) {
-                VStack(alignment: .leading, spacing: Spacing.small) {
-                    Text("旅")
-                        .font(.subheadline)
-                        .foregroundStyle(Palette.muted)
+            VStack(alignment: .leading, spacing: Spacing.small) {
+                Text("旅の長さ")
+                    .font(.subheadline)
+                    .foregroundStyle(Palette.muted)
 
-                    if let end = model.tripEndsAt {
-                        activeTrip(end: end)
-                    } else {
-                        idleTrip
+                HStack(spacing: Spacing.small) {
+                    ForEach(RoomModel.tripLengths, id: \.self) { minutes in
+                        lengthButton(minutes)
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
 
-                ProvisionalMark()
+                Button {
+                    model.startTrip()
+                } label: {
+                    Text("\(model.selectedMinutes) 分 旅に出す")
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(Palette.teal)
+                .disabled(!model.canStart)
+
+                if !model.isAuthorized || !model.hasSelection {
+                    Text("設定で、許可と止めるアプリを選んでください")
+                        .font(.footnote)
+                        .foregroundStyle(Palette.muted)
+                }
             }
         }
     }
@@ -99,43 +171,35 @@ private extension RoomView {
         }
     }
 
-    var idleTrip: some View {
-        VStack(alignment: .leading, spacing: Spacing.small) {
-            Button {
-                model.startTrip(minutes: 25)
-            } label: {
-                Text("25 分 旅に出す")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .tint(Palette.teal)
-            .disabled(!model.canStart)
+    func lengthButton(_ minutes: Int) -> some View {
+        let isSelected = model.selectedMinutes == minutes
+        let shape = RoundedRectangle(cornerRadius: 12)
 
-            if !model.isAuthorized || !model.hasSelection {
-                Text("設定で、許可と止めるアプリを選んでください")
-                    .font(.footnote)
-                    .foregroundStyle(Palette.muted)
-            }
-        }
-    }
-
-    func activeTrip(end: Date) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.small) {
-            LabeledContent("終わる時刻", value: end.formatted(date: .omitted, time: .shortened))
-                .foregroundStyle(Palette.ink)
-
-            TimelineView(.periodic(from: .now, by: 30)) { context in
-                let minutes = max(0, Int(ceil(end.timeIntervalSince(context.date) / 60)))
-
-                Text("あと \(minutes) 分")
-                    .font(.title2.weight(.semibold))
+        return Button {
+            model.selectedMinutes = minutes
+        } label: {
+            VStack(spacing: 4) {
+                Text("\(minutes) 分")
+                    .font(.headline)
                     .foregroundStyle(Palette.ink)
-            }
 
-            Button("やめる（進んだ分は残る）", role: .destructive) {
-                model.stopTrip()
+                Text(model.lengthNote(for: minutes))
+                    .font(.caption)
+                    .foregroundStyle(Palette.muted)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .padding(.vertical, Spacing.small)
+            .frame(maxWidth: .infinity)
+            .background(isSelected ? Palette.teal.opacity(0.12) : Palette.card, in: shape)
+            .overlay {
+                shape.stroke(
+                    isSelected ? Palette.teal : Palette.muted.opacity(0.3),
+                    lineWidth: isSelected ? 2 : 1
+                )
             }
         }
+        .buttonStyle(.plain)
     }
 
     func card(
