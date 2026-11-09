@@ -1,3 +1,4 @@
+import FamilyControls
 import Foundation
 import SwiftUI
 
@@ -24,6 +25,8 @@ struct TodayUsageView: View {
 
             ForEach(usage.apps.prefix(8)) { app in
                 HStack {
+                    icon(for: app)
+
                     Text(app.name)
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
@@ -44,6 +47,19 @@ struct TodayUsageView: View {
 }
 
 private extension TodayUsageView {
+    @ViewBuilder
+    func icon(for app: AppUsage) -> some View {
+        if let token = app.token {
+            Label(token)
+                .labelStyle(.iconOnly)
+                .frame(width: 24, height: 24)
+        } else {
+            Image(systemName: "app.dashed")
+                .foregroundStyle(.secondary)
+                .frame(width: 24, height: 24)
+        }
+    }
+
     func format(_ duration: TimeInterval) -> String {
         Duration.seconds(duration).formatted(.units(allowed: [.hours, .minutes], width: .narrow))
     }
