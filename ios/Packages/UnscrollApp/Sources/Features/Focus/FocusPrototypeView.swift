@@ -2,15 +2,18 @@ import Core
 import DesignSystem
 import DeviceActivity
 import FamilyControls
+import Store
 import SwiftUI
 
 public struct FocusPrototypeView: View {
-    @State private var model = FocusPrototypeModel()
+    @State private var model: FocusPrototypeModel
     @State private var isPickerPresented = false
 
     @Environment(\.scenePhase) private var scenePhase
 
-    public init() {}
+    public init(model: FocusPrototypeModel) {
+        _model = State(initialValue: model)
+    }
 
     public var body: some View {
         NavigationStack {
@@ -72,6 +75,8 @@ public struct FocusPrototypeView: View {
 private extension FocusPrototypeView {
     var focusSection: some View {
         Section {
+            LabeledContent("進んだ距離", value: "\(model.progress?.kilometers ?? 0) km")
+
             if let end = model.focusEndsAt {
                 LabeledContent("終わる時刻", value: end.formatted(date: .omitted, time: .shortened))
 
@@ -140,5 +145,7 @@ private extension FocusPrototypeView {
 }
 
 #Preview {
-    FocusPrototypeView()
+    if let database = try? AppDatabase.inMemory() {
+        FocusPrototypeView(model: FocusPrototypeModel(database: database))
+    }
 }

@@ -4,6 +4,7 @@ import FamilyControls
 import Foundation
 import ManagedSettings
 import Observation
+import Store
 
 @MainActor
 @Observable
@@ -11,9 +12,10 @@ public final class FocusPrototypeModel {
     public var selection = FamilyActivitySelection()
 
     public private(set) var isAuthorized = false
-    public private(set) var focusEndsAt: Date?
+    public private(set) var progress: JourneyProgress?
     public private(set) var logLines: [String] = []
 
+    @ObservationIgnored private let database: AppDatabase
     @ObservationIgnored private let center = DeviceActivityCenter()
     @ObservationIgnored private let defaults = UserDefaults(suiteName: ScreenTimeShared.appGroup)
 
@@ -21,13 +23,18 @@ public final class FocusPrototypeModel {
         named: ManagedSettingsStore.Name(ScreenTimeShared.focusStoreName)
     )
 
-    public init() {
+    public init(database: AppDatabase) {
+        self.database = database
         loadSelection()
         refresh()
     }
 }
 
 public extension FocusPrototypeModel {
+    var focusEndsAt: Date? {
+        progress?.activeTrip?.plannedEnd
+    }
+
     var selectionSummary: String {
         let apps = selection.applicationTokens.count
         let categories = selection.categoryTokens.count
@@ -43,6 +50,7 @@ public extension FocusPrototypeModel {
 
     func refresh() {
         isAuthorized = AuthorizationCenter.shared.authorizationStatus == .approved
+        progress = try? database.journeyProgress(at: .now)
         logLines = EventLog.lines()
     }
 
@@ -69,6 +77,16 @@ public extension FocusPrototypeModel {
         let end = start.addingTimeInterval(TimeInterval(minutes * 60))
         let schedule = makeSchedule(from: start, to: end)
 
+        let trip: Trip
+
+        do {
+            trip = try database.startTrip(minutes: minutes, at: start)
+        } catch {
+            EventLog.append("集中：保存できない（\(error.localizedDescription)）")
+            refresh()
+            return
+        }
+
         shieldSelection()
 
         do {
@@ -76,10 +94,10 @@ public extension FocusPrototypeModel {
                 DeviceActivityName(ScreenTimeShared.focusActivityName),
                 during: schedule
             )
-            focusEndsAt = end
             EventLog.append("集中：開始（\(minutes) 分）")
         } catch {
             store.clearAllSettings()
+            try? database.endTrip(trip.id, at: start)
             EventLog.append("集中：見張りを始められない（\(error.localizedDescription)）")
         }
 
@@ -87,9 +105,16 @@ public extension FocusPrototypeModel {
     }
 
     func stopFocus() {
+        if let trip = progress?.activeTrip {
+            do {
+                try database.endTrip(trip.id, at: .now)
+            } catch {
+                EventLog.append("集中：終わりを保存できない（\(error.localizedDescription)）")
+            }
+        }
+
         store.clearAllSettings()
         center.stopMonitoring([DeviceActivityName(ScreenTimeShared.focusActivityName)])
-        focusEndsAt = nil
         EventLog.append("集中：やめた")
         refresh()
     }

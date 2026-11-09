@@ -50,7 +50,10 @@ let package = Package(
         ),
         .testTarget(
             name: "FeaturesTests",
-            dependencies: ["Features"]
+            dependencies: [
+                "Features",
+                .product(name: "Store", package: "UnscrollKit")
+            ]
         )
     ]
 )
