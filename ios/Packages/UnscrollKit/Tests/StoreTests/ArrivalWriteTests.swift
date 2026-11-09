@@ -56,6 +56,21 @@ struct ArrivalWriteTests {
     }
 
     @Test
+    func listsArrivalsOfEveryTripInJourneyOrder() throws {
+        let database = try AppDatabase.inMemory()
+        let first = try database.startTrip(minutes: 90, at: start)
+        let secondStart = start.addingTimeInterval(120 * 60)
+        let second = try database.startTrip(minutes: 90, at: secondStart)
+        let now = secondStart.addingTimeInterval(90 * 60)
+
+        try database.recordArrivals(on: journey, at: now)
+        let arrivals = try database.arrivals()
+
+        #expect(arrivals.map(\.landmark.name) == ["芦ノ湖", "三保の松原"])
+        #expect(arrivals.map(\.tripID) == [first.id, second.id])
+    }
+
+    @Test
     func recordsOnlyDistanceTravelledWhenEndedEarly() throws {
         let database = try AppDatabase.inMemory()
         let trip = try database.startTrip(minutes: 90, at: start)
