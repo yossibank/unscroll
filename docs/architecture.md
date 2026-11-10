@@ -1,7 +1,7 @@
 # 構成
 
 > [!NOTE]
-> 共通の形から外れた点と、ID など Unscroll だけの事実が分かる。共通の形は claude-config の `docs/architecture-ios.md` にある。
+> 共通の形から外れた点と、ID など Unscroll だけの事実が分かる。共通の形は claude-config の `docs/app/ios-architecture.md` にある。
 
 ## 🪟 Screen Time の拡張
 

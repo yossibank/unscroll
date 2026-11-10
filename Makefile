@@ -40,7 +40,7 @@ test:
 
 snapshot:
 	@test -n "$(SNAPSHOT)" || { echo "NG SNAPSHOT に .claude/snapshots/ の下のセットの名前を渡す"; exit 1; }
-	$(CLAUDE_CONFIG)/skills/ui-snapshot/scripts/render-snapshots.sh ios/Packages/UnscrollApp .claude/snapshots/$(SNAPSHOT) .build/snapshots/$(SNAPSHOT)
+	$(CLAUDE_CONFIG)/dotclaude/skills/ui-snapshot/scripts/render-snapshots.sh ios/Packages/UnscrollApp .claude/snapshots/$(SNAPSHOT) .build/snapshots/$(SNAPSHOT)
 
 verify:
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/UnscrollKit
