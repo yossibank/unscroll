@@ -15,7 +15,7 @@
 
 ## 構成
 
-構成は、claude-config の `docs/architecture-ios.md` の共通の形に従う。外れた時に足す文書は、claude-config の `rules/docs-app.md` に従う。
+構成は、claude-config の `docs/app/ios-architecture.md` の共通の形に従う。外れた時に足す文書は、claude-config の `dotclaude/rules/docs-app.md` に従う。
 
 ## 文書
 
@@ -25,4 +25,4 @@
 | --- | --- | --- |
 | 機能・画面を足す | [overview](docs/overview.md)、[roadmap](docs/roadmap.md) | overview、roadmap |
 | 作る順番の 1 段を終える | [roadmap](docs/roadmap.md) | roadmap の状態 |
-| 構成を共通の形から外す | claude-config の `docs/architecture-ios.md` | `docs/architecture.md` |
+| 構成を共通の形から外す | claude-config の `docs/app/ios-architecture.md` | `docs/architecture.md` |
