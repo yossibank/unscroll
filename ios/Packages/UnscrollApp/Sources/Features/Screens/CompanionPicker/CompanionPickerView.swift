@@ -129,6 +129,12 @@ private extension CompanionPickerView {
                     RoundedRectangle(cornerRadius: 12)
                         .stroke(Palette.muted.opacity(0.3), lineWidth: 1)
                 }
+
+            if model.isNameTooLong {
+                Text("名前は \(Companion.nameLimit) 字までです")
+                    .font(.footnote)
+                    .foregroundStyle(Palette.muted)
+            }
         }
     }
 

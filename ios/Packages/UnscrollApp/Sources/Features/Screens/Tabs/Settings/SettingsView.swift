@@ -23,6 +23,15 @@ public struct SettingsView: View {
                 prototypeSection
             }
             .navigationTitle("設定")
+            .navigationDestination(for: Route.self) { _ in
+                CompanionPickerView(
+                    model: model.makeCompanionPicker(),
+                    isFirstTime: false,
+                    onSaved: {
+                        model.refresh()
+                    }
+                )
+            }
             .tint(Palette.teal)
             .onAppear {
                 model.refresh()
@@ -35,21 +44,19 @@ public struct SettingsView: View {
 }
 
 private extension SettingsView {
+    enum Route: Hashable {
+        case companion
+    }
+}
+
+private extension SettingsView {
     var isReady: Bool {
         model.isAuthorized && !BlockedApps.isEmpty(model.selection)
     }
 
     var companionSection: some View {
         Section("相棒") {
-            NavigationLink {
-                CompanionPickerView(
-                    model: model.makeCompanionPicker(),
-                    isFirstTime: false,
-                    onSaved: {
-                        model.refresh()
-                    }
-                )
-            } label: {
+            NavigationLink(value: Route.companion) {
                 HStack(spacing: Spacing.small + 4) {
                     if let companion = model.companion {
                         CompanionSticker(

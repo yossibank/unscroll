@@ -37,12 +37,24 @@ struct CompanionPickerModelTests {
     }
 
     @Test
-    func cutsRenameAtLimit() throws {
+    func keepsLongNameButHasNoDraft() throws {
         let model = try CompanionPickerModel(database: AppDatabase.inMemory())
 
-        model.rename("あいうえおかきくけこ")
+        model.rename("あいうえおかきくけ")
 
-        #expect(model.name == "あいうえおかきく")
+        #expect(model.name == "あいうえおかきくけ")
+        #expect(model.isNameTooLong)
+        #expect(model.draft == nil)
+    }
+
+    @Test
+    func acceptsNameAtLimit() throws {
+        let model = try CompanionPickerModel(database: AppDatabase.inMemory())
+
+        model.rename(" あいうえおかきく ")
+
+        #expect(!model.isNameTooLong)
+        #expect(model.draft?.name == "あいうえおかきく")
     }
 
     @Test

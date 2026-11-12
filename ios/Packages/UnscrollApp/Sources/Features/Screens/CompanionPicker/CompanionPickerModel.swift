@@ -34,6 +34,11 @@ public extension CompanionPickerModel {
         draft ?? Companion(species: species, coat: coat, name: species.defaultName)
     }
 
+    var isNameTooLong: Bool {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.count > Companion.nameLimit
+    }
+
     var shownName: String {
         draft?.name ?? species.defaultName
     }
@@ -56,7 +61,7 @@ public extension CompanionPickerModel {
     }
 
     func rename(_ name: String) {
-        self.name = String(name.prefix(Companion.nameLimit))
+        self.name = name
         isNameEdited = true
     }
 

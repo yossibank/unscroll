@@ -22,6 +22,22 @@ public struct CompanionSticker: View {
     }
 
     public var body: some View {
+        if breathes, !reduceMotion {
+            art
+                .phaseAnimator([false, true]) { content, phase in
+                    content
+                        .scaleEffect(x: 1, y: breathScale(phase), anchor: .bottom)
+                } animation: { _ in
+                    .easeInOut(duration: 1.2)
+                }
+        } else {
+            art
+        }
+    }
+}
+
+private extension CompanionSticker {
+    var art: some View {
         Image(companion.artName(pose), bundle: .module)
             .interpolation(.none)
             .resizable()
@@ -31,12 +47,6 @@ public struct CompanionSticker: View {
             .shadow(color: .white, radius: 0, x: 0, y: outline)
             .shadow(color: .white, radius: 0, x: 0, y: -outline)
             .shadow(color: Palette.ink.opacity(0.22), radius: 4, x: 0, y: 4)
-            .phaseAnimator([false, true]) { content, phase in
-                content
-                    .scaleEffect(x: 1, y: breathScale(phase), anchor: .bottom)
-            } animation: { _ in
-                .easeInOut(duration: 1.2)
-            }
             .accessibilityLabel(accessibilityText)
     }
 }
@@ -51,14 +61,6 @@ private extension CompanionSticker {
     }
 
     func breathScale(_ phase: Bool) -> CGFloat {
-        guard
-            phase,
-            breathes,
-            !reduceMotion
-        else {
-            return 1
-        }
-
-        return 0.97
+        phase ? 0.97 : 1
     }
 }
