@@ -58,27 +58,15 @@ private extension TripView {
 
                 road(width: width, height: height)
 
-                companion
-                    .position(x: width / 2, y: height * 0.62)
+                if let companion = model.companion {
+                    CompanionSticker(companion: companion, pose: .walk, size: 96)
+                        .position(x: width / 2, y: height * 0.62)
+                }
             }
 
             ProvisionalMark()
                 .padding(Spacing.medium)
         }
-    }
-
-    var companion: some View {
-        Text("相棒（あとで）")
-            .font(.caption)
-            .foregroundStyle(Palette.ink)
-            .padding(Spacing.medium)
-            .overlay {
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(
-                        Palette.ink.opacity(0.5),
-                        style: StrokeStyle(lineWidth: 1, dash: [6, 4])
-                    )
-            }
     }
 
     func mountain(

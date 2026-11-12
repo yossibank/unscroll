@@ -10,6 +10,7 @@ import Store
 public final class SettingsModel {
     public var selection: FamilyActivitySelection
 
+    public private(set) var companion: Companion?
     public private(set) var isAuthorized = false
     public private(set) var isTripActive = false
     public private(set) var logLines: [String] = []
@@ -29,7 +30,12 @@ public extension SettingsModel {
         BlockedApps.summary(selection)
     }
 
+    func makeCompanionPicker() -> CompanionPickerModel {
+        CompanionPickerModel(database: database)
+    }
+
     func refresh() {
+        companion = try? database.companion()
         isAuthorized = AuthorizationCenter.shared.authorizationStatus == .approved
         isTripActive = (try? database.journeyProgress(at: .now))?.activeTrip != nil
         logLines = EventLog.lines()

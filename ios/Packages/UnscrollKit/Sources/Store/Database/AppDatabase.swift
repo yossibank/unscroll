@@ -18,7 +18,6 @@ public extension AppDatabase {
     static func appGroup() throws -> AppDatabase {
         let path = try groupPath()
         let pool = try DatabasePool(path: path, configuration: configuration)
-
         return try AppDatabase(pool)
     }
 
@@ -50,6 +49,7 @@ extension AppDatabase {
         migrator.registerMigration("v2", migrate: MigrationV002.migrate)
         migrator.registerMigration("v3", migrate: MigrationV003.migrate)
         migrator.registerMigration("v4", migrate: MigrationV004.migrate)
+        migrator.registerMigration("v5", migrate: MigrationV005.migrate)
 
         return migrator
     }
@@ -62,7 +62,6 @@ private extension AppDatabase {
 
     static var groupContainer: URL? {
         let manager = FileManager.default
-
         return manager.containerURL(forSecurityApplicationGroupIdentifier: groupIdentifier)
     }
 

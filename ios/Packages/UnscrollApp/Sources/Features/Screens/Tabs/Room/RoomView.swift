@@ -5,6 +5,8 @@ import SwiftUI
 public struct RoomView: View {
     @State private var model: RoomModel
     @State private var isTripCoverShown = false
+    @State private var pose = Companion.Pose.walk
+    @State private var pokes = 0
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -16,9 +18,9 @@ public struct RoomView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: Spacing.medium) {
-                    distanceCard
+                    companionCard
 
-                    wallCard
+                    distanceCard
 
                     tripCard
 
@@ -36,6 +38,12 @@ public struct RoomView: View {
             }
             .refreshable {
                 model.refresh()
+            }
+            .task {
+                await blink()
+            }
+            .task(id: pokes) {
+                await settleAfterPoke()
             }
             .fullScreenCover(
                 isPresented: tripBinding,
@@ -87,6 +95,40 @@ private extension RoomView {
     var canShowResult: Bool {
         model.progress?.activeTrip == nil && !isTripCoverShown
     }
+
+    func poke() {
+        pose = .joy
+        pokes += 1
+    }
+
+    func settleAfterPoke() async {
+        guard pokes > 0 else {
+            return
+        }
+
+        try? await Task.sleep(for: .milliseconds(800))
+
+        if !Task.isCancelled {
+            pose = .walk
+        }
+    }
+
+    func blink() async {
+        while !Task.isCancelled {
+            try? await Task.sleep(for: .milliseconds(3200))
+
+            guard pose == .walk else {
+                continue
+            }
+
+            pose = .blink
+            try? await Task.sleep(for: .milliseconds(160))
+
+            if pose == .blink {
+                pose = .walk
+            }
+        }
+    }
 }
 
 private extension RoomView {
@@ -128,50 +170,77 @@ private extension RoomView {
         .font(.subheadline)
     }
 
-    var wallCard: some View {
-        card {
-            VStack(alignment: .leading, spacing: Spacing.small) {
-                Text("飾った絵はがき")
-                    .font(.subheadline)
-                    .foregroundStyle(Palette.muted)
+    var companionCard: some View {
+        VStack(spacing: 0) {
+            scene
 
-                if model.decoratedArrivals.isEmpty {
-                    Text("名所に着くと届く絵はがきを、ここに飾れます")
+            if let companion = model.companion {
+                HStack {
+                    Text(companion.name)
+                        .font(.headline)
+                        .foregroundStyle(Palette.ink)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+
+                    Spacer()
+
+                    Text("触ると喜ぶ")
                         .font(.footnote)
                         .foregroundStyle(Palette.muted)
-                } else {
-                    ScrollView(.horizontal) {
-                        HStack(spacing: Spacing.small) {
-                            ForEach(model.decoratedArrivals, id: \.landmark.name) { arrival in
-                                wallPostcard(arrival)
-                            }
-                        }
-                        .padding(.vertical, 4)
-                    }
-                    .scrollIndicators(.hidden)
                 }
+                .padding(.horizontal, Spacing.medium)
+                .padding(.vertical, Spacing.small + 4)
             }
         }
+        .background(Palette.card)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
     }
 
-    func wallPostcard(_ arrival: Arrival) -> some View {
-        VStack(spacing: 4) {
-            PostcardArt(
-                landmark: arrival.landmark,
-                symbolFont: .title2,
-                showsProvisionalMark: false
-            )
-            .frame(width: 96)
+    var scene: some View {
+        ZStack(alignment: .bottom) {
+            VStack(spacing: 0) {
+                wall
 
-            Text(arrival.landmark.name)
-                .font(.caption2.bold())
-                .foregroundStyle(Palette.ink)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
+                Spacer()
+
+                Palette.floor
+                    .frame(height: 64)
+                    .overlay(alignment: .top) {
+                        Palette.floorEdge
+                            .frame(height: 4)
+                    }
+            }
+
+            if let companion = model.companion {
+                Button {
+                    poke()
+                } label: {
+                    CompanionSticker(companion: companion, pose: pose, size: 128)
+                }
+                .buttonStyle(.plain)
+                .padding(.bottom, Spacing.medium)
+            }
         }
-        .padding(6)
-        .background(Palette.paper, in: RoundedRectangle(cornerRadius: 8))
-        .rotationEffect(.degrees(arrival.landmark.kilometer.isMultiple(of: 20) ? -2 : 2))
+        .frame(height: 280)
+        .background(Palette.wall)
+    }
+
+    var wall: some View {
+        ScrollView(.horizontal) {
+            HStack(alignment: .top, spacing: Spacing.small + 4) {
+                ForEach(model.decoratedArrivals, id: \.landmark.name) { arrival in
+                    wallPostcard(arrival)
+                }
+
+                if let remaining = model.kilometersToNext {
+                    nextPostcardSlot(remaining)
+                }
+            }
+            .padding(.horizontal, Spacing.medium)
+            .padding(.vertical, Spacing.small + 4)
+        }
+        .scrollIndicators(.hidden)
+        .scrollBounceBehavior(.basedOnSize)
     }
 
     var tripCard: some View {
@@ -190,7 +259,9 @@ private extension RoomView {
                 Button {
                     model.startTrip()
                 } label: {
-                    Text("\(model.selectedMinutes) 分 旅に出す")
+                    Text(model.startTitle)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                         .frame(maxWidth: .infinity)
                 }
                 .buttonStyle(.borderedProminent)
@@ -217,6 +288,43 @@ private extension RoomView {
                     .frame(height: 240)
             }
         }
+    }
+
+    func nextPostcardSlot(_ remaining: Int) -> some View {
+        VStack(spacing: 2) {
+            Text("次の絵はがき")
+            Text("あと \(remaining) km")
+        }
+        .font(.caption2)
+        .foregroundStyle(Palette.muted)
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
+        .frame(width: 84, height: 72)
+        .overlay {
+            RoundedRectangle(cornerRadius: 4)
+                .stroke(Palette.floorEdge, style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
+        }
+    }
+
+    func wallPostcard(_ arrival: Arrival) -> some View {
+        VStack(spacing: 4) {
+            PostcardArt(
+                landmark: arrival.landmark,
+                symbolFont: .title3,
+                showsProvisionalMark: false
+            )
+            .frame(width: 72)
+
+            Text(arrival.landmark.name)
+                .font(.caption2.bold())
+                .foregroundStyle(Palette.ink)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+        }
+        .padding(6)
+        .background(Palette.card, in: RoundedRectangle(cornerRadius: 4))
+        .shadow(color: Palette.ink.opacity(0.18), radius: 2, x: 0, y: 2)
+        .rotationEffect(.degrees(arrival.landmark.kilometer.isMultiple(of: 20) ? -2 : 2))
     }
 
     func lengthButton(_ minutes: Int) -> some View {
@@ -250,9 +358,7 @@ private extension RoomView {
         .buttonStyle(.plain)
     }
 
-    func card(
-        @ViewBuilder content: () -> some View
-    ) -> some View {
+    func card(@ViewBuilder content: () -> some View) -> some View {
         content()
             .padding(Spacing.medium)
             .frame(maxWidth: .infinity, alignment: .leading)

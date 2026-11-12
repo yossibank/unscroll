@@ -15,6 +15,7 @@ public final class RoomModel {
         }
     }
 
+    public private(set) var companion: Companion?
     public private(set) var progress: JourneyProgress?
     public private(set) var finishedTrip: Trip?
     public private(set) var finishedArrivals: [Arrival] = []
@@ -72,6 +73,14 @@ public extension RoomModel {
         nextLandmark.map { $0.kilometer - kilometers }
     }
 
+    var startTitle: String {
+        guard let companion else {
+            return "\(selectedMinutes) 分 旅に出す"
+        }
+
+        return "\(companion.name)と \(selectedMinutes) 分 旅に出る"
+    }
+
     var canStart: Bool {
         isAuthorized && hasSelection && progress?.activeTrip == nil
     }
@@ -104,6 +113,7 @@ public extension RoomModel {
     func refresh() {
         isAuthorized = AuthorizationCenter.shared.authorizationStatus == .approved
         hasSelection = !BlockedApps.isEmpty(BlockedApps.load())
+        companion = try? database.companion()
         progress = try? database.journeyProgress(at: now())
 
         recordArrivals()

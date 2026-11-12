@@ -8,12 +8,20 @@ public struct MainView: View {
     @State private var journeyMap: JourneyMapModel
     @State private var postcardAlbum: PostcardAlbumModel
     @State private var settings: SettingsModel
+    @State private var needsCompanion: Bool
+
+    private let database: AppDatabase
 
     public init(database: AppDatabase) {
+        let hasCompanion = (try? database.companion()) != nil
+
         _room = State(initialValue: RoomModel(database: database))
         _journeyMap = State(initialValue: JourneyMapModel(database: database))
         _postcardAlbum = State(initialValue: PostcardAlbumModel(database: database))
         _settings = State(initialValue: SettingsModel(database: database))
+        _needsCompanion = State(initialValue: !hasCompanion)
+
+        self.database = database
     }
 
     public var body: some View {
@@ -40,5 +48,15 @@ public struct MainView: View {
         }
         .tint(Palette.teal)
         .preferredColorScheme(.light)
+        .fullScreenCover(isPresented: $needsCompanion) {
+            CompanionPickerView(
+                model: CompanionPickerModel(database: database),
+                isFirstTime: true,
+                onSaved: {
+                    room.refresh()
+                    settings.refresh()
+                }
+            )
+        }
     }
 }

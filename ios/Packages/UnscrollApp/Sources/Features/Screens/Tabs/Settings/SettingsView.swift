@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import SwiftUI
 
@@ -22,6 +23,15 @@ public struct SettingsView: View {
                 prototypeSection
             }
             .navigationTitle("設定")
+            .navigationDestination(for: Route.self) { _ in
+                CompanionPickerView(
+                    model: model.makeCompanionPicker(),
+                    isFirstTime: false,
+                    onSaved: {
+                        model.refresh()
+                    }
+                )
+            }
             .tint(Palette.teal)
             .onAppear {
                 model.refresh()
@@ -34,18 +44,40 @@ public struct SettingsView: View {
 }
 
 private extension SettingsView {
+    enum Route: Hashable {
+        case companion
+    }
+}
+
+private extension SettingsView {
     var isReady: Bool {
         model.isAuthorized && !BlockedApps.isEmpty(model.selection)
     }
 
     var companionSection: some View {
         Section("相棒") {
-            HStack {
-                Text("フェネックの ふく")
+            NavigationLink(value: Route.companion) {
+                HStack(spacing: Spacing.small + 4) {
+                    if let companion = model.companion {
+                        CompanionSticker(
+                            companion: companion,
+                            pose: .walk,
+                            size: 40,
+                            breathes: false
+                        )
 
-                Spacer()
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(companion.name)
+                                .foregroundStyle(Palette.ink)
 
-                ProvisionalMark()
+                            Text(companion.kindLabel)
+                                .font(.caption)
+                                .foregroundStyle(Palette.muted)
+                        }
+                    } else {
+                        Text("相棒を選ぶ")
+                    }
+                }
             }
         }
     }
