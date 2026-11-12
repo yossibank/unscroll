@@ -38,6 +38,9 @@ let package = Package(
             name: "DesignSystem",
             dependencies: [
                 .product(name: "Core", package: "UnscrollKit")
+            ],
+            resources: [
+                .process("Resources")
             ]
         ),
         .testTarget(

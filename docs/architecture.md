@@ -3,6 +3,21 @@
 > [!NOTE]
 > 共通の形から外れた点と、ID など Unscroll だけの事実が分かる。共通の形は claude-config の `docs/app/ios-architecture.md` にある。
 
+## 🖥️ 相棒の絵
+
+相棒のドット絵は、DesignSystem の資源に置く。絵はスクリプトで描き、手で直さない。決め方は [相棒の決定](decisions/companion.md) にある。
+
+| 置き場所 | 中身 |
+| --- | --- |
+| `scripts/companion-art.py` | 相棒の絵を描くスクリプト。種ごとに 9 枚の 32×32 px の PNG を書く |
+| `ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Companions.xcassets` | 描いた絵。名前は `<種>_<動き>` で、種は `penguin`・`tanuki`・`shiba` |
+
+絵を描き直す時は、次のコマンドを走らせる。種を省くと、すべての種を描く。
+
+```sh
+python3 -I scripts/companion-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Companions.xcassets
+```
+
 ## 🪟 Screen Time の拡張
 
 ウィジェットの代わりに、Screen Time の拡張を持つ。試作の段階なので、中身はパッケージに分けず各フォルダに書く。
