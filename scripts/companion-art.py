@@ -1,6 +1,6 @@
 """相棒のドット絵を描く。
 
-種ごとに 9 枚の 32×32 px の絵を描き、透明な PNG に書く。
+種と毛の色ごとに 9 枚の 32×32 px の絵を描き、透明な PNG に書く。絵の名前は <種>_<色>_<場面>。
 出力先が .xcassets なら、絵ごとに imageset を作る。そうでなければ、PNG と並べた見本を書く。
 
     python3 -I scripts/companion-art.py <出力先> [種…]
@@ -63,6 +63,35 @@ SPECIES = {
         "paw": (82, 64, 52, 255),
     },
 }
+
+# 種ごとの毛の色 4 つ。種の色の表のうち、変える色だけを書く。
+# speckle は胡麻の毛先の点、patch と patch_sh はペンギンの耳のあたりの色。
+COATS = {
+    "shiba": {
+        "red": {"main": (206, 152, 96), "side": (176, 126, 76), "line": (110, 76, 46), "brow": (206, 152, 96), "ear_in": (240, 200, 156)},
+        "black": {},
+        "white": {"main": (242, 232, 212), "side": (222, 208, 184), "line": (150, 128, 104), "body": (253, 250, 244), "face": (255, 252, 247), "brow": (242, 232, 212), "ear_in": (240, 192, 172)},
+        "sesame": {"main": (190, 130, 80), "side": (160, 106, 64), "line": (96, 62, 40), "brow": (226, 180, 128), "ear_in": (232, 184, 136), "speckle": (92, 62, 44)},
+    },
+    "tanuki": {
+        "brown": {},
+        "dark": {"main": (112, 86, 64), "side": (90, 68, 50), "line": (60, 44, 34), "mask": (50, 38, 32), "paw": (50, 38, 32)},
+        "gray": {"main": (152, 148, 142), "side": (124, 120, 114), "line": (80, 76, 72), "mask": (68, 64, 62), "paw": (68, 64, 62), "body": (232, 230, 226), "body_sh": (212, 210, 204)},
+        "white": {"main": (238, 232, 222), "side": (216, 208, 196), "line": (150, 130, 112), "mask": (196, 170, 146), "paw": (196, 170, 146)},
+    },
+    "penguin": {
+        "gray": {},
+        "black": {"main": (56, 58, 66), "side": (38, 40, 46), "line": (26, 26, 30), "body": (246, 246, 244), "body_sh": (220, 220, 224)},
+        "emperor": {"main": (50, 54, 64), "side": (34, 38, 46), "line": (24, 26, 30), "face": (252, 249, 240), "face_sh": (232, 226, 212), "body": (250, 246, 232), "body_sh": (226, 220, 204), "patch": (252, 210, 104), "patch_sh": (238, 182, 78)},
+        "king": {"main": (128, 100, 78), "side": (104, 80, 62), "line": (70, 52, 40), "body": (158, 128, 102), "body_sh": (136, 108, 86), "face": (246, 240, 232), "face_sh": (228, 220, 208)},
+    },
+}
+
+
+def palette(name, coat):
+    p = dict(SPECIES[name])
+    p.update({k: c + (255,) for k, c in COATS[name][coat].items()})
+    return p
 
 
 def blank():
@@ -259,6 +288,7 @@ def front(p, eyes="open", lf="down", rf="down", ft="stand", dy=0, squash=0, look
         put(g, 15 + look, my, eye)
         put(g, 16 + look, my, eye)
     feet(g, p, ft, bottom)
+    speckle(g, p, (11 + look, 20 + look, 0, top + 4), (top + 7, top + 17))
     outline(g)
     return g
 
@@ -271,9 +301,12 @@ def penguin_mask(g, p, fy, look, hw):
         for x in range(W):
             if g[y][x] not in paint:
                 continue
-            for ex in (10.5 + look, 21.5 + look):
+            for i, ex in enumerate((10.5 + look, 21.5 + look)):
                 if ((x + 0.5 - ex) / 4.0) ** 2 + ((y + 0.5 - fy - 0.5) / 3.4) ** 2 <= 1:
                     g[y][x] = face_sh if x - 16 - look > 5 else face
+                    outward = (ex - x - 0.5) if i == 0 else (x + 0.5 - ex)
+                    if "patch" in p and outward >= 1:
+                        g[y][x] = p["patch"] if i == 0 else p["patch_sh"]
             band = 8 if y == fy + 2 else 6
             if y >= fy + 2 and abs(x + 0.5 - 16 - look) <= band and hw[y] - abs(x + 0.5 - 16) > 2:
                 g[y][x] = face_sh if x - 16 - look > 5 else face
@@ -350,6 +383,19 @@ def feet(g, p, pose, bottom):
         foot(21, bottom - 1)
 
 
+def speckle(g, p, head, back):
+    """胡麻の毛先の点。頭の上（head の範囲）と、影の側の筋（back の行）だけに打つ。"""
+    if "speckle" not in p:
+        return
+    (x0, x1, y0, y1), (b0, b1) = head, back
+    for y in range(H):
+        for x in range(W):
+            on_head = g[y][x] == p["main"] and x0 <= x <= x1 and y0 <= y <= y1
+            on_back = g[y][x] == p["side"] and b0 <= y <= b1
+            if (on_head or on_back) and (x * 3 + y * 5) % 7 == 0:
+                g[y][x] = p["speckle"]
+
+
 def marks(g, pts):
     for x, y in pts:
         if g[y][x] is T:
@@ -413,7 +459,7 @@ def slide(p):
         for y in range(16, 26):
             for x in range(2, 14):
                 if g[y][x] in (main, side) and ((x + 0.5 - 7.5) / 4.0) ** 2 + ((y + 0.5 - 20.5) / 3.2) ** 2 <= 1:
-                    g[y][x] = p["face"]
+                    g[y][x] = p["patch"] if "patch" in p and x >= 9 else p["face"]
         for x, y in ((15, 21), (16, 21), (17, 22), (18, 22), (19, 22), (20, 23), (21, 23), (22, 23), (23, 24)):
             put(g, x, y, line)
     else:
@@ -424,6 +470,7 @@ def slide(p):
         put(g, 5, 18, p["face"])
     put(g, 7, 21, p["cheek"])
     put(g, 8, 21, p["cheek"])
+    speckle(g, p, (5, 14, 0, 16), (16, 22))
     outline(g)
     marks(g, [(x, 16) for x in range(22, 27)] + [(x, 19) for x in range(28, 32)] + [(x, 30) for x in range(18, 25)])
     return g
@@ -528,14 +575,15 @@ def main(argv):
     names = argv[1:] or list(SPECIES)
     out.mkdir(parents=True, exist_ok=True)
     for name in names:
-        fs = frames(SPECIES[name])
-        for frame, g in fs:
-            if out.suffix == ".xcassets":
-                write_imageset(out, f"{name}_{frame}", g)
-            else:
-                (out / f"{name}_{frame}.png").write_bytes(png_bytes(transparent(g), W, H))
-        if out.suffix != ".xcassets":
-            write_sheet(out / f"{name}_sheet.png", fs)
+        for coat in COATS[name]:
+            fs = frames(palette(name, coat))
+            for frame, g in fs:
+                if out.suffix == ".xcassets":
+                    write_imageset(out, f"{name}_{coat}_{frame}", g)
+                else:
+                    (out / f"{name}_{coat}_{frame}.png").write_bytes(png_bytes(transparent(g), W, H))
+            if out.suffix != ".xcassets":
+                write_sheet(out / f"{name}_{coat}_sheet.png", fs)
 
 
 if __name__ == "__main__":

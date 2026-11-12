@@ -9,8 +9,16 @@
 
 | 置き場所 | 中身 |
 | --- | --- |
-| `scripts/companion-art.py` | 相棒の絵を描くスクリプト。種ごとに 9 枚の 32×32 px の PNG を書く |
-| `ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Companions.xcassets` | 描いた絵。名前は `<種>_<動き>` で、種は `penguin`・`tanuki`・`shiba` |
+| `scripts/companion-art.py` | 相棒の絵を描くスクリプト。種と毛の色ごとに 9 枚の 32×32 px の PNG を書く |
+| `ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Companions.xcassets` | 描いた絵。名前は `<種>_<色>_<動き>` にする |
+
+絵の名前の種と色は、次のとおりである。
+
+| 種 | 色 |
+| --- | --- |
+| `shiba` | `red`・`black`・`white`・`sesame` |
+| `tanuki` | `brown`・`dark`・`gray`・`white` |
+| `penguin` | `gray`・`black`・`emperor`・`king` |
 
 絵を描き直す時は、次のコマンドを走らせる。種を省くと、すべての種を描く。
 
