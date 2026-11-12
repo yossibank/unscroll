@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import SwiftUI
 
@@ -40,12 +41,36 @@ private extension SettingsView {
 
     var companionSection: some View {
         Section("相棒") {
-            HStack {
-                Text("フェネックの ふく")
+            NavigationLink {
+                CompanionPickerView(
+                    model: model.makeCompanionPicker(),
+                    isFirstTime: false,
+                    onSaved: {
+                        model.refresh()
+                    }
+                )
+            } label: {
+                HStack(spacing: Spacing.small + 4) {
+                    if let companion = model.companion {
+                        CompanionSticker(
+                            companion: companion,
+                            pose: .walk,
+                            size: 40,
+                            breathes: false
+                        )
 
-                Spacer()
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(companion.name)
+                                .foregroundStyle(Palette.ink)
 
-                ProvisionalMark()
+                            Text(companion.kindLabel)
+                                .font(.caption)
+                                .foregroundStyle(Palette.muted)
+                        }
+                    } else {
+                        Text("相棒を選ぶ")
+                    }
+                }
             }
         }
     }
