@@ -2,7 +2,6 @@ import Core
 import DeviceActivity
 import FamilyControls
 import Foundation
-import ManagedSettings
 import Observation
 import Store
 
@@ -29,10 +28,6 @@ public final class RoomModel {
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored private let now: @MainActor () -> Date
     @ObservationIgnored private let center = DeviceActivityCenter()
-
-    @ObservationIgnored private let store = ManagedSettingsStore(
-        named: ManagedSettingsStore.Name(ScreenTimeShared.focusStoreName)
-    )
 
     public init(
         database: AppDatabase,
@@ -140,7 +135,7 @@ public extension RoomModel {
         let minutes = selectedMinutes
         let start = now()
         let end = start.addingTimeInterval(TimeInterval(minutes * 60))
-        let schedule = makeSchedule(from: start, to: end)
+        let schedule = FocusShield.schedule(from: start, to: end)
 
         let trip: Trip
 
@@ -152,7 +147,7 @@ public extension RoomModel {
             return
         }
 
-        shieldSelection(BlockedApps.load())
+        FocusShield.startTrip(endsAt: end)
 
         do {
             try center.startMonitoring(
@@ -161,7 +156,7 @@ public extension RoomModel {
             )
             EventLog.append("旅：開始（\(minutes) 分）")
         } catch {
-            store.clearAllSettings()
+            FocusShield.endTrip()
             try? database.endTrip(trip.id, at: start)
             defaults.set(trip.id.description, forKey: Self.acknowledgedTripKey)
             EventLog.append("旅：見張りを始められない（\(error.localizedDescription)）")
@@ -179,7 +174,7 @@ public extension RoomModel {
             }
         }
 
-        store.clearAllSettings()
+        FocusShield.endTrip()
         center.stopMonitoring([DeviceActivityName(ScreenTimeShared.focusActivityName)])
         EventLog.append("旅：やめた")
         refresh()
@@ -189,7 +184,6 @@ public extension RoomModel {
 private extension RoomModel {
     static let selectedMinutesKey = "room.selectedMinutes"
     static let acknowledgedTripKey = "room.acknowledgedTripID"
-    static let shortestScheduleSeconds: TimeInterval = 15 * 60
 
     func recordArrivals() {
         do {
@@ -226,33 +220,5 @@ private extension RoomModel {
         if let lastTrip = progress.lastTrip, lastID != acknowledged {
             finishedTrip = lastTrip
         }
-    }
-
-    func shieldSelection(_ selection: FamilyActivitySelection) {
-        let apps = selection.applicationTokens
-        let categories = selection.categoryTokens
-        let domains = selection.webDomainTokens
-
-        store.shield.applications = apps.isEmpty ? nil : apps
-        store.shield.applicationCategories = categories.isEmpty ? nil : .specific(categories)
-        store.shield.webDomains = domains.isEmpty ? nil : domains
-    }
-
-    func makeSchedule(
-        from start: Date,
-        to end: Date
-    ) -> DeviceActivitySchedule {
-        let components: Set<Calendar.Component> = [.hour, .minute, .second]
-        let calendar = Calendar.current
-        let minimum = start.addingTimeInterval(Self.shortestScheduleSeconds)
-        let intervalEnd = max(end, minimum)
-        let early = Int(intervalEnd.timeIntervalSince(end))
-
-        return DeviceActivitySchedule(
-            intervalStart: calendar.dateComponents(components, from: start),
-            intervalEnd: calendar.dateComponents(components, from: intervalEnd),
-            repeats: false,
-            warningTime: early > 0 ? DateComponents(second: early) : nil
-        )
     }
 }

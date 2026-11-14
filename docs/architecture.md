@@ -32,12 +32,12 @@ python3 -I scripts/companion-art.py ios/Packages/UnscrollApp/Sources/DesignSyste
 
 | フォルダ | ターゲット | Bundle ID | 役割 | App Group |
 | --- | --- | --- | --- | --- |
-| `ios/UnscrollMonitor/` | `UnscrollMonitorExtension` | `com.yossibank.unscroll.monitor` | 見張りの始まり・終わり・区切りを記録に書く。旅の終わりに止めたアプリを戻す（15 分より短い旅は、終わる前の知らせで戻す） | 使う |
+| `ios/UnscrollMonitor/` | `UnscrollMonitorExtension` | `com.yossibank.unscroll.monitor` | 旅の終わりに止めたアプリを戻す（15 分より短い旅は、終わる前の知らせで戻す）。1 分開いたアプリを止め直す | 使う |
 | `ios/UnscrollReport/` | `UnscrollReportExtension` | `com.yossibank.unscroll.report` | 今日の使用時間を描く。数字はアプリに渡らない | |
-| `ios/UnscrollShield/` | `UnscrollShieldExtension` | `com.yossibank.unscroll.shield` | 止めたアプリを開いた時の画面の文字と色 | |
-| `ios/UnscrollShieldAction/` | `UnscrollShieldActionExtension` | `com.yossibank.unscroll.shieldaction` | 止めた画面のボタンを記録に書く | 使う |
+| `ios/UnscrollShield/` | `UnscrollShieldExtension` | `com.yossibank.unscroll.shield` | 止めたアプリを開いた時の画面の文字と色。押した時刻を読み、下のボタンの文字を替える | 使う |
+| `ios/UnscrollShieldAction/` | `UnscrollShieldActionExtension` | `com.yossibank.unscroll.shieldaction` | 止めた画面のボタンで、10 秒の待ちと 1 分開くを決める | 使う |
 
-アプリと拡張が共有する名前と記録は、Core の `ScreenTime/` にある。
+アプリと拡張が共有する名前・記録・止め方は、Core の `ScreenTime/` にある。止め方は Screen Time の API を使うので、iOS だけで組む。
 
 ## 🔧 権限と署名
 
@@ -59,6 +59,10 @@ Family Controls の権限を、アプリと 4 つの拡張に付けている。
 | 使用時間の区切りが届き、見張りの拡張から App Group に書く | ✅ 書けた |
 | 集中の時間が来ると、見張りの拡張が止めを外す | ✅ 外れた |
 | 今日の使用時間を、使用時間の拡張が描く | ✅ 出た |
+| 止めた画面の拡張から、App Group の値と DB を読む | ✅ 読めた |
+| 止めた画面のボタンを押した後に、止めた画面を描き直す | ✅ 描き直した |
+| 1 分開いた後に、見張りの終わる前の知らせで止め直す | ✅ 約 1 分で止め直した |
+| 見張りを途中で止めると、終わりの知らせが届く | ✅ 届いた |
 
 > [!WARNING]
 > - シミュレーターで許可と見張りが動くかは、確かめていない

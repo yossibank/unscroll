@@ -9,14 +9,7 @@ enum BlockedApps {
     }
 
     static func load() -> FamilyActivitySelection {
-        guard
-            let data = defaults?.data(forKey: ScreenTimeShared.selectionKey),
-            let saved = try? JSONDecoder().decode(FamilyActivitySelection.self, from: data)
-        else {
-            return FamilyActivitySelection()
-        }
-
-        return saved
+        FocusShield.savedSelection()
     }
 
     static func save(_ selection: FamilyActivitySelection) {
