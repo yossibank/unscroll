@@ -32,7 +32,11 @@ public struct JourneyMapView: View {
             .onAppear {
                 model.refresh()
             }
-            .onChange(of: scenePhase) {
+            .onChange(of: scenePhase) { _, newPhase in
+                guard newPhase == .active else {
+                    return
+                }
+
                 model.refresh()
             }
             .refreshable {
