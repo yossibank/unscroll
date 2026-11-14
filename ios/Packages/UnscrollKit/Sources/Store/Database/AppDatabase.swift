@@ -21,6 +21,16 @@ public extension AppDatabase {
         return try AppDatabase(pool)
     }
 
+    static func appGroupReader() throws -> AppDatabase {
+        let path = try groupPath()
+        var configuration = configuration
+
+        configuration.readonly = true
+
+        let pool = try DatabasePool(path: path, configuration: configuration)
+        return AppDatabase(reading: pool)
+    }
+
     static func inMemory() throws -> AppDatabase {
         let queue = try DatabaseQueue(configuration: configuration)
         return try AppDatabase(queue)
@@ -72,6 +82,10 @@ private extension AppDatabase {
         configuration.busyMode = .timeout(busyTimeout)
 
         return configuration
+    }
+
+    init(reading writer: any DatabaseWriter) {
+        self.writer = writer
     }
 
     static func groupPath() throws -> String {

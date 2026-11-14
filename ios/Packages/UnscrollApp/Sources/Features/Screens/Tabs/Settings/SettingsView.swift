@@ -109,13 +109,20 @@ private extension SettingsView {
     }
 
     var difficultySection: some View {
-        Section("外しにくさ") {
-            HStack {
-                Text("ふつう（10 秒待つ）")
-
-                Spacer()
-
-                ProvisionalMark()
+        Section {
+            Picker("外しにくさ", selection: $model.strictness) {
+                ForEach(Strictness.allCases, id: \.self) { strictness in
+                    Text(label(for: strictness))
+                }
+            }
+            .pickerStyle(.inline)
+            .labelsHidden()
+            .disabled(model.isTripActive)
+        } header: {
+            Text("外しにくさ")
+        } footer: {
+            if model.isTripActive {
+                Text("旅が終わったら変えられます")
             }
         }
     }
@@ -132,6 +139,16 @@ private extension SettingsView {
             } label: {
                 LabeledContent("記録を見る", value: "\(model.logLines.count) 行")
             }
+        }
+    }
+}
+
+private extension SettingsView {
+    func label(for strictness: Strictness) -> String {
+        switch strictness {
+        case .gentle: "やさしい（1 分だけ開ける）"
+        case .normal: "ふつう（10 秒待つ）"
+        case .strict: "きびしい（終わるまで開けない）"
         }
     }
 }

@@ -11,6 +11,10 @@ let package = Package(
         .library(
             name: "AppFeature",
             targets: ["AppFeature"]
+        ),
+        .library(
+            name: "DesignSystem",
+            targets: ["DesignSystem"]
         )
     ],
     dependencies: [
