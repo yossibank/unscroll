@@ -1,12 +1,8 @@
 import Core
 import DeviceActivity
-import ManagedSettings
+import Foundation
 
 final class UnscrollMonitor: DeviceActivityMonitor {
-    private let store = ManagedSettingsStore(
-        named: ManagedSettingsStore.Name(ScreenTimeShared.focusStoreName)
-    )
-
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)
 
@@ -16,21 +12,15 @@ final class UnscrollMonitor: DeviceActivityMonitor {
     override func intervalDidEnd(for activity: DeviceActivityName) {
         super.intervalDidEnd(for: activity)
 
-        if activity.rawValue == ScreenTimeShared.focusActivityName {
-            store.clearAllSettings()
-        }
-
+        finish(activity)
         EventLog.append("見張り：終わり（\(activity.rawValue)）")
     }
 
     override func intervalWillEndWarning(for activity: DeviceActivityName) {
         super.intervalWillEndWarning(for: activity)
 
-        if activity.rawValue == ScreenTimeShared.focusActivityName {
-            store.clearAllSettings()
-        }
-
-        EventLog.append("見張り：短い旅の終わり（\(activity.rawValue)）")
+        finish(activity)
+        EventLog.append("見張り：短い区切りの終わり（\(activity.rawValue)）")
     }
 
     override func eventDidReachThreshold(
@@ -40,5 +30,26 @@ final class UnscrollMonitor: DeviceActivityMonitor {
         super.eventDidReachThreshold(event, activity: activity)
 
         EventLog.append("見張り：区切りに届いた（\(event.rawValue)）")
+    }
+}
+
+private extension UnscrollMonitor {
+    func finish(_ activity: DeviceActivityName) {
+        switch activity.rawValue {
+        case ScreenTimeShared.focusActivityName:
+            FocusShield.endTrip()
+
+        case ScreenTimeShared.unlockActivityName:
+            let message = switch FocusShield.reshieldIfTripContinues(at: .now) {
+            case .done: "止めた画面：止め直した"
+            case .stillOpen: "止めた画面：まだ開いている時間"
+            case .tripEnded: "止めた画面：旅が終わっていた"
+            }
+
+            EventLog.append(message)
+
+        default:
+            break
+        }
     }
 }

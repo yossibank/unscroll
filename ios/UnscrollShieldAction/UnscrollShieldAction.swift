@@ -1,4 +1,5 @@
 import Core
+import Foundation
 import ManagedSettings
 
 final class UnscrollShieldAction: ShieldActionDelegate {
@@ -7,7 +8,7 @@ final class UnscrollShieldAction: ShieldActionDelegate {
         for application: ApplicationToken,
         completionHandler: @escaping (ShieldActionResponse) -> Void
     ) {
-        completionHandler(respond(to: action))
+        completionHandler(respond(to: action, for: .application(application)))
     }
 
     override func handle(
@@ -15,7 +16,7 @@ final class UnscrollShieldAction: ShieldActionDelegate {
         for webDomain: WebDomainToken,
         completionHandler: @escaping (ShieldActionResponse) -> Void
     ) {
-        completionHandler(respond(to: action))
+        completionHandler(respond(to: action, for: .webDomain(webDomain)))
     }
 
     override func handle(
@@ -23,19 +24,28 @@ final class UnscrollShieldAction: ShieldActionDelegate {
         for category: ActivityCategoryToken,
         completionHandler: @escaping (ShieldActionResponse) -> Void
     ) {
-        completionHandler(respond(to: action))
+        completionHandler(respond(to: action, for: .category(category)))
     }
 }
 
 private extension UnscrollShieldAction {
-    func respond(to action: ShieldAction) -> ShieldActionResponse {
+    func respond(
+        to action: ShieldAction,
+        for target: FocusShield.Target
+    ) -> ShieldActionResponse {
         switch action {
         case .primaryButtonPressed:
             EventLog.append("止めた画面：集中に戻る")
             return .close
 
         case .secondaryButtonPressed:
-            EventLog.append("止めた画面：1 分だけ開く（試作では開かない）")
+            let message = switch FocusShield.press(target, at: .now) {
+            case .startWaiting: "止めた画面：10 秒待ち始めた"
+            case .keepWaiting: "止めた画面：まだ 10 秒たっていない"
+            case .open: "止めた画面：1 分開いた"
+            }
+
+            EventLog.append(message)
             return .defer
 
         @unknown default:

@@ -1,3 +1,4 @@
+import Core
 import ManagedSettings
 import ManagedSettingsUI
 import UIKit
@@ -32,6 +33,7 @@ private extension UnscrollShield {
         let coral = UIColor(red: 1, green: 0.48, blue: 0.35, alpha: 1)
         let soft = UIColor(white: 0.8, alpha: 1)
         let subtitle = "\(name ?? "このアプリ")は、集中が終わるまで止めています。"
+        let secondary = FocusShield.pressedAt == nil ? "10 秒待って開く" : "10 秒後にもう一度押してね"
 
         return ShieldConfiguration(
             backgroundBlurStyle: .systemUltraThinMaterialDark,
@@ -41,7 +43,7 @@ private extension UnscrollShield {
             subtitle: ShieldConfiguration.Label(text: subtitle, color: soft),
             primaryButtonLabel: ShieldConfiguration.Label(text: "集中に戻る", color: .white),
             primaryButtonBackgroundColor: coral,
-            secondaryButtonLabel: ShieldConfiguration.Label(text: "1 分だけ開く（元気 −5）", color: soft)
+            secondaryButtonLabel: ShieldConfiguration.Label(text: secondary, color: soft)
         )
     }
 }
