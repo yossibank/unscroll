@@ -3,8 +3,6 @@ import Store
 import SwiftUI
 
 public struct RootView: View {
-    @Environment(\.scenePhase) private var scenePhase
-
     @State private var phase = Phase.loading
 
     public init() {}
@@ -14,8 +12,13 @@ public struct RootView: View {
             .task {
                 openDatabase()
             }
-            .onChange(of: scenePhase) {
-                followScenePhase()
+            .onReceive(NotificationCenter.default
+                .publisher(for: UIApplication.didEnterBackgroundNotification)) { _ in
+                    AppDatabase.suspend()
+            }
+            .onReceive(NotificationCenter.default
+                .publisher(for: UIApplication.willEnterForegroundNotification)) { _ in
+                    AppDatabase.resume()
             }
     }
 }
@@ -53,19 +56,6 @@ private extension RootView {
             phase = .ready(database)
         } catch {
             phase = .failed(error.localizedDescription)
-        }
-    }
-
-    func followScenePhase() {
-        switch scenePhase {
-        case .background:
-            AppDatabase.suspend()
-
-        case .active:
-            AppDatabase.resume()
-
-        default:
-            break
         }
     }
 }
