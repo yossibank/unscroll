@@ -12,14 +12,14 @@ final class UnscrollMonitor: DeviceActivityMonitor {
     override func intervalDidEnd(for activity: DeviceActivityName) {
         super.intervalDidEnd(for: activity)
 
-        finish(activity)
+        finish(activity, checksOpenUntil: true)
         EventLog.append("見張り：終わり（\(activity.rawValue)）")
     }
 
     override func intervalWillEndWarning(for activity: DeviceActivityName) {
         super.intervalWillEndWarning(for: activity)
 
-        finish(activity)
+        finish(activity, checksOpenUntil: false)
         EventLog.append("見張り：短い区切りの終わり（\(activity.rawValue)）")
     }
 
@@ -34,13 +34,21 @@ final class UnscrollMonitor: DeviceActivityMonitor {
 }
 
 private extension UnscrollMonitor {
-    func finish(_ activity: DeviceActivityName) {
+    func finish(
+        _ activity: DeviceActivityName,
+        checksOpenUntil: Bool
+    ) {
         switch activity.rawValue {
         case ScreenTimeShared.focusActivityName:
             FocusShield.endTrip()
 
         case ScreenTimeShared.unlockActivityName:
-            let message = switch FocusShield.reshieldIfTripContinues(at: .now) {
+            let result = FocusShield.reshieldIfTripContinues(
+                at: .now,
+                checksOpenUntil: checksOpenUntil
+            )
+
+            let message = switch result {
             case .done: "止めた画面：止め直した"
             case .stillOpen: "止めた画面：まだ開いている時間"
             case .tripEnded: "止めた画面：旅が終わっていた"

@@ -7,7 +7,9 @@ public enum ShieldUnlock: Equatable, Sendable {
 
     public static let openUntilKey = "shield.openUntil"
     public static let pressedAtKey = "shield.pressedAt"
+    public static let pressedTargetKey = "shield.pressedTarget"
     public static let waitSeconds: TimeInterval = 10
+    public static let staleSeconds: TimeInterval = 60
     public static let openSeconds: TimeInterval = 60
 
     public init(
@@ -21,7 +23,7 @@ public enum ShieldUnlock: Equatable, Sendable {
 
         let waited = now.timeIntervalSince(pressedAt)
 
-        if waited < 0 {
+        if waited < 0 || waited > Self.staleSeconds {
             self = .startWaiting
         } else if waited < Self.waitSeconds {
             self = .keepWaiting

@@ -11,19 +11,14 @@ public enum FocusShield {
         case tripEnded
     }
 
-    public enum Target {
+    public enum Target: Codable, Equatable {
         case application(ApplicationToken)
-        case category(ActivityCategoryToken)
         case webDomain(WebDomainToken)
     }
 
     public static let shortestScheduleSeconds: TimeInterval = 15 * 60
 
     private static let reshieldToleranceSeconds: TimeInterval = 5
-
-    public static var pressedAt: Date? {
-        defaults?.object(forKey: ShieldUnlock.pressedAtKey) as? Date
-    }
 
     private static var unlockName: DeviceActivityName {
         DeviceActivityName(ScreenTimeShared.unlockActivityName)
@@ -50,30 +45,40 @@ public enum FocusShield {
 
     public static func startTrip(endsAt end: Date) {
         defaults?.set(end, forKey: ScreenTimeShared.focusEndsAtKey)
-        defaults?.removeObject(forKey: ShieldUnlock.pressedAtKey)
 
+        clearPress()
         shield(savedSelection())
     }
 
     public static func endTrip() {
         defaults?.removeObject(forKey: ScreenTimeShared.focusEndsAtKey)
         defaults?.removeObject(forKey: ShieldUnlock.openUntilKey)
-        defaults?.removeObject(forKey: ShieldUnlock.pressedAtKey)
 
+        clearPress()
         store.clearAllSettings()
 
         DeviceActivityCenter().stopMonitoring([unlockName])
+    }
+
+    public static func isWaiting(
+        for target: Target?,
+        at now: Date
+    ) -> Bool {
+        ShieldUnlock(pressedAt: pressedAt(for: target), now: now) != .startWaiting
     }
 
     public static func press(
         _ target: Target,
         at now: Date
     ) -> ShieldUnlock {
-        let unlock = ShieldUnlock(pressedAt: pressedAt, now: now)
+        let unlock = ShieldUnlock(pressedAt: pressedAt(for: target), now: now)
 
         switch unlock {
         case .startWaiting:
+            let data = try? JSONEncoder().encode(target)
+
             defaults?.set(now, forKey: ShieldUnlock.pressedAtKey)
+            defaults?.set(data, forKey: ShieldUnlock.pressedTargetKey)
 
         case .keepWaiting:
             break
@@ -85,8 +90,12 @@ public enum FocusShield {
         return unlock
     }
 
-    public static func reshieldIfTripContinues(at now: Date) -> Reshield {
+    public static func reshieldIfTripContinues(
+        at now: Date,
+        checksOpenUntil: Bool
+    ) -> Reshield {
         let openUntil = defaults?.object(forKey: ShieldUnlock.openUntilKey) as? Date ?? now
+        let limit = openUntil.addingTimeInterval(-reshieldToleranceSeconds)
 
         guard
             let end = defaults?.object(forKey: ScreenTimeShared.focusEndsAtKey) as? Date,
@@ -95,7 +104,8 @@ public enum FocusShield {
             return .tripEnded
         }
 
-        guard now >= openUntil.addingTimeInterval(-reshieldToleranceSeconds) else {
+        if checksOpenUntil,
+           now < limit {
             return .stillOpen
         }
 
@@ -123,13 +133,31 @@ public enum FocusShield {
         )
     }
 
+    private static func pressedAt(for target: Target?) -> Date? {
+        guard
+            let target,
+            let data = defaults?.data(forKey: ShieldUnlock.pressedTargetKey),
+            let pressed = try? JSONDecoder().decode(Target.self, from: data),
+            pressed == target
+        else {
+            return nil
+        }
+
+        return defaults?.object(forKey: ShieldUnlock.pressedAtKey) as? Date
+    }
+
+    private static func clearPress() {
+        defaults?.removeObject(forKey: ShieldUnlock.pressedAtKey)
+        defaults?.removeObject(forKey: ShieldUnlock.pressedTargetKey)
+    }
+
     private static func shield(
         _ selection: FamilyActivitySelection,
         except target: Target? = nil
     ) {
         let store = store
         var apps = selection.applicationTokens
-        var categories = selection.categoryTokens
+        let categories = selection.categoryTokens
         var domains = selection.webDomainTokens
         var exceptApps = Set<ApplicationToken>()
 
@@ -137,9 +165,6 @@ public enum FocusShield {
         case let .application(token):
             apps.remove(token)
             exceptApps.insert(token)
-
-        case let .category(token):
-            categories.remove(token)
 
         case let .webDomain(token):
             domains.remove(token)
@@ -164,9 +189,9 @@ public enum FocusShield {
         let end = now.addingTimeInterval(ShieldUnlock.openSeconds)
         let center = DeviceActivityCenter()
 
-        defaults?.removeObject(forKey: ShieldUnlock.pressedAtKey)
         defaults?.set(end, forKey: ShieldUnlock.openUntilKey)
 
+        clearPress()
         shield(savedSelection(), except: target)
 
         center.stopMonitoring([unlockName])
