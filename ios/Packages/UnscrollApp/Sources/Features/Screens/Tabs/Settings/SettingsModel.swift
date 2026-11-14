@@ -10,6 +10,12 @@ import Store
 public final class SettingsModel {
     public var selection: FamilyActivitySelection
 
+    public var strictness: Strictness {
+        didSet {
+            FocusShield.strictness = strictness
+        }
+    }
+
     public private(set) var companion: Companion?
     public private(set) var isAuthorized = false
     public private(set) var isTripActive = false
@@ -21,6 +27,7 @@ public final class SettingsModel {
     public init(database: AppDatabase) {
         self.database = database
         self.selection = BlockedApps.load()
+        self.strictness = FocusShield.strictness
         refresh()
     }
 }

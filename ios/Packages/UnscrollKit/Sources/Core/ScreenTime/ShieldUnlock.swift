@@ -1,6 +1,7 @@
 import Foundation
 
 public enum ShieldUnlock: Equatable, Sendable {
+    case closed
     case startWaiting
     case keepWaiting
     case open
@@ -13,22 +14,38 @@ public enum ShieldUnlock: Equatable, Sendable {
     public static let openSeconds: TimeInterval = 60
 
     public init(
+        strictness: Strictness,
         pressedAt: Date?,
         now: Date
     ) {
+        switch strictness {
+        case .gentle:
+            self = .open
+
+        case .strict:
+            self = .closed
+
+        case .normal:
+            self = Self.waiting(pressedAt: pressedAt, now: now)
+        }
+    }
+
+    private static func waiting(
+        pressedAt: Date?,
+        now: Date
+    ) -> ShieldUnlock {
         guard let pressedAt else {
-            self = .startWaiting
-            return
+            return .startWaiting
         }
 
         let waited = now.timeIntervalSince(pressedAt)
 
-        if waited < 0 || waited > Self.staleSeconds {
-            self = .startWaiting
-        } else if waited < Self.waitSeconds {
-            self = .keepWaiting
+        if waited < 0 || waited > staleSeconds {
+            return .startWaiting
+        } else if waited < waitSeconds {
+            return .keepWaiting
         } else {
-            self = .open
+            return .open
         }
     }
 }

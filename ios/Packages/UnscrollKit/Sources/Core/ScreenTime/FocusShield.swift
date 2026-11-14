@@ -13,12 +13,26 @@ public enum FocusShield {
 
     public enum Target: Codable, Equatable {
         case application(ApplicationToken)
+        case category(ActivityCategoryToken)
         case webDomain(WebDomainToken)
     }
 
     public static let shortestScheduleSeconds: TimeInterval = 15 * 60
 
     private static let reshieldToleranceSeconds: TimeInterval = 5
+
+    public static var strictness: Strictness {
+        get {
+            Strictness.saved(forKey: Strictness.settingKey, in: defaults)
+        }
+        set {
+            defaults?.set(newValue.rawValue, forKey: Strictness.settingKey)
+        }
+    }
+
+    public static var tripStrictness: Strictness {
+        Strictness.saved(forKey: Strictness.tripKey, in: defaults)
+    }
 
     private static var unlockName: DeviceActivityName {
         DeviceActivityName(ScreenTimeShared.unlockActivityName)
@@ -45,6 +59,7 @@ public enum FocusShield {
 
     public static func startTrip(endsAt end: Date) {
         defaults?.set(end, forKey: ScreenTimeShared.focusEndsAtKey)
+        defaults?.set(strictness.rawValue, forKey: Strictness.tripKey)
 
         clearPress()
         shield(savedSelection())
@@ -53,7 +68,7 @@ public enum FocusShield {
     public static func endTrip() {
         defaults?.removeObject(forKey: ScreenTimeShared.focusEndsAtKey)
         defaults?.removeObject(forKey: ShieldUnlock.openUntilKey)
-
+        defaults?.removeObject(forKey: Strictness.tripKey)
         clearPress()
         store.clearAllSettings()
 
@@ -64,16 +79,33 @@ public enum FocusShield {
         for target: Target?,
         at now: Date
     ) -> Bool {
-        ShieldUnlock(pressedAt: pressedAt(for: target), now: now) != .startWaiting
+        guard tripStrictness == .normal else {
+            return false
+        }
+
+        let unlock = ShieldUnlock(
+            strictness: .normal,
+            pressedAt: pressedAt(for: target),
+            now: now
+        )
+
+        return unlock != .startWaiting
     }
 
     public static func press(
         _ target: Target,
         at now: Date
     ) -> ShieldUnlock {
-        let unlock = ShieldUnlock(pressedAt: pressedAt(for: target), now: now)
+        let unlock = ShieldUnlock(
+            strictness: tripStrictness,
+            pressedAt: pressedAt(for: target),
+            now: now
+        )
 
         switch unlock {
+        case .closed:
+            break
+
         case .startWaiting:
             let data = try? JSONEncoder().encode(target)
 
@@ -157,7 +189,7 @@ public enum FocusShield {
     ) {
         let store = store
         var apps = selection.applicationTokens
-        let categories = selection.categoryTokens
+        var categories = selection.categoryTokens
         var domains = selection.webDomainTokens
         var exceptApps = Set<ApplicationToken>()
 
@@ -165,6 +197,9 @@ public enum FocusShield {
         case let .application(token):
             apps.remove(token)
             exceptApps.insert(token)
+
+        case let .category(token):
+            categories.remove(token)
 
         case let .webDomain(token):
             domains.remove(token)
