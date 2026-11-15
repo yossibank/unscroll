@@ -35,81 +35,23 @@ public struct TripView: View {
 
 private extension TripView {
     var scenery: some View {
-        ZStack(alignment: .topTrailing) {
-            LinearGradient(
-                colors: [
-                    Color(red: 0.62, green: 0.82, blue: 0.93),
-                    Color(red: 0.96, green: 0.93, blue: 0.84)
-                ],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-
+        TimelineView(.periodic(from: .now, by: 60)) { context in
             GeometryReader { proxy in
-                let width = proxy.size.width
-                let height = proxy.size.height
+                let size = proxy.size
 
-                mountain(width: width, height: height)
-
-                Rectangle()
-                    .fill(Color(red: 0.45, green: 0.69, blue: 0.4))
-                    .frame(height: height * 0.3)
-                    .frame(maxHeight: .infinity, alignment: .bottom)
-
-                road(width: width, height: height)
+                if let landmark = sceneryLandmark(at: context.date) {
+                    TripScenery(
+                        landmark: landmark,
+                        period: DayPeriod(date: context.date)
+                    )
+                }
 
                 if let companion = model.companion {
                     CompanionSticker(companion: companion, pose: .walk, size: 96)
-                        .position(x: width / 2, y: height * 0.62)
+                        .position(x: size.width / 2, y: size.height * TripScenery.roadLine - 48)
                 }
             }
-
-            ProvisionalMark()
-                .padding(Spacing.medium)
         }
-    }
-
-    func mountain(
-        width: CGFloat,
-        height: CGFloat
-    ) -> some View {
-        let baseY = height * 0.72
-        let peak = CGPoint(x: width * 0.5, y: height * 0.2)
-        let capY = height * 0.2 + (baseY - height * 0.2) * 0.25
-        let cap = CGPoint(x: width * 0.64, y: capY)
-        let capLeft = CGPoint(x: width * 0.36, y: capY)
-
-        return ZStack {
-            Path { path in
-                path.move(to: CGPoint(x: width * 0.1, y: baseY))
-                path.addLine(to: peak)
-                path.addLine(to: CGPoint(x: width * 0.9, y: baseY))
-                path.closeSubpath()
-            }
-            .fill(Color(red: 0.42, green: 0.55, blue: 0.62))
-
-            Path { path in
-                path.move(to: capLeft)
-                path.addLine(to: peak)
-                path.addLine(to: cap)
-                path.closeSubpath()
-            }
-            .fill(Color.white)
-        }
-    }
-
-    func road(
-        width: CGFloat,
-        height: CGFloat
-    ) -> some View {
-        Path { path in
-            path.move(to: CGPoint(x: width * 0.42, y: height * 0.7))
-            path.addLine(to: CGPoint(x: width * 0.58, y: height * 0.7))
-            path.addLine(to: CGPoint(x: width * 0.8, y: height))
-            path.addLine(to: CGPoint(x: width * 0.2, y: height))
-            path.closeSubpath()
-        }
-        .fill(Color(red: 0.85, green: 0.78, blue: 0.62))
     }
 
     func panel(_ trip: Trip) -> some View {
@@ -166,6 +108,11 @@ private extension TripView {
             .font(.subheadline)
             .foregroundStyle(Palette.muted)
         }
+    }
+
+    func sceneryLandmark(at now: Date) -> Landmark? {
+        let total = model.kilometers(at: now)
+        return model.journey.nextLandmark(after: total) ?? model.journey.landmarks.last
     }
 
     func headline(at now: Date) -> String {

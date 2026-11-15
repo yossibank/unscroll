@@ -17,6 +17,14 @@ struct LandmarkArtTests {
         #expect(landmarks.allSatisfy { ($0.souvenir == nil) == ($0.souvenirArtName == nil) })
         #expect(landmarks.compactMap(\.souvenirArtName).allSatisfy { $0.hasPrefix("souvenir_") })
     }
+
+    @Test
+    func sceneryArtNamesEachLayer() throws {
+        let landmark = try #require(Journey.tokyoToKyoto.landmarks.last)
+        let names = SceneryLayer.allCases.map { landmark.sceneryArtName($0) }
+
+        #expect(names == ["trip_kiyomizu_far", "trip_kiyomizu_mid", "trip_kiyomizu_near"])
+    }
 }
 
 private extension String {
