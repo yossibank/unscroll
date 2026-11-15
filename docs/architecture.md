@@ -17,6 +17,7 @@
 | `scripts/landmark-art.py` | 名所の絵はがき。160×100 px | `Landmarks.xcassets` | `landmark_<名所>` |
 | `scripts/souvenir-art.py` | おみやげの食べ物。48×48 px | `Souvenirs.xcassets` | `souvenir_<名所>` |
 | `scripts/trip-art.py` | 旅の途中の景色。320×210 px の 3 層 | `Trips.xcassets` | `trip_<名所>_<層>` |
+| `scripts/room-art.py` | 部屋の背景。180×140 px。窓は透明 | `Rooms.xcassets` | `room_back` |
 
 名所の英字の名前は `Landmark.artName`（`Landmark+Art.swift`）で決める。景色の層は `SceneryLayer` の `far`・`mid`・`near` である。相棒の絵の名前の種と色は、次のとおりである。
 
@@ -33,7 +34,10 @@ python3 -I scripts/companion-art.py ios/Packages/UnscrollApp/Sources/DesignSyste
 python3 -I scripts/landmark-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Landmarks.xcassets
 python3 -I scripts/souvenir-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Souvenirs.xcassets
 python3 -I scripts/trip-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Trips.xcassets
+python3 -I scripts/room-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Rooms.xcassets
 ```
+
+部屋の絵の窓・紐・棚・座布団の位置は、`RoomScene.swift` の座標とそろえる。
 
 ## 🪟 Screen Time の拡張
 

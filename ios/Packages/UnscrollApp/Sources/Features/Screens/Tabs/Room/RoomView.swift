@@ -201,50 +201,17 @@ private extension RoomView {
     }
 
     var scene: some View {
-        ZStack(alignment: .bottom) {
-            VStack(spacing: 0) {
-                wall
-
-                Spacer()
-
-                Palette.floor
-                    .frame(height: 64)
-                    .overlay(alignment: .top) {
-                        Palette.floorEdge
-                            .frame(height: 4)
-                    }
+        RoomScene(
+            companion: model.companion,
+            pose: pose,
+            window: model.nextLandmark ?? model.journey.landmarks.last,
+            postcards: model.decoratedArrivals.map(\.landmark),
+            nextRemaining: model.kilometersToNext,
+            souvenirs: model.arrivals.map(\.landmark).filter { $0.souvenir != nil },
+            onPoke: {
+                poke()
             }
-
-            if let companion = model.companion {
-                Button {
-                    poke()
-                } label: {
-                    CompanionSticker(companion: companion, pose: pose, size: 128)
-                }
-                .buttonStyle(.plain)
-                .padding(.bottom, Spacing.medium)
-            }
-        }
-        .frame(height: 280)
-        .background(Palette.wall)
-    }
-
-    var wall: some View {
-        ScrollView(.horizontal) {
-            HStack(alignment: .top, spacing: Spacing.small + 4) {
-                ForEach(model.decoratedArrivals, id: \.landmark.name) { arrival in
-                    wallPostcard(arrival)
-                }
-
-                if let remaining = model.kilometersToNext {
-                    nextPostcardSlot(remaining)
-                }
-            }
-            .padding(.horizontal, Spacing.medium)
-            .padding(.vertical, Spacing.small + 4)
-        }
-        .scrollIndicators(.hidden)
-        .scrollBounceBehavior(.basedOnSize)
+        )
     }
 
     var tripCard: some View {
@@ -292,39 +259,6 @@ private extension RoomView {
                     .frame(height: 240)
             }
         }
-    }
-
-    func nextPostcardSlot(_ remaining: Int) -> some View {
-        VStack(spacing: 2) {
-            Text("次の絵はがき")
-            Text("あと \(remaining) km")
-        }
-        .font(.caption2)
-        .foregroundStyle(Palette.muted)
-        .lineLimit(1)
-        .minimumScaleFactor(0.8)
-        .frame(width: 84, height: 72)
-        .overlay {
-            RoundedRectangle(cornerRadius: 4)
-                .stroke(Palette.floorEdge, style: StrokeStyle(lineWidth: 2, dash: [6, 4]))
-        }
-    }
-
-    func wallPostcard(_ arrival: Arrival) -> some View {
-        VStack(spacing: 4) {
-            PostcardArt(landmark: arrival.landmark)
-                .frame(width: 72)
-
-            Text(arrival.landmark.name)
-                .font(.caption2.bold())
-                .foregroundStyle(Palette.ink)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-        }
-        .padding(6)
-        .background(Palette.card, in: RoundedRectangle(cornerRadius: 4))
-        .shadow(color: Palette.ink.opacity(0.18), radius: 2, x: 0, y: 2)
-        .rotationEffect(.degrees(arrival.landmark.kilometer.isMultiple(of: 20) ? -2 : 2))
     }
 
     func lengthButton(_ minutes: Int) -> some View {

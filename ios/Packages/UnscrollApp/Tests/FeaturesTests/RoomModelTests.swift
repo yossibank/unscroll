@@ -24,6 +24,18 @@ struct RoomModelTests {
     }
 
     @Test
+    func listsArrivalsWithoutDecorating() throws {
+        let database = try AppDatabase.inMemory()
+        _ = try database.startTrip(minutes: 90, at: fixedNow.addingTimeInterval(-100 * 60))
+        let model = RoomModel(database: database, defaults: makeDefaults(), now: { fixedNow })
+
+        model.refresh()
+
+        #expect(model.arrivals.map(\.landmark.name) == ["芦ノ湖"])
+        #expect(model.decoratedArrivals.isEmpty)
+    }
+
+    @Test
     func showsActiveTrip() throws {
         let database = try AppDatabase.inMemory()
         _ = try database.startTrip(minutes: 25, at: fixedNow.addingTimeInterval(-5 * 60))
