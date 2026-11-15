@@ -135,7 +135,7 @@ private extension PostcardAlbumView {
                         .font(.system(size: 28, weight: .bold, design: .rounded))
                         .foregroundStyle(Palette.muted.opacity(0.6))
                 }
-                .aspectRatio(4 / 3, contentMode: .fit)
+                .aspectRatio(LandmarkArt.aspectRatio, contentMode: .fit)
 
             Text(entry.landmark.name)
                 .font(.subheadline.bold())

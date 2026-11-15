@@ -312,12 +312,8 @@ private extension RoomView {
 
     func wallPostcard(_ arrival: Arrival) -> some View {
         VStack(spacing: 4) {
-            PostcardArt(
-                landmark: arrival.landmark,
-                symbolFont: .title3,
-                showsProvisionalMark: false
-            )
-            .frame(width: 72)
+            PostcardArt(landmark: arrival.landmark)
+                .frame(width: 72)
 
             Text(arrival.landmark.name)
                 .font(.caption2.bold())

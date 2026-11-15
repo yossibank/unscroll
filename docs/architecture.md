@@ -3,16 +3,21 @@
 > [!NOTE]
 > 共通の形から外れた点と、ID など Unscroll だけの事実が分かる。共通の形は claude-config の `docs/app/ios-architecture.md` にある。
 
-## 🖥️ 相棒の絵
+## 🖥️ ドット絵
 
-相棒のドット絵は、DesignSystem の資源に置く。絵はスクリプトで描き、手で直さない。決め方は [相棒の決定](decisions/companion.md) にある。
+相棒・名所・おみやげのドット絵は、DesignSystem の資源に置く。絵はスクリプトで描き、手で直さない。決め方は[相棒の決定](decisions/companion.md)と[名所の決定](decisions/landmark.md)にある。
 
-| 置き場所 | 中身 |
-| --- | --- |
-| `scripts/companion-art.py` | 相棒の絵を描くスクリプト。種と毛の色ごとに 9 枚の 32×32 px の PNG を書く |
-| `ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Companions.xcassets` | 描いた絵。名前は `<種>_<色>_<動き>` にする |
+資源は、すべて次のフォルダの下に置く。
 
-絵の名前の種と色は、次のとおりである。
+- `ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/`
+
+| スクリプト | 描く絵 | 置き場所 | 名前 |
+| --- | --- | --- | --- |
+| `scripts/companion-art.py` | 相棒。種と毛の色ごとに 9 枚の 32×32 px | `Companions.xcassets` | `<種>_<色>_<動き>` |
+| `scripts/landmark-art.py` | 名所の絵はがき。160×100 px | `Landmarks.xcassets` | `landmark_<名所>` |
+| `scripts/souvenir-art.py` | おみやげの食べ物。48×48 px | `Souvenirs.xcassets` | `souvenir_<名所>` |
+
+名所の英字の名前は `Landmark.artName`（`Landmark+Art.swift`）で決める。相棒の絵の名前の種と色は、次のとおりである。
 
 | 種 | 色 |
 | --- | --- |
@@ -20,10 +25,12 @@
 | `tanuki` | `brown`・`dark`・`gray`・`white` |
 | `penguin` | `gray`・`black`・`emperor`・`king` |
 
-絵を描き直す時は、次のコマンドを走らせる。種を省くと、すべての種を描く。
+絵を描き直す時は、次のコマンドを走らせる。種や名所を省くと、すべてを描く。出力先を `.xcassets` でないフォルダにすると、並べた見本も書く。
 
 ```sh
 python3 -I scripts/companion-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Companions.xcassets
+python3 -I scripts/landmark-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Landmarks.xcassets
+python3 -I scripts/souvenir-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Souvenirs.xcassets
 ```
 
 ## 🪟 Screen Time の拡張

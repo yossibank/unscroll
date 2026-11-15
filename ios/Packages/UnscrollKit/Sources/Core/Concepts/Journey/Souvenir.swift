@@ -2,17 +2,17 @@ public extension Landmark {
     var souvenir: String? {
         switch name {
         case "芦ノ湖":
-            "寄木細工のコースター"
+            "大涌谷の黒たまご"
         case "三保の松原":
-            "静岡のお茶"
+            "静岡おでん"
         case "浜名湖":
-            "浜名湖ののり"
+            "うな重"
         case "名古屋城":
-            "しゃちほこの置物"
+            "天むす"
         case "琵琶湖":
-            "信楽焼のたぬき"
+            "鮎の塩焼き"
         case "清水寺":
-            "清水焼の湯のみ"
+            "生八ッ橋"
         default:
             nil
         }
