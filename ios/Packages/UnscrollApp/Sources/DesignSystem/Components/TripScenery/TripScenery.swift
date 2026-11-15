@@ -6,18 +6,21 @@ public struct TripScenery: View {
 
     private let landmark: Landmark
     private let period: DayPeriod
+    private let isMoving: Bool
 
     public init(
         landmark: Landmark,
-        period: DayPeriod
+        period: DayPeriod,
+        isMoving: Bool = true
     ) {
         self.landmark = landmark
         self.period = period
+        self.isMoving = isMoving
     }
 
     public var body: some View {
-        TimelineView(.animation(paused: reduceMotion)) { context in
-            let seconds = context.date.timeIntervalSinceReferenceDate
+        TimelineView(.animation(paused: reduceMotion || !isMoving)) { context in
+            let seconds = isMoving ? context.date.timeIntervalSinceReferenceDate : 0
 
             GeometryReader { proxy in
                 ZStack {
