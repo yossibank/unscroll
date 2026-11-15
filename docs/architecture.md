@@ -16,8 +16,9 @@
 | `scripts/companion-art.py` | 相棒。種と毛の色ごとに 9 枚の 32×32 px | `Companions.xcassets` | `<種>_<色>_<動き>` |
 | `scripts/landmark-art.py` | 名所の絵はがき。160×100 px | `Landmarks.xcassets` | `landmark_<名所>` |
 | `scripts/souvenir-art.py` | おみやげの食べ物。48×48 px | `Souvenirs.xcassets` | `souvenir_<名所>` |
+| `scripts/trip-art.py` | 旅の途中の景色。320×210 px の 3 層 | `Trips.xcassets` | `trip_<名所>_<層>` |
 
-名所の英字の名前は `Landmark.artName`（`Landmark+Art.swift`）で決める。相棒の絵の名前の種と色は、次のとおりである。
+名所の英字の名前は `Landmark.artName`（`Landmark+Art.swift`）で決める。景色の層は `SceneryLayer` の `far`・`mid`・`near` である。相棒の絵の名前の種と色は、次のとおりである。
 
 | 種 | 色 |
 | --- | --- |
@@ -31,6 +32,7 @@
 python3 -I scripts/companion-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Companions.xcassets
 python3 -I scripts/landmark-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Landmarks.xcassets
 python3 -I scripts/souvenir-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Souvenirs.xcassets
+python3 -I scripts/trip-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Trips.xcassets
 ```
 
 ## 🪟 Screen Time の拡張
