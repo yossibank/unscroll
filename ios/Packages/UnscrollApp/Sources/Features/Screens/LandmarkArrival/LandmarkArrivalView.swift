@@ -3,10 +3,10 @@ import DesignSystem
 import SwiftUI
 
 public struct LandmarkArrivalView: View {
+    @State private var isDecorated: Bool
+
     private let arrival: Arrival
     private let onDecorate: (Bool) -> Void
-
-    @State private var isDecorated: Bool
 
     public init(
         arrival: Arrival,
@@ -30,8 +30,9 @@ public struct LandmarkArrivalView: View {
 
                 postcard
 
-                if let souvenir = arrival.landmark.souvenir {
-                    souvenirCard(souvenir)
+                if let art = SouvenirArt(landmark: arrival.landmark, size: 64),
+                   let souvenir = arrival.landmark.souvenir {
+                    souvenirCard(souvenir, art: art)
                 }
 
                 decorateButton
@@ -58,7 +59,7 @@ private extension LandmarkArrivalView {
 
     var postcard: some View {
         VStack(alignment: .leading, spacing: Spacing.small) {
-            PostcardArt(landmark: arrival.landmark, symbolFont: .system(size: 64))
+            PostcardArt(landmark: arrival.landmark)
 
             Text("絵はがき")
                 .font(.caption.bold())
@@ -68,30 +69,6 @@ private extension LandmarkArrivalView {
         .background(Palette.card, in: RoundedRectangle(cornerRadius: 12))
         .rotationEffect(.degrees(-1.5))
         .padding(.horizontal, Spacing.small)
-    }
-
-    func souvenirCard(_ souvenir: String) -> some View {
-        HStack(spacing: Spacing.small) {
-            Image(systemName: "gift.fill")
-                .font(.title2)
-                .foregroundStyle(Palette.coral)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("おみやげ")
-                    .font(.caption)
-                    .foregroundStyle(Palette.muted)
-
-                Text(souvenir)
-                    .font(.headline)
-                    .foregroundStyle(Palette.ink)
-            }
-
-            Spacer()
-
-            ProvisionalMark()
-        }
-        .padding(Spacing.medium)
-        .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
     }
 
     @ViewBuilder
@@ -118,6 +95,29 @@ private extension LandmarkArrivalView {
             .buttonStyle(.borderedProminent)
             .tint(Palette.teal)
         }
+    }
+
+    func souvenirCard(
+        _ souvenir: String,
+        art: SouvenirArt
+    ) -> some View {
+        HStack(spacing: Spacing.medium) {
+            art
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("おみやげ")
+                    .font(.caption)
+                    .foregroundStyle(Palette.muted)
+
+                Text(souvenir)
+                    .font(.headline)
+                    .foregroundStyle(Palette.ink)
+            }
+
+            Spacer()
+        }
+        .padding(Spacing.medium)
+        .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
     }
 
     func setDecorated(_ value: Bool) {
