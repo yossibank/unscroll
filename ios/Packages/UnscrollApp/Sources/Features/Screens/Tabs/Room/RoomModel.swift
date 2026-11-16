@@ -56,10 +56,10 @@ public final class RoomModel {
 
 public extension RoomModel {
     #if DEBUG
-    static let tripPresets = [1, 25, 50, 90]
+    static let tripPresets = [1, 25, 45, 60, 90, 120]
     static let tripRange = 1...180
     #else
-    static let tripPresets = [25, 50, 90]
+    static let tripPresets = [15, 25, 45, 60, 90, 120]
     static let tripRange = 5...180
     #endif
 
