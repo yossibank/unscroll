@@ -60,10 +60,6 @@ private extension JourneyMapView {
             )
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("1 本目の道のり")
-                    .font(.caption.weight(.heavy))
-                    .foregroundStyle(Palette.muted)
-
                 Text(model.journey.name)
                     .font(.title3.weight(.heavy))
                     .foregroundStyle(Palette.ink)

@@ -22,11 +22,12 @@ extension Arrival: FetchableRecord, PersistableRecord {
             throw DatabaseError(message: "Invalid trip id: \(text)")
         }
 
+        let name: String = row[Columns.landmarkName]
+        let landmark = Landmark.named(name)
+            ?? Landmark(name: name, kilometer: row[Columns.kilometer], artKey: name)
+
         self.init(
-            landmark: Landmark(
-                name: row[Columns.landmarkName],
-                kilometer: row[Columns.kilometer]
-            ),
+            landmark: landmark,
             tripID: tripID,
             arrivedAt: row[Columns.arrivedAt],
             decoratedAt: row[Columns.decoratedAt]

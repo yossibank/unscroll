@@ -18,6 +18,16 @@ extension Arrival {
             .fetchAll(db)
     }
 
+    static func fetchAllInOrder(
+        _ db: Database,
+        journeyID: String
+    ) throws -> [Arrival] {
+        try Arrival
+            .filter(sql: "journeyID = ?", arguments: [journeyID])
+            .order(Columns.kilometer)
+            .fetchAll(db)
+    }
+
     static func fetchDecorated(_ db: Database) throws -> [Arrival] {
         try Arrival
             .filter(Columns.decoratedAt != nil)
@@ -36,6 +46,12 @@ public extension AppDatabase {
     func arrivals() throws -> [Arrival] {
         try writer.read { db in
             try Arrival.fetchAllInOrder(db)
+        }
+    }
+
+    func arrivals(journeyID: String) throws -> [Arrival] {
+        try writer.read { db in
+            try Arrival.fetchAllInOrder(db, journeyID: journeyID)
         }
     }
 
