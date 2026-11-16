@@ -15,6 +15,10 @@ struct JourneyMapViewTests {
     func makesCanvasBody() throws {
         let model = try JourneyMapModel(database: AppDatabase.inMemory())
 
-        _ = JourneyMapCanvas(journey: model.journey, kilometers: model.kilometers).body
+        _ = JourneyMapCanvas(
+            journey: model.journey,
+            kilometers: model.kilometers,
+            companion: model.companion
+        ).body
     }
 }

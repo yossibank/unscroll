@@ -65,10 +65,14 @@ private extension JourneyMapView {
     }
 
     var mapFrame: some View {
-        JourneyMapCanvas(journey: model.journey, kilometers: model.kilometers)
-            .clipShape(RoundedRectangle(cornerRadius: 12))
-            .padding(Spacing.small)
-            .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
+        JourneyMapCanvas(
+            journey: model.journey,
+            kilometers: model.kilometers,
+            companion: model.companion
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+        .padding(Spacing.small)
+        .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
     }
 
     var distance: some View {
@@ -91,10 +95,15 @@ private extension JourneyMapView {
     }
 
     var nextCard: some View {
-        HStack(spacing: Spacing.small) {
-            Image(systemName: "mappin.circle.fill")
-                .font(.largeTitle)
-                .foregroundStyle(Palette.teal)
+        HStack(spacing: Spacing.medium) {
+            if model.nextLandmark == nil, let last = model.journey.landmarks.last {
+                LandmarkArt(landmark: last)
+                    .frame(width: 64)
+                    .padding(2)
+                    .background(Color.white)
+            } else {
+                hiddenPostcard(width: 68)
+            }
 
             VStack(alignment: .leading, spacing: 4) {
                 if let landmark = model.nextLandmark, let remaining = model.kilometersToNext {
@@ -135,27 +144,17 @@ private extension JourneyMapView {
 
     func stamp(_ landmark: Landmark) -> some View {
         let isReached = model.isReached(landmark)
-        let dash = StrokeStyle(lineWidth: 2, dash: [4, 3])
 
         return VStack(spacing: 4) {
             if isReached {
-                Text("U")
-                    .font(.system(size: 16, weight: .black, design: .rounded))
-                    .foregroundStyle(Palette.ink)
-                    .frame(width: 40, height: 40)
-                    .background(Palette.coral.opacity(0.2), in: Circle())
-                    .overlay {
-                        Circle().stroke(Palette.coral, lineWidth: 2)
-                    }
-                    .rotationEffect(.degrees(-8))
+                LandmarkArt(landmark: landmark)
+                    .frame(width: 64)
+                    .padding(2)
+                    .background(Color.white)
+                    .shadow(color: Palette.ink.opacity(0.15), radius: 1, y: 1)
+                    .rotationEffect(.degrees(-3))
             } else {
-                Text("?")
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
-                    .foregroundStyle(Palette.muted)
-                    .frame(width: 40, height: 40)
-                    .overlay {
-                        Circle().stroke(Palette.muted.opacity(0.5), style: dash)
-                    }
+                hiddenPostcard(width: 68)
             }
 
             Text(landmark.name)
@@ -164,7 +163,20 @@ private extension JourneyMapView {
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }
-        .frame(width: 60)
+        .frame(width: 72)
+    }
+
+    func hiddenPostcard(width: CGFloat) -> some View {
+        let dash = StrokeStyle(lineWidth: 1.5, dash: [4, 3])
+
+        return RoundedRectangle(cornerRadius: 4)
+            .stroke(Palette.muted.opacity(0.5), style: dash)
+            .overlay {
+                Text("?")
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundStyle(Palette.muted.opacity(0.6))
+            }
+            .frame(width: width, height: width / LandmarkArt.aspectRatio)
     }
 
     func note(remaining: Int) -> String {
