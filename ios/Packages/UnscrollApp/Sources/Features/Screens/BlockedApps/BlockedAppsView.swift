@@ -1,3 +1,4 @@
+import DesignSystem
 import FamilyControls
 import SwiftUI
 
@@ -11,35 +12,43 @@ public struct BlockedAppsView: View {
     }
 
     public var body: some View {
-        List {
-            Section {
-                Text("旅の間、ここで選んだアプリを止めます。選び直すと、次の旅から変わります。")
-            }
+        ScrollView {
+            VStack(alignment: .leading, spacing: Spacing.medium) {
+                Label(
+                    "旅の間、ここで選んだアプリを止めます。選び直すと、次の旅から変わります。",
+                    systemImage: "hand.raised.fill"
+                )
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(Palette.coralDeep)
+                .roundedCard(fill: LinearGradient(
+                    colors: [Palette.coralSoft, Palette.card],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ))
 
-            Section("選んでいるアプリ") {
-                ForEach(Array(model.selection.applicationTokens), id: \.self) { token in
-                    Label(token)
-                }
+                selectedCard
 
-                ForEach(Array(model.selection.categoryTokens), id: \.self) { token in
-                    Label(token)
-                }
-            }
-
-            Section {
-                Button("アプリを選ぶ") {
+                Button {
                     isPickerPresented = true
+                } label: {
+                    Label("アプリを選ぶ", systemImage: "plus.app.fill")
                 }
+                .buttonStyle(.pill)
                 .disabled(isPickerDisabled)
 
                 if model.isTripActive {
                     Text("旅の途中は選び直せません")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Palette.muted)
+                        .frame(maxWidth: .infinity)
                 }
             }
+            .padding(Spacing.medium)
         }
+        .scrollBounceBehavior(.basedOnSize)
+        .background(PaperBackdrop())
         .navigationTitle("止めるアプリ")
+        .navigationBarTitleDisplayMode(.inline)
         .onAppear {
             model.refresh()
         }
@@ -51,7 +60,48 @@ public struct BlockedAppsView: View {
 }
 
 private extension BlockedAppsView {
+    var selectedCard: some View {
+        VStack(alignment: .leading, spacing: Spacing.small + 4) {
+            CardLabel(
+                "選んでいるアプリ",
+                systemImage: "app.badge.fill",
+                tint: Palette.teal,
+                wash: Palette.tealSoft
+            ) {
+                Text(model.selectionSummary)
+                    .foregroundStyle(Palette.muted)
+            }
+
+            if isEmpty {
+                Text("まだ選んでいません")
+                    .font(.footnote.weight(.bold))
+                    .foregroundStyle(Palette.muted)
+                    .frame(maxWidth: .infinity, minHeight: 48)
+                    .background(Palette.paper, in: .rect(cornerRadius: 16))
+            }
+
+            VStack(alignment: .leading, spacing: Spacing.small) {
+                ForEach(Array(model.selection.applicationTokens), id: \.self) { token in
+                    Label(token)
+                        .font(.subheadline.weight(.bold))
+                }
+
+                ForEach(Array(model.selection.categoryTokens), id: \.self) { token in
+                    Label(token)
+                        .font(.subheadline.weight(.bold))
+                }
+            }
+        }
+        .roundedCard()
+    }
+}
+
+private extension BlockedAppsView {
     var isPickerDisabled: Bool {
         model.isTripActive || !model.isAuthorized
+    }
+
+    var isEmpty: Bool {
+        model.selection.applicationTokens.isEmpty && model.selection.categoryTokens.isEmpty
     }
 }

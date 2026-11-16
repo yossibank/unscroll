@@ -13,7 +13,7 @@
 
 | スクリプト | 描く絵 | 置き場所 | 名前 |
 | --- | --- | --- | --- |
-| `scripts/companion-art.py` | 相棒。種と毛の色ごとに 9 枚の 32×32 px | `Companions.xcassets` | `<種>_<色>_<動き>` |
+| `scripts/companion-art.py` | 相棒。種と毛の色ごとに 10 枚の 32×32 px | `Companions.xcassets` | `<種>_<色>_<動き>` |
 | `scripts/landmark-art.py` | 名所の絵はがき。160×100 px | `Landmarks.xcassets` | `landmark_<名所>` |
 | `scripts/souvenir-art.py` | おみやげの食べ物。48×48 px | `Souvenirs.xcassets` | `souvenir_<名所>` |
 | `scripts/trip-art.py` | 旅の途中の景色。320×210 px の 3 層 | `Trips.xcassets` | `trip_<名所>_<層>` |

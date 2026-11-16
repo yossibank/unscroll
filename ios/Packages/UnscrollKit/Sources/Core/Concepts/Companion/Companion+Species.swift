@@ -27,6 +27,7 @@ public extension Companion {
         case sleep
         case surprise
         case slide
+        case hang
     }
 }
 

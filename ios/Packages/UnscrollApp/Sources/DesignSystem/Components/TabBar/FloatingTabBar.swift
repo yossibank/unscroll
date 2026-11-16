@@ -20,14 +20,19 @@ public struct FloatingTabBar<Tab: Hashable, Peek: View>: View {
     }
 
     public var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: Self.spacing) {
             ForEach(items) { item in
                 button(item)
-
-                if item.id != items.last?.id {
-                    Spacer(minLength: 0)
-                }
             }
+        }
+        .overlay {
+            GeometryReader { proxy in
+                peek
+                    .hop(trigger: selection)
+                    .frame(height: 0, alignment: .bottom)
+                    .position(x: peekX(in: proxy.size.width), y: 0)
+            }
+            .allowsHitTesting(false)
         }
         .padding(.horizontal, 8)
         .frame(height: FloatingTabBarMetrics.height)
@@ -42,7 +47,7 @@ public struct FloatingTabBar<Tab: Hashable, Peek: View>: View {
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 4)
-        .animation(.spring(duration: 0.4, bounce: 0.3), value: selection)
+        .animation(.spring(duration: 0.5, bounce: 0.35), value: selection)
     }
 }
 
@@ -81,6 +86,10 @@ public extension EnvironmentValues {
 }
 
 private extension FloatingTabBar {
+    static var spacing: CGFloat {
+        4
+    }
+
     @ViewBuilder
     func button(_ item: FloatingTabItem<Tab>) -> some View {
         let isSelected = item.tab == selection
@@ -88,23 +97,19 @@ private extension FloatingTabBar {
         Button {
             selection = item.tab
         } label: {
-            HStack(spacing: 4) {
+            VStack(spacing: 2) {
                 Image(systemName: item.systemImage)
                     .font(.system(size: 18, weight: .bold))
                     .symbolVariant(isSelected ? .fill : .none)
+                    .frame(height: 22)
 
-                if isSelected {
-                    Text(item.title)
-                        .font(.footnote.weight(.heavy))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .fixedSize()
-                        .transition(.opacity.combined(with: .scale(scale: 0.8)))
-                }
+                Text(item.title)
+                    .font(.caption2.weight(.heavy))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
-            .foregroundStyle(isSelected ? Color.white : Palette.muted.opacity(0.7))
-            .padding(.horizontal, isSelected ? 16 : 0)
-            .frame(minWidth: 48, minHeight: 48)
+            .foregroundStyle(isSelected ? Color.white : Palette.muted.opacity(0.8))
+            .frame(maxWidth: .infinity, minHeight: 52)
             .background {
                 if isSelected {
                     Capsule()
@@ -113,19 +118,18 @@ private extension FloatingTabBar {
                         .matchedGeometryEffect(id: "face", in: namespace)
                 }
             }
-            .overlay(alignment: .top) {
-                if isSelected {
-                    peek
-                        .offset(y: -36)
-                        .allowsHitTesting(false)
-                        .matchedGeometryEffect(id: "peek", in: namespace)
-                }
-            }
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(item.title)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    func peekX(in width: CGFloat) -> CGFloat {
+        let count = CGFloat(max(items.count, 1))
+        let slot = (width - Self.spacing * (count - 1)) / count
+        let index = CGFloat(items.firstIndex { $0.tab == selection } ?? 0)
+        return index * (slot + Self.spacing) + slot / 2
     }
 }
 

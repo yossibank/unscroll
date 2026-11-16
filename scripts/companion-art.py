@@ -1,6 +1,6 @@
 """相棒のドット絵を描く。
 
-種と毛の色ごとに 9 枚の 32×32 px の絵を描き、透明な PNG に書く。絵の名前は <種>_<色>_<場面>。
+種と毛の色ごとに 10 枚の 32×32 px の絵を描き、透明な PNG に書く。絵の名前は <種>_<色>_<場面>。
 出力先が .xcassets なら、絵ごとに imageset を作る。そうでなければ、PNG と並べた見本を書く。
 
     python3 -I scripts/companion-art.py <出力先> [種…]
@@ -15,7 +15,7 @@ W = H = 32
 T = None
 OUT = (36, 34, 32, 255)
 FX = (150, 170, 200, 255)
-FRAME_NAMES = ["walk", "walk_left", "blink", "wave", "joy", "jump", "sleep", "surprise", "slide"]
+FRAME_NAMES = ["walk", "walk_left", "blink", "wave", "joy", "jump", "sleep", "surprise", "slide", "hang"]
 
 SPECIES = {
     "penguin": {
@@ -422,6 +422,21 @@ def sleep(p):
     return g
 
 
+def hang(p):
+    edge = 25
+    g = front(p, eyes="happy", lf="none", rf="none", ft="tuck", dy=4)
+    for y in range(H):
+        for x in range(W):
+            if g[y][x] == OUT or y >= edge:
+                g[y][x] = T
+    for cx in (9, 22):
+        paw(g, p, cx, edge)
+        put(g, cx - 2, edge - 1, p.get("paw", p["main"]))
+        put(g, cx + 2, edge - 1, p.get("paw", p["main"]))
+    outline(g)
+    return g
+
+
 def surprise(p):
     """驚く。左上の空いた所に「!」を出す。"""
     g = front(p, eyes="wide", lf="up", rf="up", mouth=True)
@@ -523,6 +538,7 @@ def frames(p):
         ("sleep", sleep(p)),
         ("surprise", surprise(p)),
         ("slide", slide(p)),
+        ("hang", hang(p)),
     ]
 
 
@@ -556,7 +572,8 @@ def write_sheet(path, fs):
     s, pad, cols = 8, 16, 3
     cell = W * s
     sw = cols * cell + (cols + 1) * pad
-    sh = 3 * cell + 4 * pad
+    rows = -(-len(fs) // cols)
+    sh = rows * cell + (rows + 1) * pad
     sheet = [[(240, 238, 234, 255)] * sw for _ in range(sh)]
     for i, (_, g) in enumerate(fs):
         ox = pad + (i % cols) * (cell + pad)
