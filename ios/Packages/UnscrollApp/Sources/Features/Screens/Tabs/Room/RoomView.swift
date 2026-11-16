@@ -235,7 +235,7 @@ private extension RoomView {
             )
 
             UsageReportView()
-                .frame(height: 400)
+                .frame(height: 440)
         }
         .roundedCard()
     }

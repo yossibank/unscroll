@@ -12,7 +12,8 @@ struct SnapshotTests {
         for item in Self.cases() {
             let view = item.view()
                 .padding(16)
-                .frame(width: item.size.width, height: item.size.height, alignment: .top)
+                .frame(width: item.size.width, height: item.size.height, alignment: item.alignment)
+                .clipped()
                 .background(Color.white)
                 .environment(\.colorScheme, .light)
 
@@ -25,6 +26,7 @@ extension SnapshotTests {
     struct Case {
         let name: String
         let size: CGSize
+        var alignment: Alignment = .top
         let view: () -> AnyView
     }
 }
@@ -33,6 +35,8 @@ private extension SnapshotTests {
     static let directory = "__OUT__"
 
     static let card = CGSize(width: 361, height: 480)
+
+    static let host = CGSize(width: 361, height: 472)
 
     static var busy: TodayUsage {
         var hours = Array(repeating: TimeInterval(0), count: 24)
@@ -110,6 +114,9 @@ private extension SnapshotTests {
             },
             Case(name: "usage-empty", size: card) {
                 AnyView(TodayUsageView(usage: empty))
+            },
+            Case(name: "usage-busy-host", size: host, alignment: .center) {
+                AnyView(TodayUsageView(usage: busy))
             }
         ]
     }

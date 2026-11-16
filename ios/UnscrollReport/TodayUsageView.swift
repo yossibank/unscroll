@@ -63,7 +63,11 @@ struct TodayUsageView: View {
         }
         .fontDesign(.rounded)
         .foregroundStyle(Palette.ink)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(
+            maxWidth: .infinity,
+            maxHeight: .infinity,
+            alignment: .topLeading
+        )
     }
 }
 
