@@ -40,7 +40,7 @@ public final class RoomModel {
         self.database = database
         self.defaults = defaults
         self.now = now
-        self.selectedMinutes = Self.tripLengths.contains(saved) ? saved : 25
+        self.selectedMinutes = Self.isTripLength(saved) ? saved : 25
 
         refresh()
     }
@@ -48,10 +48,22 @@ public final class RoomModel {
 
 public extension RoomModel {
     #if DEBUG
-    static let tripLengths = [1, 25, 50, 90]
+    static let tripPresets = [1, 25, 50, 90]
+    static let tripRange = 1...180
     #else
-    static let tripLengths = [25, 50, 90]
+    static let tripPresets = [25, 50, 90]
+    static let tripRange = 5...180
     #endif
+
+    static let tripStep = 5
+
+    var canShorten: Bool {
+        selectedMinutes > Self.tripRange.lowerBound
+    }
+
+    var canLengthen: Bool {
+        selectedMinutes < Self.tripRange.upperBound
+    }
 
     var tripEndsAt: Date? {
         progress?.activeTrip?.plannedEnd
@@ -81,6 +93,10 @@ public extension RoomModel {
         isAuthorized && hasSelection && progress?.activeTrip == nil
     }
 
+    static func isTripLength(_ minutes: Int) -> Bool {
+        tripRange.contains(minutes) && (minutes % tripStep == 0 || tripPresets.contains(minutes))
+    }
+
     func lengthNote(for minutes: Int) -> String {
         let distance = minutes * Trip.kilometersPerMinute
         let reached = journey.landmarkReached(from: kilometers, to: kilometers + distance)
@@ -90,6 +106,16 @@ public extension RoomModel {
         }
 
         return "\(reached.name)に着く"
+    }
+
+    func shorten() {
+        let previous = (selectedMinutes - 1) / Self.tripStep * Self.tripStep
+        selectedMinutes = max(previous, Self.tripRange.lowerBound)
+    }
+
+    func lengthen() {
+        let next = (selectedMinutes / Self.tripStep + 1) * Self.tripStep
+        selectedMinutes = min(next, Self.tripRange.upperBound)
     }
 
     func kilometers(at date: Date) -> Int {

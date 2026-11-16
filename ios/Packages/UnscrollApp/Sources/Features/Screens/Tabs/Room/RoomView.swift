@@ -213,9 +213,11 @@ private extension RoomView {
                 wash: Palette.coralSoft
             )
 
+            lengthStepper
+
             HStack(spacing: Spacing.small) {
-                ForEach(RoomModel.tripLengths, id: \.self) { minutes in
-                    lengthButton(minutes)
+                ForEach(RoomModel.tripPresets, id: \.self) { minutes in
+                    presetButton(minutes)
                 }
             }
 
@@ -251,33 +253,99 @@ private extension RoomView {
         .roundedCard()
     }
 
-    func lengthButton(_ minutes: Int) -> some View {
+    var lengthStepper: some View {
+        HStack(spacing: Spacing.medium) {
+            stepButton(systemImage: "minus", isEnabled: model.canShorten) {
+                model.shorten()
+            }
+
+            VStack(spacing: 2) {
+                HStack(alignment: .firstTextBaseline, spacing: 4) {
+                    Text("\(model.selectedMinutes)")
+                        .font(.largeTitle.weight(.heavy))
+                        .monospacedDigit()
+                        .contentTransition(.numericText(value: Double(model.selectedMinutes)))
+
+                    Text("分")
+                        .font(.headline.weight(.heavy))
+                }
+                .foregroundStyle(Palette.ink)
+
+                Text(model.lengthNote(for: model.selectedMinutes))
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Palette.tealDeep)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .frame(maxWidth: .infinity)
+            .animation(.snappy, value: model.selectedMinutes)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("旅の長さ")
+            .accessibilityValue(
+                "\(model.selectedMinutes) 分、\(model.lengthNote(for: model.selectedMinutes))"
+            )
+            .accessibilityAdjustableAction { direction in
+                switch direction {
+                case .increment:
+                    model.lengthen()
+
+                case .decrement:
+                    model.shorten()
+
+                @unknown default:
+                    break
+                }
+            }
+
+            stepButton(systemImage: "plus", isEnabled: model.canLengthen) {
+                model.lengthen()
+            }
+        }
+        .padding(.vertical, Spacing.small)
+        .padding(.horizontal, Spacing.small)
+        .background(Palette.paper, in: .rect(cornerRadius: 20))
+    }
+
+    func stepButton(
+        systemImage: String,
+        isEnabled: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Image(systemName: systemImage)
+                .font(.title3.weight(.heavy))
+                .foregroundStyle(.white)
+                .frame(width: 48, height: 48)
+                .background(Palette.teal, in: Circle())
+                .shadow(color: Palette.teal.opacity(0.35), radius: 6, y: 4)
+        }
+        .buttonStyle(.plain)
+        .buttonRepeatBehavior(.enabled)
+        .disabled(!isEnabled)
+        .opacity(isEnabled ? 1 : 0.35)
+        .accessibilityHidden(true)
+    }
+
+    func presetButton(_ minutes: Int) -> some View {
         let isSelected = model.selectedMinutes == minutes
 
         return Button {
             model.selectedMinutes = minutes
         } label: {
-            VStack(spacing: 2) {
-                Text("\(minutes)")
-                    .font(.title3.weight(.heavy))
-                    .monospacedDigit()
-
-                Text(model.lengthNote(for: minutes))
-                    .font(.system(size: 9, weight: .bold))
-                    .opacity(0.8)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
-            .foregroundStyle(isSelected ? Color.white : Palette.ink)
-            .padding(.vertical, Spacing.small)
-            .padding(.horizontal, 4)
-            .frame(maxWidth: .infinity)
-            .background(isSelected ? Palette.teal : Palette.paper, in: .rect(cornerRadius: 16))
-            .shadow(color: isSelected ? Palette.teal.opacity(0.35) : .clear, radius: 7, y: 6)
-            .animation(.snappy, value: isSelected)
+            Text("\(minutes) 分")
+                .font(.subheadline.weight(.heavy))
+                .monospacedDigit()
+                .foregroundStyle(isSelected ? Color.white : Palette.ink)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .padding(.vertical, Spacing.small)
+                .frame(maxWidth: .infinity)
+                .background(isSelected ? Palette.teal : Palette.paper, in: Capsule())
+                .animation(.snappy, value: isSelected)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("\(minutes) 分、\(model.lengthNote(for: minutes))")
+        .accessibilityLabel("\(minutes) 分にする")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
