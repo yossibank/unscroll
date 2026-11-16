@@ -37,6 +37,10 @@ public extension JourneyMapModel {
         nextLandmark.map { $0.kilometer - kilometers }
     }
 
+    var isOnTrip: Bool {
+        progress?.activeTrip != nil
+    }
+
     var remainingKilometers: Int {
         max(0, journey.totalKilometers - kilometers)
     }
@@ -52,6 +56,10 @@ public extension JourneyMapModel {
 
     func isReached(_ landmark: Landmark) -> Bool {
         landmark.kilometer <= kilometers
+    }
+
+    func makeJourneyPicker() -> JourneyPickerModel {
+        JourneyPickerModel(database: database, now: now)
     }
 
     func refresh() {

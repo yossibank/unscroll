@@ -72,3 +72,14 @@ public extension AppDatabase {
         }
     }
 }
+
+public extension AppDatabase {
+    func journeyProgress(
+        journeyID: String,
+        at now: Date
+    ) throws -> JourneyProgress {
+        try writer.read { db in
+            try JourneyProgress.fetch(db, journeyID: journeyID, at: now)
+        }
+    }
+}
