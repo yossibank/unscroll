@@ -6,7 +6,7 @@ public struct UsageReportView: View {
     public init() {}
 
     public var body: some View {
-        DeviceActivityReport(reportContext, filter: todayFilter)
+        DeviceActivityReport(reportContext, filter: filter)
     }
 }
 
@@ -15,11 +15,14 @@ private extension UsageReportView {
         DeviceActivityReport.Context(ScreenTimeShared.reportContextName)
     }
 
-    var todayFilter: DeviceActivityFilter {
-        let today = Calendar.current.dateInterval(of: .day, for: .now) ?? DateInterval()
+    var filter: DeviceActivityFilter {
+        let calendar = Calendar.current
+        let today = calendar.dateInterval(of: .day, for: .now) ?? DateInterval()
+        let yesterday = calendar.date(byAdding: .day, value: -1, to: today.start) ?? today.start
+        let interval = DateInterval(start: yesterday, end: today.end)
 
         return DeviceActivityFilter(
-            segment: .hourly(during: today),
+            segment: .hourly(during: interval),
             users: .all,
             devices: .init([.iPhone])
         )
