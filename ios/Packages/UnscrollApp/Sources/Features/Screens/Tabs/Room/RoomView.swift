@@ -85,7 +85,6 @@ public struct RoomView: View {
                 isDecorShown = false
             }
             .presentationDetents([.medium, .large])
-            .presentationBackgroundInteraction(.enabled(upThrough: .medium))
         }
     }
 }

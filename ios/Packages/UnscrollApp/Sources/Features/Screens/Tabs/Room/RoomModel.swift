@@ -195,7 +195,12 @@ public extension RoomModel {
         let kept = decoratedArrivals.map(\.landmark).filter { chosen.contains($0) }
         let matching = zip(kept, chosen).prefix { $0 == $1 }.count
         let removed = decoratedArrivals.map(\.landmark).filter { !chosen.contains($0) }
-        let start = now()
+        let staying = kept.prefix(matching)
+        let latest = decoratedArrivals
+            .filter { staying.contains($0.landmark) }
+            .compactMap(\.decoratedAt)
+            .max()
+        let start = max(now(), latest.map { $0.addingTimeInterval(Self.hangStep) } ?? .distantPast)
 
         do {
             for landmark in removed + kept.dropFirst(matching) {
@@ -203,7 +208,7 @@ public extension RoomModel {
             }
 
             for (offset, landmark) in chosen.dropFirst(matching).enumerated() {
-                let time = start.addingTimeInterval(Double(offset) / 1000)
+                let time = start.addingTimeInterval(Double(offset) * Self.hangStep)
                 try database.setDecorated(true, landmark: landmark, at: time)
             }
         } catch {
@@ -267,6 +272,7 @@ public extension RoomModel {
 private extension RoomModel {
     static let selectedMinutesKey = "room.selectedMinutes"
     static let acknowledgedTripKey = "room.acknowledgedTripID"
+    static let hangStep: TimeInterval = 0.01
 
     func recordArrivals() {
         do {

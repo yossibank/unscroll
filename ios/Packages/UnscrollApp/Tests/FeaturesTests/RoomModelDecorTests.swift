@@ -66,6 +66,38 @@ struct RoomModelDecorTests {
     }
 
     @Test
+    func restoresPostcardsBeyondString() throws {
+        var current = fixedNow
+        let model = try makeModel { current }
+        let landmarks = Array(model.journey.landmarks[1...3])
+
+        model.hang(landmarks)
+        current += 1
+        model.toggleHung(landmarks[2])
+
+        #expect(model.decoratedArrivals.map(\.landmark) == [landmarks[1]])
+
+        current += 1
+        model.hang(landmarks)
+
+        #expect(model.decoratedArrivals.map(\.landmark) == landmarks)
+    }
+
+    @Test
+    func keepsTappedOrderWhenClockGoesBack() throws {
+        var current = fixedNow
+        let model = try makeModel { current }
+        let first = model.journey.landmarks[1]
+        let second = model.journey.landmarks[2]
+
+        model.toggleHung(first)
+        current -= 60
+        model.toggleHung(second)
+
+        #expect(model.hungPostcards == [first, second])
+    }
+
+    @Test
     func ignoresPostcardNotArrived() throws {
         let model = try makeModel { fixedNow }
 

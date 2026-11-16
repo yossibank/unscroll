@@ -15,7 +15,7 @@ struct RoomDecorSheet: View {
     ) {
         self.model = model
         self.onClose = onClose
-        _original = State(initialValue: (model.look, model.hungPostcards))
+        _original = State(initialValue: (model.look, model.decoratedArrivals.map(\.landmark)))
     }
 
     var body: some View {
@@ -231,7 +231,7 @@ private extension RoomDecorSheet {
 
 private extension RoomDecorSheet {
     var isChanged: Bool {
-        model.look != original.look || model.hungPostcards != original.postcards
+        model.look != original.look || model.decoratedArrivals.map(\.landmark) != original.postcards
     }
 
     func columns(_ count: Int) -> [GridItem] {
