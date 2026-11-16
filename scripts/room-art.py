@@ -1,9 +1,10 @@
 """部屋の背景のドット絵を描く。
 
-壁・腰板・床・窓・棚・絵はがきの紐・座布団・観葉植物を、180x140 px の PNG に描く。
+壁・床・家具を、180x140 px の別々の PNG に描き、アプリが重ねる。
+壁は 4 種、床は 3 種。家具は腰板・窓・棚・絵はがきの紐・座布団・観葉植物である。
 窓のガラスは透明にし、アプリが後ろに旅の景色を描く。絵はがき・おみやげ・相棒もアプリが置く。
 置く位置は RoomScene.swift の座標とそろえる。描き方の決まりは docs/decisions/landmark.md にある。
-出力先が .xcassets なら imageset を作り、そうでなければ 3 倍に広げた見本も書く。
+出力先が .xcassets なら imageset を作り、そうでなければ壁と床の組ごとに 3 倍の見本を書く。
 
     python3 -I scripts/room-art.py <出力先>
 """
@@ -47,11 +48,44 @@ class Canvas:
                 self.put(x, y, c)
 
 
-def wall(cv):
+def wall_plaster(cv):
     base = (240, 228, 206)
     for y in range(WALL_BOTTOM):
         for x in range(W):
             cv.put(x, y, shade(base, 0.97) if noise(x, y, 1) > 0.9 else base)
+
+
+def wall_dots(cv):
+    base, dot = (214, 234, 248), (255, 255, 255)
+    for y in range(WALL_BOTTOM):
+        for x in range(W):
+            row = y // 10
+            dx, dy = (x + row % 2 * 5) % 10, y % 10
+            on = dx in (4, 5) and dy in (3, 4, 5, 6) or dx in (3, 6) and dy in (4, 5)
+            cv.put(x, y, dot if on else base)
+
+
+def wall_stripe(cv):
+    base, line = (253, 232, 225), (246, 204, 190)
+    for y in range(WALL_BOTTOM):
+        for x in range(W):
+            cv.put(x, y, line if x % 12 < 5 else base)
+
+
+def wall_stars(cv):
+    base, star, dust = (46, 62, 107), (246, 196, 83), (196, 206, 232)
+    cv.rect(0, 0, W, WALL_BOTTOM, base)
+    for y in range(2, WALL_BOTTOM - 2):
+        for x in range(2, W - 2):
+            n = noise(x, y, 11)
+            if n > 0.994:
+                for dx, dy in ((0, 0), (1, 0), (-1, 0), (0, 1), (0, -1)):
+                    cv.put(x + dx, y + dy, star)
+            elif n > 0.985:
+                cv.put(x, y, dust)
+
+
+def wainscot(cv):
     wood = (184, 134, 90)
     for y in range(70, WALL_BOTTOM):
         for x in range(W):
@@ -64,7 +98,7 @@ def wall(cv):
     cv.rect(0, WALL_BOTTOM, W, WALL_BOTTOM + 1, (140, 100, 68))
 
 
-def floor(cv):
+def floor_wood(cv):
     wood = (204, 160, 110)
     for y in range(FLOOR_TOP, H):
         row = (y - FLOOR_TOP) // 8
@@ -75,12 +109,38 @@ def floor(cv):
             cv.put(x, y, shade(c, 1 - (y - FLOOR_TOP) * 0.003))
 
 
-def window(cv):
+def floor_tatami(cv):
+    straw, edge = (201, 197, 138), (94, 107, 58)
+    for y in range(FLOOR_TOP, H):
+        row = (y - FLOOR_TOP) // 20
+        for x in range(W):
+            border = (y - FLOOR_TOP) % 20 in (18, 19) or (x + row % 2 * 45) % 90 in (0, 1)
+            weave = x % 3 == 0
+            c = edge if border else shade(straw, 0.92) if weave else straw
+            cv.put(x, y, shade(c, 1 - (y - FLOOR_TOP) * 0.003))
+
+
+def floor_tile(cv):
+    light, dark, grout = (237, 230, 216), (216, 205, 182), (196, 184, 160)
+    for y in range(FLOOR_TOP, H):
+        for x in range(W):
+            tx, ty = x % 10, (y - FLOOR_TOP) % 10
+            checker = (x // 10 + (y - FLOOR_TOP) // 10) % 2
+            c = grout if tx == 9 or ty == 9 else dark if checker else light
+            cv.put(x, y, shade(c, 1 - (y - FLOOR_TOP) * 0.003))
+
+
+def glass(cv):
     x0, y0, x1, y1 = WINDOW
-    frame, light = (150, 104, 64), (196, 150, 104)
     for y in range(y0 + 3, y1 - 3):
         for x in range(x0 + 3, x1 - 3):
             cv.px[y][x] = (0, 0, 0, 0)
+
+
+def window(cv):
+    x0, y0, x1, y1 = WINDOW
+    frame, light = (150, 104, 64), (196, 150, 104)
+    glass(cv)
     cv.rect(x0, y0, x1, y0 + 3, frame)
     cv.rect(x0, y1 - 3, x1, y1, frame)
     cv.rect(x0, y0, x0 + 3, y1, frame)
@@ -172,23 +232,50 @@ def write_imageset(root, name, px):
     (folder / "Contents.json").write_text(json.dumps(contents, indent=2) + "\n")
 
 
+WALLS = {"plaster": wall_plaster, "dots": wall_dots, "stripe": wall_stripe, "stars": wall_stars}
+FLOORS = {"wood": floor_wood, "tatami": floor_tatami, "tile": floor_tile}
+
+
+def layer(*draws):
+    cv = Canvas()
+    for draw in draws:
+        draw(cv)
+    return cv.px
+
+
+def layers():
+    found = {"room_back": layer(wainscot, window, shelf, garland, cushion, plant)}
+    found.update({f"room_wall_{name}": layer(draw, glass) for name, draw in WALLS.items()})
+    found.update({f"room_floor_{name}": layer(draw) for name, draw in FLOORS.items()})
+    return found
+
+
+def stack(*images):
+    out = [[(150, 196, 236, 255)] * W for _ in range(H)]
+    for px in images:
+        for y in range(H):
+            for x in range(W):
+                if px[y][x][3]:
+                    out[y][x] = px[y][x]
+    return out
+
+
 def main(argv):
     out = Path(argv[0])
-    cv = Canvas()
-    for draw in (wall, floor, window, shelf, garland, cushion, plant):
-        draw(cv)
+    found = layers()
     out.mkdir(parents=True, exist_ok=True)
     if out.suffix == ".xcassets":
         contents = out / "Contents.json"
         if not contents.exists():
             contents.write_text(json.dumps({"info": {"author": "xcode", "version": 1}}, indent=2) + "\n")
-        write_imageset(out, "room_back", cv.px)
+        for name, px in found.items():
+            write_imageset(out, name, px)
         return
-    (out / "room_back.png").write_bytes(png_bytes(cv.px))
-    sky = (150, 196, 236, 255)
-    preview = [[p if p[3] else sky for p in row] for row in cv.px]
-    big = [[p for p in row for _ in range(3)] for row in preview for _ in range(3)]
-    (out / "room_preview.png").write_bytes(png_bytes(big))
+    for wall_name in WALLS:
+        for floor_name in FLOORS:
+            room = stack(found[f"room_wall_{wall_name}"], found[f"room_floor_{floor_name}"], found["room_back"])
+            big = [[p for p in row for _ in range(3)] for row in room for _ in range(3)]
+            (out / f"room_{wall_name}_{floor_name}.png").write_bytes(png_bytes(big))
 
 
 if __name__ == "__main__":
