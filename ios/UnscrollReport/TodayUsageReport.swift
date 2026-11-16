@@ -67,7 +67,7 @@ nonisolated struct TodayUsageReport: DeviceActivityReportScene {
             .sorted { $0.duration > $1.duration }
 
         return TodayUsage(
-            total: apps.reduce(0) { $0 + $1.duration },
+            total: hours.reduce(0, +),
             apps: apps,
             hours: hours,
             pickups: pickups,
