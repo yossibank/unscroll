@@ -20,10 +20,19 @@ public struct FloatingTabBar<Tab: Hashable, Peek: View>: View {
     }
 
     public var body: some View {
-        HStack(spacing: 4) {
+        HStack(spacing: Self.spacing) {
             ForEach(items) { item in
                 button(item)
             }
+        }
+        .overlay {
+            GeometryReader { proxy in
+                peek
+                    .hop(trigger: selection)
+                    .frame(height: 0, alignment: .bottom)
+                    .position(x: peekX(in: proxy.size.width), y: 0)
+            }
+            .allowsHitTesting(false)
         }
         .padding(.horizontal, 8)
         .frame(height: FloatingTabBarMetrics.height)
@@ -77,6 +86,10 @@ public extension EnvironmentValues {
 }
 
 private extension FloatingTabBar {
+    static var spacing: CGFloat {
+        4
+    }
+
     @ViewBuilder
     func button(_ item: FloatingTabItem<Tab>) -> some View {
         let isSelected = item.tab == selection
@@ -105,19 +118,18 @@ private extension FloatingTabBar {
                         .matchedGeometryEffect(id: "face", in: namespace)
                 }
             }
-            .overlay(alignment: .top) {
-                if isSelected {
-                    peek
-                        .hop(trigger: selection)
-                        .allowsHitTesting(false)
-                        .matchedGeometryEffect(id: "peek", in: namespace)
-                }
-            }
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
         .accessibilityLabel(item.title)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    func peekX(in width: CGFloat) -> CGFloat {
+        let count = CGFloat(max(items.count, 1))
+        let slot = (width - Self.spacing * (count - 1)) / count
+        let index = CGFloat(items.firstIndex { $0.tab == selection } ?? 0)
+        return index * (slot + Self.spacing) + slot / 2
     }
 }
 

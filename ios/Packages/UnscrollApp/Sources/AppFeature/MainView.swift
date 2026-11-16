@@ -125,7 +125,7 @@ private extension MainView {
                     size: 40,
                     breathes: false
                 )
-                .offset(y: -29)
+                .offset(y: 11)
             }
         }
     }
