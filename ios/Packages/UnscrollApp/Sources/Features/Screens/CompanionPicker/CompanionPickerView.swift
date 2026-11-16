@@ -108,7 +108,7 @@ private extension CompanionPickerView {
     var speciesPicker: some View {
         VStack(alignment: .leading, spacing: Spacing.small + 4) {
             CardLabel(
-                "種",
+                "キャラクター",
                 systemImage: "pawprint.fill",
                 tint: Palette.teal,
                 wash: Palette.tealSoft
