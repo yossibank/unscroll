@@ -15,7 +15,9 @@ struct RoomTripCard: View {
 
             lengthStepper
 
-            HStack(spacing: Spacing.small) {
+            lengthSlider
+
+            LazyVGrid(columns: presetColumns, spacing: Spacing.small) {
                 ForEach(RoomModel.tripPresets, id: \.self) { minutes in
                     presetButton(minutes)
                 }
@@ -93,6 +95,39 @@ private extension RoomTripCard {
         .background(Palette.paper, in: .rect(cornerRadius: 20))
     }
 
+    var lengthSlider: some View {
+        VStack(spacing: 4) {
+            Slider(
+                value: sliderMinutes,
+                in: Double(RoomModel.tripStep)...Double(RoomModel.tripRange.upperBound),
+                step: Double(RoomModel.tripStep)
+            ) {
+                Text("旅の長さ")
+            }
+            .tint(Palette.teal)
+            .sensoryFeedback(.selection, trigger: model.selectedMinutes)
+
+            HStack {
+                Text("5 分")
+
+                Spacer()
+
+                Text("1 時間")
+
+                Spacer()
+
+                Text("2 時間")
+
+                Spacer()
+
+                Text("3 時間")
+            }
+            .font(.caption2.weight(.bold))
+            .foregroundStyle(Palette.muted)
+            .accessibilityHidden(true)
+        }
+    }
+
     func stepButton(
         systemImage: String,
         isEnabled: Bool,
@@ -119,7 +154,7 @@ private extension RoomTripCard {
         return Button {
             model.selectedMinutes = minutes
         } label: {
-            Text("\(minutes) 分")
+            Text(presetTitle(minutes))
                 .font(.subheadline.weight(.heavy))
                 .monospacedDigit()
                 .foregroundStyle(isSelected ? Color.white : Palette.ink)
@@ -133,5 +168,32 @@ private extension RoomTripCard {
         .buttonStyle(.plain)
         .accessibilityLabel("\(minutes) 分にする")
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+}
+
+private extension RoomTripCard {
+    var presetColumns: [GridItem] {
+        let column = GridItem(.flexible(), spacing: Spacing.small)
+        return Array(repeating: column, count: 3)
+    }
+
+    var sliderMinutes: Binding<Double> {
+        Binding(
+            get: {
+                Double(model.selectedMinutes)
+            },
+            set: { value in
+                model.selectedMinutes = Int(value.rounded())
+            }
+        )
+    }
+
+    func presetTitle(_ minutes: Int) -> String {
+        switch (minutes / 60, minutes % 60) {
+        case (0, _): "\(minutes) 分"
+        case let (hours, 0): "\(hours) 時間"
+        case let (hours, 30): "\(hours) 時間半"
+        case let (hours, rest): "\(hours) 時間 \(rest) 分"
+        }
     }
 }
