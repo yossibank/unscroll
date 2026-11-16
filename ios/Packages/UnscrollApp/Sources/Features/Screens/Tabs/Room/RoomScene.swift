@@ -4,6 +4,7 @@ import SwiftUI
 
 struct RoomScene: View {
     let companion: Companion?
+    let look: RoomLook
     let pose: Companion.Pose
     let window: Landmark?
     let postcards: [Landmark]
@@ -21,7 +22,7 @@ struct RoomScene: View {
                 ZStack(alignment: .topLeading) {
                     windowView(period, scale: scale)
 
-                    RoomBackdrop()
+                    RoomBackdrop(look: look)
 
                     postcardsView(scale: scale)
 

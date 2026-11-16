@@ -1,4 +1,5 @@
 import Core
+import DesignSystem
 import DeviceActivity
 import FamilyControls
 import Foundation
@@ -11,6 +12,12 @@ public final class RoomModel {
     public var selectedMinutes: Int {
         didSet {
             defaults.set(selectedMinutes, forKey: Self.selectedMinutesKey)
+        }
+    }
+
+    public var look: RoomLook {
+        didSet {
+            look.save(to: defaults)
         }
     }
 
@@ -41,6 +48,7 @@ public final class RoomModel {
         self.defaults = defaults
         self.now = now
         self.selectedMinutes = Self.isTripLength(saved) ? saved : 25
+        self.look = RoomLook(defaults: defaults)
 
         refresh()
     }
@@ -79,6 +87,14 @@ public extension RoomModel {
 
     var kilometersToNext: Int? {
         nextLandmark.map { $0.kilometer - kilometers }
+    }
+
+    var postcardLimit: Int {
+        kilometersToNext == nil ? 3 : 2
+    }
+
+    var hungPostcards: [Landmark] {
+        decoratedArrivals.suffix(postcardLimit).map(\.landmark)
     }
 
     var startTitle: String {
@@ -159,6 +175,50 @@ public extension RoomModel {
         decoratedArrivals = (try? database.decoratedArrivals()) ?? []
     }
 
+    func toggleHung(_ landmark: Landmark) {
+        var chosen = hungPostcards
+
+        if let index = chosen.firstIndex(of: landmark) {
+            chosen.remove(at: index)
+        } else {
+            if chosen.count >= postcardLimit {
+                chosen.removeFirst()
+            }
+
+            chosen.append(landmark)
+        }
+
+        hang(chosen)
+    }
+
+    func hang(_ chosen: [Landmark]) {
+        let kept = decoratedArrivals.map(\.landmark).filter { chosen.contains($0) }
+        let matching = zip(kept, chosen).prefix { $0 == $1 }.count
+        let removed = decoratedArrivals.map(\.landmark).filter { !chosen.contains($0) }
+        let staying = kept.prefix(matching)
+        let latest = decoratedArrivals
+            .filter { staying.contains($0.landmark) }
+            .compactMap(\.decoratedAt)
+            .max()
+        let start = max(now(), latest.map { $0.addingTimeInterval(Self.hangStep) } ?? .distantPast)
+
+        do {
+            for landmark in removed + kept.dropFirst(matching) {
+                try database.setDecorated(false, landmark: landmark, at: start)
+            }
+
+            for (offset, landmark) in chosen.dropFirst(matching).enumerated() {
+                let time = start.addingTimeInterval(Double(offset) * Self.hangStep)
+                try database.setDecorated(true, landmark: landmark, at: time)
+            }
+        } catch {
+            EventLog.append("絵はがき：飾りを替えられない（\(error.localizedDescription)）")
+        }
+
+        updateFinishedArrivals()
+        decoratedArrivals = (try? database.decoratedArrivals()) ?? []
+    }
+
     func startTrip() {
         let minutes = selectedMinutes
         let start = now()
@@ -212,6 +272,7 @@ public extension RoomModel {
 private extension RoomModel {
     static let selectedMinutesKey = "room.selectedMinutes"
     static let acknowledgedTripKey = "room.acknowledgedTripID"
+    static let hangStep: TimeInterval = 0.01
 
     func recordArrivals() {
         do {

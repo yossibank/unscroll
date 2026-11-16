@@ -76,6 +76,7 @@ private extension CompanionPickerView {
     var preview: some View {
         RoomScene(
             companion: model.preview,
+            look: RoomLook(defaults: .standard),
             pose: pose,
             window: Journey.tokyoToKyoto.nextLandmark(after: 0),
             postcards: [],

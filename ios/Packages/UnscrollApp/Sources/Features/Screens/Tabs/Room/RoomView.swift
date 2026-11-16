@@ -5,6 +5,7 @@ import SwiftUI
 public struct RoomView: View {
     @State private var model: RoomModel
     @State private var isTripCoverShown = false
+    @State private var isDecorShown = false
     @State private var pose = Companion.Pose.walk
     @State private var pokes = 0
 
@@ -23,7 +24,7 @@ public struct RoomView: View {
 
                 distanceCard
 
-                tripCard
+                RoomTripCard(model: model)
 
                 usageCard
             }
@@ -79,12 +80,18 @@ public struct RoomView: View {
                 .presentationDetents([.medium, .large])
             }
         )
+        .sheet(isPresented: $isDecorShown) {
+            RoomDecorSheet(model: model) {
+                isDecorShown = false
+            }
+            .presentationDetents([.medium, .large])
+        }
     }
 }
 
 private extension RoomView {
     var topBar: some View {
-        HStack {
+        HStack(spacing: Spacing.small) {
             TagPill(
                 model.journey.name,
                 systemImage: "map.fill",
@@ -92,14 +99,27 @@ private extension RoomView {
                 wash: Palette.tealSoft
             )
 
-            Spacer()
-
             TagPill(
                 postcardCount,
                 systemImage: "envelope.fill",
                 tint: Palette.coralDeep,
                 wash: Palette.coralSoft
             )
+
+            Spacer(minLength: 0)
+
+            Button {
+                isDecorShown = true
+            } label: {
+                TagPill(
+                    "模様替え",
+                    systemImage: "paintbrush.fill",
+                    tint: Palette.plumDeep,
+                    wash: Palette.plumSoft
+                )
+            }
+            .buttonStyle(.plain)
+            .frame(minHeight: 44)
         }
     }
 
@@ -133,9 +153,10 @@ private extension RoomView {
     var scene: some View {
         RoomScene(
             companion: model.companion,
+            look: model.look,
             pose: pose,
             window: model.nextLandmark ?? model.journey.landmarks.last,
-            postcards: model.decoratedArrivals.map(\.landmark),
+            postcards: model.hungPostcards,
             nextRemaining: model.kilometersToNext,
             souvenirs: model.arrivals.map(\.landmark).filter { $0.souvenir != nil },
             onPoke: {
@@ -204,40 +225,6 @@ private extension RoomView {
         .roundedCard()
     }
 
-    var tripCard: some View {
-        VStack(alignment: .leading, spacing: Spacing.small + 4) {
-            CardLabel(
-                "旅の長さ",
-                systemImage: "timer",
-                tint: Palette.coral,
-                wash: Palette.coralSoft
-            )
-
-            lengthStepper
-
-            HStack(spacing: Spacing.small) {
-                ForEach(RoomModel.tripPresets, id: \.self) { minutes in
-                    presetButton(minutes)
-                }
-            }
-
-            Button {
-                model.startTrip()
-            } label: {
-                Label(model.startTitle, systemImage: "backpack.fill")
-            }
-            .buttonStyle(.pill)
-            .disabled(!model.canStart)
-
-            if !model.isAuthorized || !model.hasSelection {
-                Label("設定で、許可と止めるアプリを選んでください", systemImage: "info.circle.fill")
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Palette.muted)
-            }
-        }
-        .roundedCard()
-    }
-
     var usageCard: some View {
         VStack(alignment: .leading, spacing: Spacing.small) {
             CardLabel(
@@ -251,101 +238,6 @@ private extension RoomView {
                 .frame(height: 400)
         }
         .roundedCard()
-    }
-
-    var lengthStepper: some View {
-        HStack(spacing: Spacing.medium) {
-            stepButton(systemImage: "minus", isEnabled: model.canShorten) {
-                model.shorten()
-            }
-
-            VStack(spacing: 2) {
-                HStack(alignment: .firstTextBaseline, spacing: 4) {
-                    Text("\(model.selectedMinutes)")
-                        .font(.largeTitle.weight(.heavy))
-                        .monospacedDigit()
-                        .contentTransition(.numericText(value: Double(model.selectedMinutes)))
-
-                    Text("分")
-                        .font(.headline.weight(.heavy))
-                }
-                .foregroundStyle(Palette.ink)
-
-                Text(model.lengthNote(for: model.selectedMinutes))
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Palette.tealDeep)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
-            .frame(maxWidth: .infinity)
-            .animation(.snappy, value: model.selectedMinutes)
-            .accessibilityElement(children: .combine)
-            .accessibilityLabel("旅の長さ")
-            .accessibilityValue(
-                "\(model.selectedMinutes) 分、\(model.lengthNote(for: model.selectedMinutes))"
-            )
-            .accessibilityAdjustableAction { direction in
-                switch direction {
-                case .increment:
-                    model.lengthen()
-
-                case .decrement:
-                    model.shorten()
-
-                @unknown default:
-                    break
-                }
-            }
-
-            stepButton(systemImage: "plus", isEnabled: model.canLengthen) {
-                model.lengthen()
-            }
-        }
-        .padding(.vertical, Spacing.small)
-        .padding(.horizontal, Spacing.small)
-        .background(Palette.paper, in: .rect(cornerRadius: 20))
-    }
-
-    func stepButton(
-        systemImage: String,
-        isEnabled: Bool,
-        action: @escaping () -> Void
-    ) -> some View {
-        Button(action: action) {
-            Image(systemName: systemImage)
-                .font(.title3.weight(.heavy))
-                .foregroundStyle(.white)
-                .frame(width: 48, height: 48)
-                .background(Palette.teal, in: Circle())
-                .shadow(color: Palette.teal.opacity(0.35), radius: 6, y: 4)
-        }
-        .buttonStyle(.plain)
-        .buttonRepeatBehavior(.enabled)
-        .disabled(!isEnabled)
-        .opacity(isEnabled ? 1 : 0.35)
-        .accessibilityHidden(true)
-    }
-
-    func presetButton(_ minutes: Int) -> some View {
-        let isSelected = model.selectedMinutes == minutes
-
-        return Button {
-            model.selectedMinutes = minutes
-        } label: {
-            Text("\(minutes) 分")
-                .font(.subheadline.weight(.heavy))
-                .monospacedDigit()
-                .foregroundStyle(isSelected ? Color.white : Palette.ink)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .padding(.vertical, Spacing.small)
-                .frame(maxWidth: .infinity)
-                .background(isSelected ? Palette.teal : Palette.paper, in: Capsule())
-                .animation(.snappy, value: isSelected)
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("\(minutes) 分にする")
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 

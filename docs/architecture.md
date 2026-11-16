@@ -17,7 +17,7 @@
 | `scripts/landmark-art.py` | 名所の絵はがき。160×100 px | `Landmarks.xcassets` | `landmark_<名所>` |
 | `scripts/souvenir-art.py` | おみやげの食べ物。48×48 px | `Souvenirs.xcassets` | `souvenir_<名所>` |
 | `scripts/trip-art.py` | 旅の途中の景色。320×210 px の 3 層 | `Trips.xcassets` | `trip_<名所>_<層>` |
-| `scripts/room-art.py` | 部屋の背景。180×140 px。窓は透明 | `Rooms.xcassets` | `room_back` |
+| `scripts/room-art.py` | 部屋の壁・床・家具を、180×140 px の別々の絵に描く。窓は透明 | `Rooms.xcassets` | `room_back`・`room_wall_<柄>`・`room_floor_<柄>` |
 | `scripts/map-art.py` | 地図の土台。228×150 px | `Maps.xcassets` | `map_back` |
 
 名所の英字の名前は `Landmark.artName`（`Landmark+Art.swift`）で決める。景色の層は `SceneryLayer` の `far`・`mid`・`near` である。相棒の絵の名前の種と色は、次のとおりである。
