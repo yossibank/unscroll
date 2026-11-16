@@ -5,230 +5,211 @@ import SwiftUI
 struct JourneyMapCanvas: View {
     let journey: Journey
     let kilometers: Int
+    let companion: Companion?
 
     var body: some View {
-        Canvas { context, size in
-            drawSea(&context, size)
-            drawLand(&context, size)
-            drawMountains(&context, size)
-            drawLakes(&context, size)
-            drawFuji(&context, size)
-            drawRoad(&context, size)
-            drawLandmarks(&context, size)
-            drawPosition(&context, size)
-        }
-        .aspectRatio(JourneyMapGeometry.aspectRatio, contentMode: .fit)
-        .frame(maxWidth: .infinity)
+        MapBackdrop()
+            .overlay {
+                GeometryReader { proxy in
+                    let unit = proxy.size.width / MapBackdrop.width
+
+                    ZStack(alignment: .topLeading) {
+                        Canvas { context, _ in
+                            drawRoad(&context, unit)
+                            drawLandmarks(&context, unit)
+                            drawLabels(&context, unit)
+                        }
+
+                        marker(unit)
+                    }
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .accessibilityElement()
+            .accessibilityLabel(accessibilityText)
     }
 }
 
 private extension JourneyMapCanvas {
-    func drawSea(
-        _ context: inout GraphicsContext,
-        _ size: CGSize
-    ) {
-        let gradient = Gradient(colors: [Color(hex: 0xCFE6EA), Color(hex: 0xA9D3DC)])
-        let shading = GraphicsContext.Shading.linearGradient(
-            gradient,
-            startPoint: .zero,
-            endPoint: CGPoint(x: 0, y: size.height)
-        )
+    @ViewBuilder
+    func marker(_ unit: CGFloat) -> some View {
+        let point = currentPosition()
+        let side = 16 * unit
 
-        context.fill(Path(CGRect(origin: .zero, size: size)), with: shading)
-    }
-
-    func drawLand(
-        _ context: inout GraphicsContext,
-        _ size: CGSize
-    ) {
-        let path = polygon(JourneyMapGeometry.land, size)
-
-        context.fill(path, with: .color(Color(hex: 0xEFE7D2)))
-        context.stroke(path, with: .color(Color(hex: 0xC9BC9B)), lineWidth: 1.5)
-    }
-
-    func drawMountains(
-        _ context: inout GraphicsContext,
-        _ size: CGSize
-    ) {
-        let scale = size.width / 228
-        let color = Color(red: 143 / 255, green: 179 / 255, blue: 140 / 255).opacity(0.35)
-
-        for mountain in JourneyMapGeometry.mountains {
-            let center = JourneyMapGeometry.project(mountain, in: size)
-            var path = Path()
-            path.move(to: CGPoint(x: center.x - 8 * scale, y: center.y + 5 * scale))
-            path.addLine(to: CGPoint(x: center.x, y: center.y - 6 * scale))
-            path.addLine(to: CGPoint(x: center.x + 8 * scale, y: center.y + 5 * scale))
-            path.closeSubpath()
-
-            context.fill(path, with: .color(color))
-        }
-    }
-
-    func drawLakes(
-        _ context: inout GraphicsContext,
-        _ size: CGSize
-    ) {
-        let scale = size.width / 228
-        let sea = Color(hex: 0xA9D3DC)
-        let biwa = polygon(JourneyMapGeometry.biwa, size)
-
-        context.fill(biwa, with: .color(sea))
-        context.stroke(biwa, with: .color(Color(hex: 0x8FBCC6)), lineWidth: 1.5)
-
-        if let hamana = JourneyMapGeometry.spots["浜名湖"] {
-            let center = JourneyMapGeometry.project(hamana, in: size)
-            let rect = CGRect(
-                x: center.x - 5.5 * scale,
-                y: center.y - 4.5 * scale,
-                width: 7 * scale,
-                height: 5 * scale
+        if let companion {
+            CompanionSticker(
+                companion: companion,
+                pose: .walkLeft,
+                size: side,
+                breathes: false
             )
-
-            context.fill(Path(ellipseIn: rect), with: .color(sea))
+            .position(x: point.x * unit, y: (point.y - 6) * unit)
+        } else {
+            Rectangle()
+                .fill(Palette.teal)
+                .frame(width: 4 * unit, height: 4 * unit)
+                .position(x: point.x * unit, y: point.y * unit)
         }
     }
+}
 
-    func drawFuji(
-        _ context: inout GraphicsContext,
-        _ size: CGSize
-    ) {
-        let scale = size.width / 228
-        let center = JourneyMapGeometry.project(JourneyMapGeometry.fuji, in: size)
-        var body = Path()
-        body.move(to: CGPoint(x: center.x - 10 * scale, y: center.y + 6 * scale))
-        body.addLine(to: CGPoint(x: center.x - 2 * scale, y: center.y - 6 * scale))
-        body.addLine(to: CGPoint(x: center.x + 2 * scale, y: center.y - 6 * scale))
-        body.addLine(to: CGPoint(x: center.x + 10 * scale, y: center.y + 6 * scale))
-        body.closeSubpath()
+private extension JourneyMapCanvas {
+    static let passed = Color(hex: 0xC9705F)
+    static let ahead = Color(hex: 0x7A6A4E)
+    static let outline = Color(hex: 0x4A3428)
 
-        var snow = Path()
-        snow.move(to: CGPoint(x: center.x - 2 * scale, y: center.y - 6 * scale))
-        snow.addLine(to: CGPoint(x: center.x + 2 * scale, y: center.y - 6 * scale))
-        snow.addLine(to: CGPoint(x: center.x + 4.5 * scale, y: center.y - 2 * scale))
-        snow.addLine(to: CGPoint(x: center.x - 4.5 * scale, y: center.y - 2 * scale))
-        snow.closeSubpath()
-
-        context.fill(body, with: .color(Color(hex: 0x7D9CBF)))
-        context.fill(snow, with: .color(.white))
+    var accessibilityText: String {
+        let reached = landmarkPoints().filter { $0.kilometer <= kilometers }.map(\.name)
+        let names = reached.joined(separator: "、")
+        return "\(journey.name)の地図。\(kilometers) km 進んだ。通った名所は \(names)"
     }
 
     func drawRoad(
         _ context: inout GraphicsContext,
-        _ size: CGSize
+        _ unit: CGFloat
     ) {
-        let scale = size.width / 228
-        let points = landmarkPoints(size)
-        let position = currentPosition(size)
-        let passed = points.filter { $0.kilometer <= kilometers }.map(\.point)
-        let ahead = points.filter { $0.kilometer > kilometers }.map(\.point)
+        let points = landmarkPoints()
+        let position = currentPosition()
+        let done = points.filter { $0.kilometer <= kilometers }.map(\.point) + [position]
+        let rest = [position] + points.filter { $0.kilometer > kilometers }.map(\.point)
 
-        var done = Path()
-        done.addLines(passed + [position])
+        for pixel in pixels(along: rest) where (Int(pixel.x) + Int(pixel.y)) % 3 != 0 {
+            fill(&context, pixel, side: 1, color: Self.ahead, unit: unit)
+        }
 
-        var rest = Path()
-        rest.addLines([position] + ahead)
-
-        context.stroke(
-            rest,
-            with: .color(Color(hex: 0x9D8F70)),
-            style: StrokeStyle(lineWidth: 2 * scale, dash: [3 * scale, 4 * scale])
-        )
-        context.stroke(
-            done,
-            with: .color(Palette.teal),
-            style: StrokeStyle(lineWidth: 3 * scale, lineCap: .round, lineJoin: .round)
-        )
+        for pixel in pixels(along: done) {
+            fill(
+                &context,
+                CGPoint(x: pixel.x, y: pixel.y + 1),
+                side: 2,
+                color: Self.outline,
+                unit: unit
+            )
+            fill(&context, pixel, side: 2, color: Self.passed, unit: unit)
+        }
     }
 
     func drawLandmarks(
         _ context: inout GraphicsContext,
-        _ size: CGSize
+        _ unit: CGFloat
     ) {
-        let scale = size.width / 228
+        let next = journey.nextLandmark(after: kilometers)?.name
 
-        for item in landmarkPoints(size) {
+        for item in landmarkPoints() {
             let isReached = item.kilometer <= kilometers
-            let rect = CGRect(
-                x: item.point.x - 4.5 * scale,
-                y: item.point.y - 4.5 * scale,
-                width: 9 * scale,
-                height: 9 * scale
+            let isNext = item.name == next
+            let face = isReached ? Palette.coral : Color.white
+            let corner = CGPoint(x: item.point.x - 2, y: item.point.y - 2)
+
+            if isNext {
+                let ring = CGPoint(x: item.point.x - 4, y: item.point.y - 4)
+                fill(&context, ring, side: 9, color: Color(hex: 0xF2C14E), unit: unit)
+            }
+
+            fill(
+                &context,
+                CGPoint(x: corner.x - 1, y: corner.y - 1),
+                side: 7,
+                color: Self.outline,
+                unit: unit
             )
-            let fill = isReached ? Palette.coral : Color.white
-            let edge = isReached ? Color(hex: 0xC9705F) : Color(hex: 0x9D8F70)
+            fill(&context, corner, side: 5, color: face, unit: unit)
 
-            context.fill(Path(ellipseIn: rect), with: .color(fill))
-            context.stroke(Path(ellipseIn: rect), with: .color(edge), lineWidth: 1.5 * scale)
-
-            if let offset = JourneyMapGeometry.labelOffsets[item.name] {
-                let label = Text(item.name)
-                    .font(.system(size: 7.5 * scale, weight: .bold, design: .rounded))
-                    .foregroundStyle(isReached ? Palette.ink : Palette.muted)
-                let at = CGPoint(
-                    x: item.point.x + offset.width * scale,
-                    y: item.point.y + offset.height * scale
+            if isReached {
+                fill(
+                    &context,
+                    CGPoint(x: corner.x + 1, y: corner.y + 1),
+                    side: 1,
+                    color: .white,
+                    unit: unit
                 )
-
-                context.draw(label, at: at)
             }
         }
     }
 
-    func drawPosition(
+    func drawLabels(
         _ context: inout GraphicsContext,
-        _ size: CGSize
+        _ unit: CGFloat
     ) {
-        let scale = size.width / 228
-        let center = currentPosition(size)
-        let radius = 11 * scale
+        let next = journey.nextLandmark(after: kilometers)?.name
+
+        for item in landmarkPoints() {
+            guard let offset = JourneyMapGeometry.labelOffsets[item.name] else {
+                continue
+            }
+
+            let isLit = item.kilometer <= kilometers || item.name == next
+            let color = isLit ? Palette.ink : Palette.muted
+            let label = Text(item.name)
+                .font(.system(size: 6.5 * unit, weight: .bold, design: .rounded))
+                .foregroundStyle(color)
+            let resolved = context.resolve(label)
+            let size = resolved.measure(in: CGSize(width: 200 * unit, height: 40 * unit))
+            let center = CGPoint(
+                x: (item.point.x + offset.width) * unit,
+                y: (item.point.y + offset.height) * unit
+            )
+            let plate = CGRect(
+                x: center.x - size.width / 2 - 2 * unit,
+                y: center.y - size.height / 2 - 0.5 * unit,
+                width: size.width + 4 * unit,
+                height: size.height + unit
+            )
+            let opacity = isLit ? 0.92 : 0.7
+
+            context.fill(Path(plate), with: .color(Color(hex: 0xFBFAF6).opacity(opacity)))
+            context.draw(resolved, at: center)
+        }
+    }
+
+    func fill(
+        _ context: inout GraphicsContext,
+        _ pixel: CGPoint,
+        side: CGFloat,
+        color: Color,
+        unit: CGFloat
+    ) {
         let rect = CGRect(
-            x: center.x - radius,
-            y: center.y - radius,
-            width: radius * 2,
-            height: radius * 2
+            x: pixel.x * unit,
+            y: pixel.y * unit,
+            width: side * unit,
+            height: side * unit
         )
 
-        context.fill(Path(ellipseIn: rect), with: .color(Color(hex: 0xFBFAF6)))
-        context.stroke(Path(ellipseIn: rect), with: .color(Palette.teal), lineWidth: 2 * scale)
-
-        var symbol = context.resolve(Image(systemName: "figure.walk"))
-        symbol.shading = .color(Palette.teal)
-        let side = radius * 1.2
-
-        context.draw(
-            symbol,
-            in: CGRect(x: center.x - side / 2, y: center.y - side / 2, width: side, height: side)
-        )
+        context.fill(Path(rect), with: .color(color))
     }
 
-    func polygon(
-        _ points: [CGPoint],
-        _ size: CGSize
-    ) -> Path {
-        var path = Path()
-        path.addLines(points.map { JourneyMapGeometry.project($0, in: size) })
-        path.closeSubpath()
-        return path
+    func pixels(along points: [CGPoint]) -> [CGPoint] {
+        zip(points, points.dropFirst()).flatMap { from, to in
+            let steps = Int(max(abs(to.x - from.x), abs(to.y - from.y)).rounded())
+
+            return (0...max(steps, 1)).map { step in
+                let ratio = CGFloat(step) / CGFloat(max(steps, 1))
+                let x = from.x + (to.x - from.x) * ratio
+                let y = from.y + (to.y - from.y) * ratio
+                return CGPoint(x: x.rounded(.down), y: y.rounded(.down))
+            }
+        }
     }
 
-    func landmarkPoints(_ size: CGSize) -> [LandmarkPoint] {
+    func landmarkPoints() -> [LandmarkPoint] {
         journey.landmarks.compactMap { landmark in
             guard let spot = JourneyMapGeometry.spots[landmark.name] else {
                 return nil
             }
 
+            let point = JourneyMapGeometry.pixel(spot)
+
             return LandmarkPoint(
                 name: landmark.name,
                 kilometer: landmark.kilometer,
-                point: JourneyMapGeometry.project(spot, in: size)
+                point: CGPoint(x: point.x.rounded(), y: point.y.rounded())
             )
         }
     }
 
-    func currentPosition(_ size: CGSize) -> CGPoint {
-        let points = landmarkPoints(size)
+    func currentPosition() -> CGPoint {
+        let points = landmarkPoints()
 
         guard let first = points.first, let last = points.last else {
             return .zero
@@ -252,11 +233,10 @@ private extension JourneyMapCanvas {
         let from = points[next - 1]
         let to = points[next]
         let ratio = Double(kilometers - from.kilometer) / Double(to.kilometer - from.kilometer)
+        let x = from.point.x + (to.point.x - from.point.x) * ratio
+        let y = from.point.y + (to.point.y - from.point.y) * ratio
 
-        return CGPoint(
-            x: from.point.x + (to.point.x - from.point.x) * ratio,
-            y: from.point.y + (to.point.y - from.point.y) * ratio
-        )
+        return CGPoint(x: x.rounded(), y: y.rounded())
     }
 }
 

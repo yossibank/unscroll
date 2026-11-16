@@ -7,6 +7,7 @@ import Store
 @Observable
 public final class JourneyMapModel {
     public private(set) var progress: JourneyProgress?
+    public private(set) var companion: Companion?
     public let journey = Journey.tokyoToKyoto
 
     @ObservationIgnored private let database: AppDatabase
@@ -55,5 +56,6 @@ public extension JourneyMapModel {
 
     func refresh() {
         progress = try? database.journeyProgress(at: now())
+        companion = try? database.companion()
     }
 }
