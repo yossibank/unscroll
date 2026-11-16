@@ -4,29 +4,37 @@ import SwiftUI
 
 public struct PostcardAlbumView: View {
     @State private var model: PostcardAlbumModel
+    @State private var path: [Landmark] = []
 
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.tabBarHidden) private var tabBarHidden
 
     public init(model: PostcardAlbumModel) {
         _model = State(initialValue: model)
     }
 
     public var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.medium) {
                     header
 
                     LazyVGrid(columns: columns, spacing: Spacing.medium) {
-                        ForEach(model.entries, id: \.landmark.name) { entry in
+                        ForEach(
+                            Array(model.entries.enumerated()),
+                            id: \.element.landmark.name
+                        ) { index, entry in
                             postcard(entry)
+                                .rotationEffect(.degrees(index.isMultiple(of: 2) ? -1.6 : 1.4))
                         }
                     }
                 }
-                .padding(Spacing.medium)
+                .padding(.horizontal, Spacing.medium)
+                .padding(.top, Spacing.small)
+                .padding(.bottom, FloatingTabBarMetrics.clearance)
             }
-            .background(Palette.paper)
-            .navigationTitle("絵はがき")
+            .background(PaperBackdrop())
+            .toolbarVisibility(.hidden, for: .navigationBar)
             .navigationDestination(for: Landmark.self) { landmark in
                 if let arrival = model.arrival(at: landmark) {
                     LandmarkArrivalView(arrival: arrival) { isDecorated in
@@ -44,6 +52,9 @@ public struct PostcardAlbumView: View {
 
                 model.refresh()
             }
+            .onChange(of: path.isEmpty) { _, isEmpty in
+                tabBarHidden.wrappedValue = !isEmpty
+            }
             .refreshable {
                 model.refresh()
             }
@@ -60,25 +71,34 @@ private extension PostcardAlbumView {
     }
 
     var header: some View {
-        VStack(alignment: .leading, spacing: Spacing.small) {
-            HStack {
+        HStack(spacing: Spacing.medium) {
+            ProgressRing(
+                ratio: Double(model.collectedCount) / Double(max(1, model.totalCount)),
+                label: "\(model.collectedCount)/\(model.totalCount)",
+                tint: Palette.coral,
+                wash: Palette.coralSoft
+            )
+
+            VStack(alignment: .leading, spacing: 4) {
                 Text(model.journey.name)
-                    .font(.title3.bold())
+                    .font(.caption.weight(.heavy))
+                    .foregroundStyle(Palette.muted)
+
+                Text("あつめた絵はがき")
+                    .font(.title3.weight(.heavy))
                     .foregroundStyle(Palette.ink)
 
-                Spacer()
-
-                Text("\(model.collectedCount) / \(model.totalCount) 枚")
-                    .font(.headline)
-                    .foregroundStyle(Palette.teal)
+                HStack(spacing: 4) {
+                    ForEach(model.entries, id: \.landmark.name) { entry in
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(entry.isCollected ? Palette.coral : Palette.paperDeep)
+                            .frame(width: 16, height: 16)
+                    }
+                }
+                .accessibilityHidden(true)
             }
-
-            ProgressView(
-                value: Double(model.collectedCount),
-                total: Double(max(1, model.totalCount))
-            )
-            .tint(Palette.teal)
         }
+        .roundedCard()
     }
 
     @ViewBuilder
@@ -97,60 +117,80 @@ private extension PostcardAlbumView {
         _ landmark: Landmark,
         arrival: Arrival
     ) -> some View {
-        VStack(alignment: .leading, spacing: Spacing.small) {
+        VStack(alignment: .leading, spacing: 4) {
             PostcardArt(landmark: landmark)
-
-            HStack(spacing: 4) {
-                Text(landmark.name)
-                    .font(.subheadline.bold())
-                    .foregroundStyle(Palette.ink)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-
-                if arrival.isDecorated {
-                    Image(systemName: "pin.fill")
-                        .font(.caption2)
-                        .foregroundStyle(Palette.coral)
-                        .accessibilityLabel("部屋に飾っている")
+                .overlay(alignment: .topTrailing) {
+                    if arrival.isDecorated {
+                        Image(systemName: "house.fill")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundStyle(Palette.coral)
+                            .frame(width: 24, height: 28)
+                            .background(.white, in: .rect(cornerRadius: 4))
+                            .overlay {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .strokeBorder(
+                                        Palette.coral,
+                                        style: StrokeStyle(lineWidth: 1.5, dash: [3, 2])
+                                    )
+                            }
+                            .padding(4)
+                            .accessibilityLabel("部屋に飾っている")
+                    }
                 }
-            }
+
+            Text(landmark.name)
+                .font(.subheadline.weight(.heavy))
+                .foregroundStyle(Palette.ink)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .padding(.horizontal, 4)
+                .padding(.top, 4)
 
             Text(arrivedDate(arrival))
-                .font(.caption)
+                .font(.caption2.weight(.bold))
                 .foregroundStyle(Palette.muted)
+                .padding(.horizontal, 4)
         }
         .padding(Spacing.small)
-        .background(Palette.card, in: RoundedRectangle(cornerRadius: 12))
-        .rotationEffect(.degrees(-1))
+        .background(Palette.card, in: .rect(cornerRadius: 20))
+        .shadow(color: Palette.ink.opacity(0.1), radius: 9, y: 8)
     }
 
     func uncollected(_ entry: PostcardAlbumModel.Entry) -> some View {
-        let dash = StrokeStyle(lineWidth: 1.5, dash: [5, 4])
-
-        return VStack(alignment: .leading, spacing: Spacing.small) {
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(Palette.muted.opacity(0.5), style: dash)
+        VStack(alignment: .leading, spacing: 4) {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Palette.paper)
                 .overlay {
-                    Text("?")
-                        .font(.system(size: 28, weight: .bold, design: .rounded))
-                        .foregroundStyle(Palette.muted.opacity(0.6))
+                    Text(remainingNote(entry.remainingKilometers))
+                        .font(.caption2.weight(.heavy))
+                        .foregroundStyle(Palette.teal)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .padding(.horizontal, Spacing.small)
+                        .padding(.vertical, 4)
+                        .background(.white, in: Capsule())
                 }
                 .aspectRatio(LandmarkArt.aspectRatio, contentMode: .fit)
 
             Text(entry.landmark.name)
-                .font(.subheadline.bold())
+                .font(.subheadline.weight(.heavy))
                 .foregroundStyle(Palette.muted)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
+                .padding(.horizontal, 4)
+                .padding(.top, 4)
 
-            Text(remainingNote(entry.remainingKilometers))
-                .font(.caption)
+            Text(entry.remainingKilometers > 0 ? "まだ先" : "もうすぐ届く")
+                .font(.caption2.weight(.bold))
                 .foregroundStyle(Palette.muted)
+                .padding(.horizontal, 4)
         }
         .padding(Spacing.small)
-        .background(Palette.card.opacity(0.5), in: RoundedRectangle(cornerRadius: 12))
+        .background(Palette.card.opacity(0.7), in: .rect(cornerRadius: 20))
     }
+}
 
+private extension PostcardAlbumView {
     func remainingNote(_ kilometers: Int) -> String {
         guard kilometers > 0 else {
             return "旅が終わると届く"
@@ -161,7 +201,7 @@ private extension PostcardAlbumView {
 
     func arrivedDate(_ arrival: Arrival) -> String {
         let format = Date.VerbatimFormatStyle(
-            format: "\(year: .defaultDigits)/\(month: .defaultDigits)/\(day: .defaultDigits) に届いた",
+            format: "\(month: .defaultDigits)/\(day: .defaultDigits) に届いた",
             timeZone: .current,
             calendar: .current
         )

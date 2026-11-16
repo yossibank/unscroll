@@ -12,86 +12,69 @@ public struct JourneyMapView: View {
     }
 
     public var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: Spacing.medium) {
-                    header
+        ScrollView {
+            VStack(alignment: .leading, spacing: Spacing.medium) {
+                header
 
-                    mapFrame
+                JourneyMapCanvas(
+                    journey: model.journey,
+                    kilometers: model.kilometers,
+                    companion: model.companion
+                )
+                .clipShape(.rect(cornerRadius: 16))
+                .roundedCard(padding: Spacing.small)
 
-                    distance
+                nextCard
 
-                    nextCard
-
-                    stamps
-                }
-                .padding(Spacing.medium)
+                stamps
             }
-            .background(Palette.paper)
-            .navigationTitle("地図")
-            .onAppear {
-                model.refresh()
+            .padding(.horizontal, Spacing.medium)
+            .padding(.top, Spacing.small)
+            .padding(.bottom, FloatingTabBarMetrics.clearance)
+        }
+        .background(PaperBackdrop())
+        .onAppear {
+            model.refresh()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active else {
+                return
             }
-            .onChange(of: scenePhase) { _, newPhase in
-                guard newPhase == .active else {
-                    return
-                }
 
-                model.refresh()
-            }
-            .refreshable {
-                model.refresh()
-            }
+            model.refresh()
+        }
+        .refreshable {
+            model.refresh()
         }
     }
 }
 
 private extension JourneyMapView {
     var header: some View {
-        HStack {
-            Text(model.journey.name)
-                .font(.title3.bold())
-                .foregroundStyle(Palette.ink)
+        HStack(spacing: Spacing.medium) {
+            ProgressRing(
+                ratio: model.progressRatio,
+                label: "\(Int((model.progressRatio * 100).rounded()))%",
+                tint: Palette.teal,
+                wash: Palette.tealSoft
+            )
 
-            Spacer()
+            VStack(alignment: .leading, spacing: 2) {
+                Text("1 本目の道のり")
+                    .font(.caption.weight(.heavy))
+                    .foregroundStyle(Palette.muted)
 
-            Text("1 本目の道のり")
-                .font(.caption.bold())
-                .foregroundStyle(Palette.teal)
-                .padding(.horizontal, Spacing.small)
-                .padding(.vertical, 4)
-                .background(Palette.teal.opacity(0.12), in: Capsule())
-        }
-    }
-
-    var mapFrame: some View {
-        JourneyMapCanvas(
-            journey: model.journey,
-            kilometers: model.kilometers,
-            companion: model.companion
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 8))
-        .padding(Spacing.small)
-        .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
-    }
-
-    var distance: some View {
-        VStack(spacing: Spacing.small) {
-            HStack {
-                Text("\(model.kilometers) / \(model.journey.totalKilometers) km")
-                    .font(.headline)
+                Text(model.journey.name)
+                    .font(.title3.weight(.heavy))
                     .foregroundStyle(Palette.ink)
 
-                Spacer()
-
-                Text("あと \(model.remainingKilometers) km")
-                    .font(.subheadline)
-                    .foregroundStyle(Palette.muted)
+                Text(distanceNote)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Palette.teal)
+                    .monospacedDigit()
             }
-
-            ProgressView(value: model.progressRatio)
-                .tint(Palette.teal)
         }
+        .roundedCard()
     }
 
     var nextCard: some View {
@@ -99,47 +82,61 @@ private extension JourneyMapView {
             if model.nextLandmark == nil, let last = model.journey.landmarks.last {
                 LandmarkArt(landmark: last)
                     .frame(width: 64)
-                    .padding(2)
-                    .background(Color.white)
+                    .clipShape(.rect(cornerRadius: 8))
             } else {
-                hiddenPostcard(width: 68)
+                hiddenPostcard(width: 64)
             }
 
             VStack(alignment: .leading, spacing: 4) {
                 if let landmark = model.nextLandmark, let remaining = model.kilometersToNext {
                     Text("次の名所")
-                        .font(.caption)
-                        .foregroundStyle(Palette.muted)
+                        .font(.caption.weight(.heavy))
+                        .foregroundStyle(Palette.sunDeep)
 
                     Text(landmark.name)
-                        .font(.headline)
+                        .font(.title3.weight(.heavy))
                         .foregroundStyle(Palette.ink)
 
                     Text(note(remaining: remaining))
-                        .font(.footnote)
+                        .font(.caption.weight(.bold))
                         .foregroundStyle(Palette.muted)
                 } else {
                     Text("京都に着きました")
-                        .font(.headline)
+                        .font(.title3.weight(.heavy))
                         .foregroundStyle(Palette.ink)
                 }
             }
-
-            Spacer()
         }
-        .padding(Spacing.medium)
-        .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
+        .roundedCard(fill: LinearGradient(
+            colors: [Palette.sunSoft, Palette.card],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        ))
     }
 
     var stamps: some View {
-        ScrollView(.horizontal) {
-            HStack(alignment: .top, spacing: Spacing.small) {
-                ForEach(model.journey.landmarks.dropFirst(), id: \.name) { landmark in
-                    stamp(landmark)
-                }
+        VStack(alignment: .leading, spacing: Spacing.small + 4) {
+            CardLabel(
+                "届いた絵はがき",
+                systemImage: "envelope.fill",
+                tint: Palette.coral,
+                wash: Palette.coralSoft
+            ) {
+                Text("\(reachedCount) / \(model.journey.landmarks.count - 1)")
+                    .foregroundStyle(Palette.muted)
             }
+
+            ScrollView(.horizontal) {
+                HStack(alignment: .top, spacing: Spacing.small) {
+                    ForEach(model.journey.landmarks.dropFirst(), id: \.name) { landmark in
+                        stamp(landmark)
+                    }
+                }
+                .padding(.vertical, 4)
+            }
+            .scrollIndicators(.hidden)
         }
-        .scrollIndicators(.hidden)
+        .roundedCard()
     }
 
     func stamp(_ landmark: Landmark) -> some View {
@@ -149,38 +146,47 @@ private extension JourneyMapView {
             if isReached {
                 LandmarkArt(landmark: landmark)
                     .frame(width: 64)
-                    .padding(2)
-                    .background(Color.white)
-                    .shadow(color: Palette.ink.opacity(0.15), radius: 1, y: 1)
-                    .rotationEffect(.degrees(-3))
+                    .clipShape(.rect(cornerRadius: 8))
             } else {
-                hiddenPostcard(width: 68)
+                hiddenPostcard(width: 64)
             }
 
             Text(landmark.name)
-                .font(.caption2.bold())
+                .font(.caption2.weight(.heavy))
                 .foregroundStyle(isReached ? Palette.ink : Palette.muted)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }
-        .frame(width: 72)
+        .padding(4)
+        .background(Palette.card, in: .rect(cornerRadius: 12))
+        .shadow(color: Palette.shadow, radius: 4, y: 3)
+        .frame(width: 76)
     }
 
     func hiddenPostcard(width: CGFloat) -> some View {
-        let dash = StrokeStyle(lineWidth: 1.5, dash: [4, 3])
-
-        return RoundedRectangle(cornerRadius: 4)
-            .stroke(Palette.muted.opacity(0.5), style: dash)
+        RoundedRectangle(cornerRadius: 8)
+            .fill(Palette.paperDeep)
             .overlay {
-                Text("?")
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                Image(systemName: "questionmark")
+                    .font(.system(size: 14, weight: .heavy))
                     .foregroundStyle(Palette.muted.opacity(0.6))
             }
             .frame(width: width, height: width / LandmarkArt.aspectRatio)
     }
+}
+
+private extension JourneyMapView {
+    var reachedCount: Int {
+        model.journey.landmarks.dropFirst().filter { model.isReached($0) }.count
+    }
+
+    var distanceNote: String {
+        let total = model.journey.totalKilometers
+        return "\(model.kilometers) / \(total) km ・ あと \(model.remainingKilometers) km"
+    }
 
     func note(remaining: Int) -> String {
         let minutes = remaining / Trip.kilometersPerMinute
-        return "あと \(remaining) km · 約 \(minutes) 分の集中で届く"
+        return "あと \(remaining) km ・ 約 \(minutes) 分の旅で届く"
     }
 }

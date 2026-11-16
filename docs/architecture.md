@@ -48,7 +48,7 @@ python3 -I scripts/map-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Reso
 | フォルダ | ターゲット | Bundle ID | 役割 | App Group |
 | --- | --- | --- | --- | --- |
 | `ios/UnscrollMonitor/` | `UnscrollMonitorExtension` | `com.yossibank.unscroll.monitor` | 旅の終わりに止めたアプリを戻す（15 分より短い旅は、終わる前の知らせで戻す）。1 分開いたアプリを止め直す | 使う |
-| `ios/UnscrollReport/` | `UnscrollReportExtension` | `com.yossibank.unscroll.report` | 今日の使用時間を描く。数字はアプリに渡らない | |
+| `ios/UnscrollReport/` | `UnscrollReportExtension` | `com.yossibank.unscroll.report` | 今日の使用時間を描く。数字はアプリに渡らず、色は DesignSystem から受け取る | |
 | `ios/UnscrollShield/` | `UnscrollShieldExtension` | `com.yossibank.unscroll.shield` | 止めた画面に相棒の手紙を描く。DB は読むだけで開き、相棒の絵は DesignSystem から受け取る | 使う |
 | `ios/UnscrollShieldAction/` | `UnscrollShieldActionExtension` | `com.yossibank.unscroll.shieldaction` | 止めた画面のボタンで、10 秒の待ちと 1 分開くを決める | 使う |
 
