@@ -35,12 +35,20 @@ public extension Trip {
     func focusedMinutes(at now: Date) -> Int {
         let end = min(now, endedAt ?? now, plannedEnd)
         let minutes = Int(end.timeIntervalSince(startedAt) / 60)
-
         return min(max(minutes, 0), plannedMinutes)
     }
 
     func kilometers(at now: Date) -> Int {
         focusedMinutes(at: now) * Self.kilometersPerMinute
+    }
+
+    func remainingMinutes(at now: Date) -> Int? {
+        guard isActive(at: now) else {
+            return nil
+        }
+
+        let seconds = plannedEnd.timeIntervalSince(now)
+        return Int((seconds / 60).rounded(.up))
     }
 }
 
