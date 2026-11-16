@@ -6,6 +6,7 @@ public struct CompanionPickerView: View {
     @Environment(\.dismiss) private var dismiss
 
     @State private var model: CompanionPickerModel
+    @State private var pose = Companion.Pose.wave
 
     private let isFirstTime: Bool
     private let onSaved: () -> Void
@@ -55,6 +56,9 @@ public struct CompanionPickerView: View {
         .scrollBounceBehavior(.basedOnSize)
         .background(Palette.paper)
         .navigationTitle(navigationTitle)
+        .task(id: model.preview) {
+            await cheer(.jump)
+        }
     }
 }
 
@@ -73,10 +77,21 @@ private extension CompanionPickerView {
     }
 
     var preview: some View {
-        VStack(spacing: Spacing.small + 4) {
-            if let companion = model.preview {
-                CompanionSticker(companion: companion, pose: .wave, size: 160)
-            }
+        VStack(spacing: Spacing.small) {
+            RoomScene(
+                companion: model.preview,
+                pose: pose,
+                window: Journey.tokyoToKyoto.nextLandmark(after: 0),
+                postcards: [],
+                nextRemaining: nil,
+                souvenirs: [],
+                onPoke: {
+                    Task {
+                        await cheer(.joy)
+                    }
+                }
+            )
+            .clipShape(RoundedRectangle(cornerRadius: 12))
 
             Text(model.shownName)
                 .font(.title3.bold())
@@ -84,22 +99,30 @@ private extension CompanionPickerView {
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, Spacing.large)
-        .background(Palette.card, in: RoundedRectangle(cornerRadius: 24))
+        .padding(Spacing.small)
+        .background(Palette.card, in: RoundedRectangle(cornerRadius: 20))
     }
 
     var speciesPicker: some View {
         VStack(alignment: .leading, spacing: Spacing.small) {
             label("種")
 
-            Picker("種", selection: speciesBinding) {
+            HStack(spacing: Spacing.small) {
                 ForEach(Companion.Species.allCases, id: \.self) { species in
-                    Text(species.label)
-                        .tag(species)
+                    let sample = species.coats.first.flatMap { coat in
+                        Companion(species: species, coat: coat, name: species.defaultName)
+                    }
+
+                    choiceButton(
+                        title: species.label,
+                        sample: sample,
+                        isSelected: model.species == species,
+                        action: {
+                            model.select(species)
+                        }
+                    )
                 }
             }
-            .pickerStyle(.segmented)
         }
     }
 
@@ -109,7 +132,18 @@ private extension CompanionPickerView {
 
             HStack(spacing: Spacing.small) {
                 ForEach(model.species.coats, id: \.self) { coat in
-                    coatButton(coat)
+                    choiceButton(
+                        title: model.species.label(of: coat),
+                        sample: Companion(
+                            species: model.species,
+                            coat: coat,
+                            name: model.species.defaultName
+                        ),
+                        isSelected: model.coat == coat,
+                        action: {
+                            model.select(coat)
+                        }
+                    )
                 }
             }
         }
@@ -144,26 +178,26 @@ private extension CompanionPickerView {
             .foregroundStyle(Palette.muted)
     }
 
-    func coatButton(_ coat: Companion.Coat) -> some View {
-        let isSelected = model.coat == coat
+    func choiceButton(
+        title: String,
+        sample: Companion?,
+        isSelected: Bool,
+        action: @escaping () -> Void
+    ) -> some View {
         let shape = RoundedRectangle(cornerRadius: 12)
-        let species = model.species
-        let sample = Companion(species: species, coat: coat, name: species.defaultName)
         let fill = isSelected ? Palette.teal.opacity(0.12) : Palette.card
         let stroke = isSelected ? Palette.teal : Palette.muted.opacity(0.3)
         let lineWidth: CGFloat = isSelected ? 2 : 1
         let traits: AccessibilityTraits = isSelected ? .isSelected : []
 
-        return Button {
-            model.select(coat)
-        } label: {
+        return Button(action: action) {
             VStack(spacing: 4) {
                 if let sample {
                     CompanionSticker(companion: sample, pose: .walk, size: 48, breathes: false)
                         .accessibilityHidden(true)
                 }
 
-                Text(species.label(of: coat))
+                Text(title)
                     .font(.caption)
                     .foregroundStyle(Palette.ink)
                     .lineLimit(1)
@@ -177,19 +211,12 @@ private extension CompanionPickerView {
             }
         }
         .buttonStyle(.plain)
-        .accessibilityLabel(species.label(of: coat))
+        .accessibilityLabel(title)
         .accessibilityAddTraits(traits)
     }
 }
 
 private extension CompanionPickerView {
-    var speciesBinding: Binding<Companion.Species> {
-        Binding(
-            get: { model.species },
-            set: { model.select($0) }
-        )
-    }
-
     var nameBinding: Binding<String> {
         Binding(
             get: { model.name },
@@ -203,6 +230,14 @@ private extension CompanionPickerView {
 
     var buttonTitle: String {
         isFirstTime ? "\(model.shownName)と旅に出る" : "この相棒にする"
+    }
+
+    func cheer(_ reaction: Companion.Pose) async {
+        pose = reaction
+
+        try? await Task.sleep(for: .seconds(0.6))
+
+        pose = .wave
     }
 
     func save() {
