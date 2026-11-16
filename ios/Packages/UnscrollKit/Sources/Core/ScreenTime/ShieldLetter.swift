@@ -7,19 +7,25 @@ public struct ShieldLetter: Hashable, Sendable {
     public init(
         companionName: String?,
         journey: Journey,
-        kilometers: Int?
+        kilometers: Int?,
+        remainingMinutes: Int?
     ) {
         let name = companionName ?? "相棒"
         let next = kilometers.flatMap { journey.nextLandmark(after: $0) }
-
-        self.title = "\(name)から手紙が届いたよ"
+        var lines = ["まだ帰らないよ。"]
 
         if let kilometers,
            let next {
-            let remaining = next.kilometer - kilometers
-            self.body = "まだ帰らないよ。\(next.name)まで、あと \(remaining) km。いっしょに行こう。"
-        } else {
-            self.body = "まだ帰らないよ。いっしょに行こう。"
+            lines.append("\(next.name)まで、あと \(next.kilometer - kilometers) km。")
         }
+
+        if let remainingMinutes {
+            lines.append("旅はあと \(remainingMinutes) 分。")
+        }
+
+        lines.append("いっしょに行こう。")
+
+        self.title = "\(name)から手紙が届いたよ"
+        self.body = lines.joined()
     }
 }

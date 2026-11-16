@@ -54,4 +54,22 @@ struct TripTests {
         #expect(trip.focusedMinutes(at: trip.plannedEnd) == 25)
         #expect(!trip.isActive(at: trip.plannedEnd))
     }
+
+    @Test
+    func roundsRemainingMinutesUp() {
+        let trip = Trip(startedAt: start, plannedMinutes: 25)
+
+        #expect(trip.remainingMinutes(at: start) == 25)
+        #expect(trip.remainingMinutes(at: start.addingTimeInterval(60 + 1)) == 24)
+        #expect(trip.remainingMinutes(at: trip.plannedEnd.addingTimeInterval(-1)) == 1)
+        #expect(trip.remainingMinutes(at: trip.plannedEnd) == nil)
+    }
+
+    @Test
+    func hasNoRemainingMinutesAfterEndingEarly() {
+        var trip = Trip(startedAt: start, plannedMinutes: 25)
+        trip.endedAt = start.addingTimeInterval(5 * 60)
+
+        #expect(trip.remainingMinutes(at: start.addingTimeInterval(6 * 60)) == nil)
+    }
 }
