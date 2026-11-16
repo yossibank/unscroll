@@ -23,6 +23,8 @@ struct AppUsage: Identifiable, @unchecked Sendable {
 }
 
 struct CategoryUsage: Identifiable, Sendable {
+    static let otherName = "ほか"
+
     let id: String
     let name: String
     let duration: TimeInterval
@@ -38,7 +40,8 @@ nonisolated struct TodayUsageReport: DeviceActivityReportScene {
         let calendar = Calendar.current
         let now = Date.now
         let todayStart = calendar.startOfDay(for: now)
-        let sameTimeYesterday = now.addingTimeInterval(-24 * 60 * 60)
+        let sameTimeYesterday = calendar.date(byAdding: .day, value: -1, to: now) ?? now
+            .addingTimeInterval(-86400)
 
         var durations: [String: TimeInterval] = [:]
         var tokens: [String: ApplicationToken] = [:]
@@ -54,9 +57,11 @@ nonisolated struct TodayUsageReport: DeviceActivityReportScene {
                 let start = segment.dateInterval.start
 
                 guard start >= todayStart else {
-                    if start < sameTimeYesterday {
-                        yesterdayTotal = (yesterdayTotal ?? 0) + segment.totalActivityDuration
-                    }
+                    let length = max(segment.dateInterval.duration, 1)
+                    let before = min(max(sameTimeYesterday.timeIntervalSince(start), 0), length)
+                    let share = segment.totalActivityDuration * before / length
+
+                    yesterdayTotal = (yesterdayTotal ?? 0) + share
 
                     continue
                 }
@@ -71,7 +76,8 @@ nonisolated struct TodayUsageReport: DeviceActivityReportScene {
                 }
 
                 for await category in segment.categories {
-                    let categoryName = category.category.localizedDisplayName ?? "ほか"
+                    let categoryName = category.category.localizedDisplayName ?? CategoryUsage
+                        .otherName
 
                     categories[categoryName, default: 0] += category.totalActivityDuration
 

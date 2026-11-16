@@ -105,9 +105,14 @@ private extension TodayUsageView {
     }
 
     var categoryStrip: some View {
-        let shown = Array(usage.categories.prefix(3))
-        let rest = usage.categories.dropFirst(3).reduce(0) { $0 + $1.duration }
-        let parts = shown.map { ($0.name, $0.duration) } + (rest > 0 ? [("ほか", rest)] : [])
+        let named = usage.categories.filter { $0.name != CategoryUsage.otherName }
+        let shown = Array(named.prefix(3))
+        let shownNames = Set(shown.map(\.name))
+        let rest = usage.categories
+            .filter { !shownNames.contains($0.name) }
+            .reduce(0) { $0 + $1.duration }
+        let other = rest > 0 ? [(CategoryUsage.otherName, rest)] : []
+        let parts = shown.map { ($0.name, $0.duration) } + other
         let sum = max(parts.reduce(0) { $0 + $1.1 }, 1)
 
         return VStack(alignment: .leading, spacing: 6) {

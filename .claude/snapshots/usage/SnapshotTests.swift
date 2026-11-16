@@ -57,6 +57,7 @@ private extension SnapshotTests {
             yesterdayTotal: 173 * 60,
             categories: [
                 CategoryUsage(id: "SNS", name: "SNS", duration: 85 * 60),
+                CategoryUsage(id: "ほか", name: "ほか", duration: 45 * 60),
                 CategoryUsage(id: "エンタメ", name: "エンタメ", duration: 40 * 60),
                 CategoryUsage(id: "ゲーム", name: "ゲーム", duration: 12 * 60),
                 CategoryUsage(id: "仕事効率化", name: "仕事効率化", duration: 6 * 60),
