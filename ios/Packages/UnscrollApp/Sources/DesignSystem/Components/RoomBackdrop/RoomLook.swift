@@ -84,6 +84,7 @@ private extension RoomLook {
                 .offset(x: -crop.minX * scale, y: -crop.minY * scale)
         }
         .clipped()
+        .contentShape(.rect)
         .accessibilityHidden(true)
     }
 }
