@@ -4,11 +4,12 @@ import SwiftUI
 
 struct JourneyMapCanvas: View {
     let journey: Journey
+    let geometry: JourneyMapGeometry
     let kilometers: Int
     let companion: Companion?
 
     var body: some View {
-        MapBackdrop()
+        MapBackdrop(name: geometry.backdrop)
             .overlay {
                 GeometryReader { proxy in
                     let unit = proxy.size.width / MapBackdrop.width
@@ -137,7 +138,7 @@ private extension JourneyMapCanvas {
         let next = journey.nextLandmark(after: kilometers)?.name
 
         for item in landmarkPoints() {
-            guard let offset = JourneyMapGeometry.labelOffsets[item.name] else {
+            guard let offset = geometry.labelOffsets[item.name] else {
                 continue
             }
 
@@ -232,11 +233,11 @@ private extension JourneyMapCanvas {
 
     func landmarkPoints() -> [LandmarkPoint] {
         journey.landmarks.compactMap { landmark in
-            guard let spot = JourneyMapGeometry.spots[landmark.name] else {
+            guard let spot = geometry.spots[landmark.name] else {
                 return nil
             }
 
-            let point = JourneyMapGeometry.pixel(spot)
+            let point = geometry.pixel(spot)
 
             return LandmarkPoint(
                 name: landmark.name,
