@@ -4,6 +4,8 @@ import SwiftUI
 public struct CompanionSticker: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    @State private var hops = 0
+
     private let companion: Companion
     private let pose: Companion.Pose
     private let size: CGFloat
@@ -22,6 +24,23 @@ public struct CompanionSticker: View {
     }
 
     public var body: some View {
+        breathing
+            .hop(trigger: hops, height: size * 0.12)
+            .onChange(of: pose) { _, newPose in
+                guard Self.lively.contains(newPose) else {
+                    return
+                }
+
+                hops += 1
+            }
+    }
+}
+
+private extension CompanionSticker {
+    static let lively: Set<Companion.Pose> = [.joy, .jump, .surprise]
+
+    @ViewBuilder
+    var breathing: some View {
         if breathes, !reduceMotion {
             art
                 .phaseAnimator([false, true]) { content, phase in
@@ -34,9 +53,7 @@ public struct CompanionSticker: View {
             art
         }
     }
-}
 
-private extension CompanionSticker {
     var art: some View {
         Image(companion.artName(pose), bundle: .module)
             .interpolation(.none)

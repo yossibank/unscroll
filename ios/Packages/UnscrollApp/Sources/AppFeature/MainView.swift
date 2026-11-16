@@ -119,7 +119,13 @@ private extension MainView {
             ]
         ) {
             if let companion = room.companion {
-                CompanionSticker(companion: companion, pose: .walk, size: 32)
+                CompanionSticker(
+                    companion: companion,
+                    pose: .hang,
+                    size: 40,
+                    breathes: false
+                )
+                .offset(y: -29)
             }
         }
     }

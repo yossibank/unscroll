@@ -23,10 +23,6 @@ public struct FloatingTabBar<Tab: Hashable, Peek: View>: View {
         HStack(spacing: 4) {
             ForEach(items) { item in
                 button(item)
-
-                if item.id != items.last?.id {
-                    Spacer(minLength: 0)
-                }
             }
         }
         .padding(.horizontal, 8)
@@ -42,7 +38,7 @@ public struct FloatingTabBar<Tab: Hashable, Peek: View>: View {
         }
         .padding(.horizontal, 16)
         .padding(.bottom, 4)
-        .animation(.spring(duration: 0.4, bounce: 0.3), value: selection)
+        .animation(.spring(duration: 0.5, bounce: 0.35), value: selection)
     }
 }
 
@@ -88,23 +84,19 @@ private extension FloatingTabBar {
         Button {
             selection = item.tab
         } label: {
-            HStack(spacing: 4) {
+            VStack(spacing: 2) {
                 Image(systemName: item.systemImage)
                     .font(.system(size: 18, weight: .bold))
                     .symbolVariant(isSelected ? .fill : .none)
+                    .frame(height: 22)
 
-                if isSelected {
-                    Text(item.title)
-                        .font(.footnote.weight(.heavy))
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .fixedSize()
-                        .transition(.opacity.combined(with: .scale(scale: 0.8)))
-                }
+                Text(item.title)
+                    .font(.caption2.weight(.heavy))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
-            .foregroundStyle(isSelected ? Color.white : Palette.muted.opacity(0.7))
-            .padding(.horizontal, isSelected ? 16 : 0)
-            .frame(minWidth: 48, minHeight: 48)
+            .foregroundStyle(isSelected ? Color.white : Palette.muted.opacity(0.8))
+            .frame(maxWidth: .infinity, minHeight: 52)
             .background {
                 if isSelected {
                     Capsule()
@@ -116,7 +108,7 @@ private extension FloatingTabBar {
             .overlay(alignment: .top) {
                 if isSelected {
                     peek
-                        .offset(y: -36)
+                        .hop(trigger: selection)
                         .allowsHitTesting(false)
                         .matchedGeometryEffect(id: "peek", in: namespace)
                 }
