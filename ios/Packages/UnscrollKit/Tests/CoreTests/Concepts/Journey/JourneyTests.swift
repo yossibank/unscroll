@@ -24,6 +24,6 @@ struct JourneyTests {
     @Test
     func totalsKilometers() {
         #expect(journey.totalKilometers == 500)
-        #expect(Journey(name: "空", landmarks: []).totalKilometers == 0)
+        #expect(Journey(id: "empty", name: "空", landmarks: []).totalKilometers == 0)
     }
 }

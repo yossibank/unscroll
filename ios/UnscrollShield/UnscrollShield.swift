@@ -45,10 +45,11 @@ private extension UnscrollShield {
         let database = try? AppDatabase.appGroupReader()
         let companion = try? database?.companion()
         let progress = try? database?.journeyProgress(at: now)
+        let journey = (try? database?.currentJourney()) ?? .tokyoToKyoto
 
         let letter = ShieldLetter(
             companionName: companion?.name,
-            journey: .tokyoToKyoto,
+            journey: journey,
             kilometers: progress?.kilometers,
             remainingMinutes: progress?.activeTrip?.remainingMinutes(at: now)
         )

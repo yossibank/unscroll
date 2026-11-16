@@ -9,6 +9,7 @@ public extension AppDatabase {
     ) throws {
         try writer.write { db in
             let trips = try Trip
+                .filter(sql: "journeyID = ?", arguments: [journey.id])
                 .order(Trip.Columns.startedAt)
                 .fetchAll(db)
 
@@ -20,6 +21,11 @@ public extension AppDatabase {
 
                     for arrival in arrivals {
                         try arrival.insert(db, onConflict: .ignore)
+
+                        try db.execute(
+                            sql: "update arrival set journeyID = ? where landmarkName = ?",
+                            arguments: [journey.id, arrival.landmark.name]
+                        )
                     }
                 }
 

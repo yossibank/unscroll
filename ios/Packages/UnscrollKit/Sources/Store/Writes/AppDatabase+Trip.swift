@@ -15,6 +15,13 @@ public extension AppDatabase {
             let trip = Trip(startedAt: now, plannedMinutes: minutes)
             try trip.insert(db)
 
+            let journey = try Self.currentJourney(db)
+
+            try db.execute(
+                sql: "update trip set journeyID = ? where id = ?",
+                arguments: [journey.id, trip.id.description]
+            )
+
             return trip
         }
     }
