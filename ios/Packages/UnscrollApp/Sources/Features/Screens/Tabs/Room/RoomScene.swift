@@ -124,6 +124,7 @@ private extension RoomScene {
         .lineLimit(1)
         .minimumScaleFactor(0.5)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Palette.paper.opacity(0.9))
         .overlay {
             Rectangle()
                 .stroke(
