@@ -1,8 +1,6 @@
 import SwiftUI
 
 public struct FloatingTabBar<Tab: Hashable, Peek: View>: View {
-    @Namespace private var namespace
-
     @Binding private var selection: Tab
 
     private let items: [FloatingTabItem<Tab>]
@@ -23,6 +21,15 @@ public struct FloatingTabBar<Tab: Hashable, Peek: View>: View {
         HStack(spacing: Self.spacing) {
             ForEach(items) { item in
                 button(item)
+            }
+        }
+        .background {
+            GeometryReader { proxy in
+                Capsule()
+                    .fill(selectedTint)
+                    .shadow(color: selectedTint.opacity(0.45), radius: 8, y: 6)
+                    .frame(width: slotWidth(in: proxy.size.width), height: 52)
+                    .position(x: peekX(in: proxy.size.width), y: proxy.size.height / 2)
             }
         }
         .overlay {
@@ -90,6 +97,10 @@ private extension FloatingTabBar {
         4
     }
 
+    var selectedTint: Color {
+        items.first { $0.tab == selection }?.tint ?? .clear
+    }
+
     @ViewBuilder
     func button(_ item: FloatingTabItem<Tab>) -> some View {
         let isSelected = item.tab == selection
@@ -110,14 +121,6 @@ private extension FloatingTabBar {
             }
             .foregroundStyle(isSelected ? Color.white : Palette.muted.opacity(0.8))
             .frame(maxWidth: .infinity, minHeight: 52)
-            .background {
-                if isSelected {
-                    Capsule()
-                        .fill(item.tint)
-                        .shadow(color: item.tint.opacity(0.45), radius: 8, y: 6)
-                        .matchedGeometryEffect(id: "face", in: namespace)
-                }
-            }
             .contentShape(Capsule())
         }
         .buttonStyle(.plain)
@@ -125,9 +128,13 @@ private extension FloatingTabBar {
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
-    func peekX(in width: CGFloat) -> CGFloat {
+    func slotWidth(in width: CGFloat) -> CGFloat {
         let count = CGFloat(max(items.count, 1))
-        let slot = (width - Self.spacing * (count - 1)) / count
+        return (width - Self.spacing * (count - 1)) / count
+    }
+
+    func peekX(in width: CGFloat) -> CGFloat {
+        let slot = slotWidth(in: width)
         let index = CGFloat(items.firstIndex { $0.tab == selection } ?? 0)
         return index * (slot + Self.spacing) + slot / 2
     }
