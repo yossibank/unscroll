@@ -36,6 +36,10 @@ public extension AppDatabase {
 
 extension AppDatabase {
     static func currentJourney(_ db: Database) throws -> Journey {
+        guard try db.tableExists("currentJourney") else {
+            return .tokyoToKyoto
+        }
+
         let id = try String.fetchOne(db, sql: "select journeyID from currentJourney where id = 1")
         return id.flatMap { Journey.with(id: $0) } ?? .tokyoToKyoto
     }

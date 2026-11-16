@@ -64,6 +64,10 @@ extension AppDatabase {
 
         return migrator
     }
+
+    init(reading writer: any DatabaseWriter) {
+        self.writer = writer
+    }
 }
 
 private extension AppDatabase {
@@ -83,10 +87,6 @@ private extension AppDatabase {
         configuration.busyMode = .timeout(busyTimeout)
 
         return configuration
-    }
-
-    init(reading writer: any DatabaseWriter) {
-        self.writer = writer
     }
 
     static func groupPath() throws -> String {

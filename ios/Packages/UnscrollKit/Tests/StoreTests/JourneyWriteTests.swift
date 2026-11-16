@@ -140,4 +140,26 @@ struct JourneyWriteTests {
         #expect(arrivalJourneys == ["tokaido"])
         #expect(try database.currentJourney() == .tokyoToKyoto)
     }
+
+    @Test
+    func readsProgressBeforeMigration() throws {
+        let queue = try DatabaseQueue()
+        try AppDatabase.migrator.migrate(queue, upTo: "v5")
+
+        try queue.write { db in
+            try db.execute(
+                sql: """
+                insert into trip (id, startedAt, plannedMinutes, endedAt)
+                values ('11111111-1111-1111-1111-111111111111', ?, 25, ?)
+                """,
+                arguments: [start, start.addingTimeInterval(25 * 60)]
+            )
+        }
+
+        let database = AppDatabase(reading: queue)
+        let progress = try database.journeyProgress(at: start.addingTimeInterval(60 * 60))
+
+        #expect(try database.currentJourney() == .tokyoToKyoto)
+        #expect(progress.kilometers == 25)
+    }
 }
