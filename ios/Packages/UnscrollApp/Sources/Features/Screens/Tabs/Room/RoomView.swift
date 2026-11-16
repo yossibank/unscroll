@@ -15,73 +15,291 @@ public struct RoomView: View {
     }
 
     public var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(spacing: Spacing.medium) {
-                    companionCard
+        ScrollView {
+            VStack(spacing: Spacing.medium) {
+                topBar
 
-                    distanceCard
+                companionCard
 
-                    tripCard
+                distanceCard
 
-                    usageCard
-                }
-                .padding(Spacing.medium)
-            }
-            .background(Palette.paper)
-            .navigationTitle("Unscroll")
-            .onAppear {
-                model.refresh()
-            }
-            .onChange(of: scenePhase) { _, newPhase in
-                guard newPhase == .active else {
-                    return
-                }
+                tripCard
 
-                model.refresh()
+                usageCard
             }
-            .refreshable {
-                model.refresh()
-            }
-            .task {
-                await blink()
-            }
-            .task(id: pokes) {
-                await settleAfterPoke()
-            }
-            .fullScreenCover(
-                isPresented: tripBinding,
-                onDismiss: {
-                    isTripCoverShown = false
-                },
-                content: {
-                    TripView(model: model)
-                        .onAppear {
-                            isTripCoverShown = true
-                        }
-                }
-            )
-            .sheet(
-                item: finishedTripBinding,
-                onDismiss: {
-                    model.acknowledgeFinishedTrip()
-                },
-                content: { trip in
-                    TripResultSheet(
-                        trip: trip,
-                        model: model,
-                        onClose: {
-                            model.acknowledgeFinishedTrip()
-                        }
-                    )
-                    .presentationDetents([.medium, .large])
-                }
-            )
+            .padding(.horizontal, Spacing.medium)
+            .padding(.top, Spacing.small)
+            .padding(.bottom, FloatingTabBarMetrics.clearance)
         }
+        .background(PaperBackdrop())
+        .onAppear {
+            model.refresh()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active else {
+                return
+            }
+
+            model.refresh()
+        }
+        .refreshable {
+            model.refresh()
+        }
+        .task {
+            await blink()
+        }
+        .task(id: pokes) {
+            await settleAfterPoke()
+        }
+        .fullScreenCover(
+            isPresented: tripBinding,
+            onDismiss: {
+                isTripCoverShown = false
+            },
+            content: {
+                TripView(model: model)
+                    .onAppear {
+                        isTripCoverShown = true
+                    }
+            }
+        )
+        .sheet(
+            item: finishedTripBinding,
+            onDismiss: {
+                model.acknowledgeFinishedTrip()
+            },
+            content: { trip in
+                TripResultSheet(
+                    trip: trip,
+                    model: model,
+                    onClose: {
+                        model.acknowledgeFinishedTrip()
+                    }
+                )
+                .presentationDetents([.medium, .large])
+            }
+        )
     }
 }
 
 private extension RoomView {
+    var topBar: some View {
+        HStack {
+            TagPill(
+                model.journey.name,
+                systemImage: "map.fill",
+                tint: Palette.tealDeep,
+                wash: Palette.tealSoft
+            )
+
+            Spacer()
+
+            TagPill(
+                postcardCount,
+                systemImage: "envelope.fill",
+                tint: Palette.coralDeep,
+                wash: Palette.coralSoft
+            )
+        }
+    }
+
+    var companionCard: some View {
+        scene
+            .overlay {
+                GeometryReader { proxy in
+                    bubble
+                        .position(x: proxy.size.width * 0.27, y: proxy.size.height * 0.5)
+                }
+                .allowsHitTesting(false)
+            }
+            .overlay(alignment: .bottomLeading) {
+                if let companion = model.companion {
+                    Text(companion.name)
+                        .font(.footnote.weight(.heavy))
+                        .foregroundStyle(Palette.ink)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                        .padding(.horizontal, Spacing.small + 4)
+                        .padding(.vertical, 4)
+                        .background(.white.opacity(0.92), in: Capsule())
+                        .padding(Spacing.small + 4)
+                        .allowsHitTesting(false)
+                }
+            }
+            .clipShape(.rect(cornerRadius: RoundedCard.radius))
+            .shadow(color: Palette.shadow, radius: 12, y: 8)
+    }
+
+    var scene: some View {
+        RoomScene(
+            companion: model.companion,
+            pose: pose,
+            window: model.nextLandmark ?? model.journey.landmarks.last,
+            postcards: model.decoratedArrivals.map(\.landmark),
+            nextRemaining: model.kilometersToNext,
+            souvenirs: model.arrivals.map(\.landmark).filter { $0.souvenir != nil },
+            onPoke: {
+                poke()
+            }
+        )
+    }
+
+    var bubble: some View {
+        Text(pose == .joy ? "うれしい！" : "そろそろ出かける？")
+            .font(.caption2.weight(.heavy))
+            .foregroundStyle(Palette.ink)
+            .lineLimit(1)
+            .minimumScaleFactor(0.8)
+            .padding(.horizontal, Spacing.small)
+            .padding(.vertical, 4)
+            .background(alignment: .bottomTrailing) {
+                Image(systemName: "triangleshape.fill")
+                    .font(.system(size: 8))
+                    .foregroundStyle(.white)
+                    .rotationEffect(.degrees(150))
+                    .offset(x: 2, y: 4)
+            }
+            .background(.white, in: Capsule())
+            .shadow(color: Palette.ink.opacity(0.12), radius: 4, y: 3)
+            .contentTransition(.opacity)
+            .animation(.snappy, value: pose == .joy)
+    }
+
+    var distanceCard: some View {
+        VStack(alignment: .leading, spacing: Spacing.small) {
+            CardLabel(
+                "進んだ距離",
+                systemImage: "figure.walk",
+                tint: Palette.teal,
+                wash: Palette.tealSoft
+            ) {
+                Text(nextNote)
+                    .foregroundStyle(Palette.teal)
+            }
+
+            HStack(alignment: .lastTextBaseline, spacing: 4) {
+                Text("\(model.kilometers)")
+                    .font(.system(size: 44, weight: .heavy))
+                    .foregroundStyle(Palette.teal)
+                    .contentTransition(.numericText())
+
+                Text("/ \(model.journey.totalKilometers) km")
+                    .font(.subheadline.weight(.heavy))
+                    .foregroundStyle(Palette.muted)
+            }
+
+            JourneyTrack(ratio: progressRatio)
+                .padding(.top, 4)
+
+            HStack {
+                Text(model.journey.landmarks.first?.name ?? "")
+
+                Spacer()
+
+                Text(model.journey.landmarks.last?.name ?? "")
+            }
+            .font(.caption2.weight(.bold))
+            .foregroundStyle(Palette.muted)
+        }
+        .roundedCard()
+    }
+
+    var tripCard: some View {
+        VStack(alignment: .leading, spacing: Spacing.small + 4) {
+            CardLabel(
+                "旅の長さ",
+                systemImage: "timer",
+                tint: Palette.coral,
+                wash: Palette.coralSoft
+            )
+
+            HStack(spacing: Spacing.small) {
+                ForEach(RoomModel.tripLengths, id: \.self) { minutes in
+                    lengthButton(minutes)
+                }
+            }
+
+            Button {
+                model.startTrip()
+            } label: {
+                Label(model.startTitle, systemImage: "backpack.fill")
+            }
+            .buttonStyle(.pill)
+            .disabled(!model.canStart)
+
+            if !model.isAuthorized || !model.hasSelection {
+                Label("設定で、許可と止めるアプリを選んでください", systemImage: "info.circle.fill")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Palette.muted)
+            }
+        }
+        .roundedCard()
+    }
+
+    var usageCard: some View {
+        VStack(alignment: .leading, spacing: Spacing.small) {
+            CardLabel(
+                "今日のスマホ",
+                systemImage: "iphone",
+                tint: Palette.skyDeep,
+                wash: Palette.skySoft
+            )
+
+            UsageReportView()
+                .frame(height: 400)
+        }
+        .roundedCard()
+    }
+
+    func lengthButton(_ minutes: Int) -> some View {
+        let isSelected = model.selectedMinutes == minutes
+
+        return Button {
+            model.selectedMinutes = minutes
+        } label: {
+            VStack(spacing: 2) {
+                Text("\(minutes)")
+                    .font(.title3.weight(.heavy))
+                    .monospacedDigit()
+
+                Text(model.lengthNote(for: minutes))
+                    .font(.system(size: 9, weight: .bold))
+                    .opacity(0.8)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+            }
+            .foregroundStyle(isSelected ? Color.white : Palette.ink)
+            .padding(.vertical, Spacing.small)
+            .padding(.horizontal, 4)
+            .frame(maxWidth: .infinity)
+            .background(isSelected ? Palette.teal : Palette.paper, in: .rect(cornerRadius: 16))
+            .shadow(color: isSelected ? Palette.teal.opacity(0.35) : .clear, radius: 7, y: 6)
+            .animation(.snappy, value: isSelected)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(minutes) 分、\(model.lengthNote(for: minutes))")
+    }
+}
+
+private extension RoomView {
+    var postcardCount: String {
+        let total = model.journey.landmarks.count - 1
+        return "\(model.arrivals.count) / \(total) 枚"
+    }
+
+    var nextNote: String {
+        guard let landmark = model.nextLandmark, let remaining = model.kilometersToNext else {
+            return "京都に着きました"
+        }
+
+        return "あと \(remaining) km で\(landmark.name)"
+    }
+
+    var progressRatio: Double {
+        let total = max(1, model.journey.totalKilometers)
+        return Double(model.kilometers) / Double(total)
+    }
+
     var tripBinding: Binding<Bool> {
         Binding(
             get: { model.progress?.activeTrip != nil },
@@ -132,170 +350,5 @@ private extension RoomView {
                 pose = .walk
             }
         }
-    }
-}
-
-private extension RoomView {
-    var distanceCard: some View {
-        card {
-            VStack(alignment: .leading, spacing: Spacing.small) {
-                Text("進んだ距離")
-                    .font(.subheadline)
-                    .foregroundStyle(Palette.muted)
-
-                Text("\(model.kilometers) km")
-                    .font(.system(size: 48, weight: .bold, design: .rounded))
-                    .foregroundStyle(Palette.ink)
-
-                Text(model.journey.name)
-                    .foregroundStyle(Palette.ink)
-
-                nextLandmarkLine
-            }
-        }
-    }
-
-    var nextLandmarkLine: some View {
-        HStack(spacing: Spacing.small) {
-            Image(systemName: "mappin.circle.fill")
-                .foregroundStyle(Palette.teal)
-
-            if let landmark = model.nextLandmark, let remaining = model.kilometersToNext {
-                Text("次は\(landmark.name)")
-                    .foregroundStyle(Palette.ink)
-
-                Text("あと \(remaining) km")
-                    .foregroundStyle(Palette.muted)
-            } else {
-                Text("京都に着きました")
-                    .foregroundStyle(Palette.ink)
-            }
-        }
-        .font(.subheadline)
-    }
-
-    var companionCard: some View {
-        VStack(spacing: 0) {
-            scene
-
-            if let companion = model.companion {
-                HStack {
-                    Text(companion.name)
-                        .font(.headline)
-                        .foregroundStyle(Palette.ink)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-
-                    Spacer()
-
-                    Text("触ると喜ぶ")
-                        .font(.footnote)
-                        .foregroundStyle(Palette.muted)
-                }
-                .padding(.horizontal, Spacing.medium)
-                .padding(.vertical, Spacing.small + 4)
-            }
-        }
-        .background(Palette.card)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-    }
-
-    var scene: some View {
-        RoomScene(
-            companion: model.companion,
-            pose: pose,
-            window: model.nextLandmark ?? model.journey.landmarks.last,
-            postcards: model.decoratedArrivals.map(\.landmark),
-            nextRemaining: model.kilometersToNext,
-            souvenirs: model.arrivals.map(\.landmark).filter { $0.souvenir != nil },
-            onPoke: {
-                poke()
-            }
-        )
-    }
-
-    var tripCard: some View {
-        card {
-            VStack(alignment: .leading, spacing: Spacing.small) {
-                Text("旅の長さ")
-                    .font(.subheadline)
-                    .foregroundStyle(Palette.muted)
-
-                HStack(spacing: Spacing.small) {
-                    ForEach(RoomModel.tripLengths, id: \.self) { minutes in
-                        lengthButton(minutes)
-                    }
-                }
-
-                Button {
-                    model.startTrip()
-                } label: {
-                    Text(model.startTitle)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.borderedProminent)
-                .tint(Palette.teal)
-                .disabled(!model.canStart)
-
-                if !model.isAuthorized || !model.hasSelection {
-                    Text("設定で、許可と止めるアプリを選んでください")
-                        .font(.footnote)
-                        .foregroundStyle(Palette.muted)
-                }
-            }
-        }
-    }
-
-    var usageCard: some View {
-        card {
-            VStack(alignment: .leading, spacing: Spacing.small) {
-                Text("今日のスマホ")
-                    .font(.subheadline)
-                    .foregroundStyle(Palette.muted)
-
-                UsageReportView()
-                    .frame(height: 240)
-            }
-        }
-    }
-
-    func lengthButton(_ minutes: Int) -> some View {
-        let isSelected = model.selectedMinutes == minutes
-        let shape = RoundedRectangle(cornerRadius: 12)
-
-        return Button {
-            model.selectedMinutes = minutes
-        } label: {
-            VStack(spacing: 4) {
-                Text("\(minutes) 分")
-                    .font(.headline)
-                    .foregroundStyle(Palette.ink)
-
-                Text(model.lengthNote(for: minutes))
-                    .font(.caption)
-                    .foregroundStyle(Palette.muted)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
-            .padding(.vertical, Spacing.small)
-            .frame(maxWidth: .infinity)
-            .background(isSelected ? Palette.teal.opacity(0.12) : Palette.card, in: shape)
-            .overlay {
-                shape.stroke(
-                    isSelected ? Palette.teal : Palette.muted.opacity(0.3),
-                    lineWidth: isSelected ? 2 : 1
-                )
-            }
-        }
-        .buttonStyle(.plain)
-    }
-
-    func card(@ViewBuilder content: () -> some View) -> some View {
-        content()
-            .padding(Spacing.medium)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
     }
 }

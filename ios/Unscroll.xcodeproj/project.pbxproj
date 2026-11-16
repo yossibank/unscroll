@@ -18,6 +18,7 @@
 		78875DED3079D500005422E3 /* Core in Frameworks */ = {isa = PBXBuildFile; productRef = 78875DEE3079D500005422E3 /* Core */; };
 		78875DEF3079D500005422E3 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 78875DF03079D500005422E3 /* DesignSystem */; };
 		78875DF23079D500005422E3 /* Store in Frameworks */ = {isa = PBXBuildFile; productRef = 78875DF33079D500005422E3 /* Store */; };
+		78875DF43079D500005422E3 /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 78875DF53079D500005422E3 /* DesignSystem */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -182,6 +183,7 @@
 			isa = PBXFrameworksBuildPhase;
 			files = (
 				78875DC23079D500005422E3 /* Core in Frameworks */,
+				78875DF43079D500005422E3 /* DesignSystem in Frameworks */,
 			);
 		};
 		78875DD73079D500005422E3 /* Frameworks */ = {
@@ -294,6 +296,7 @@
 			name = UnscrollReportExtension;
 			packageProductDependencies = (
 				78875DC33079D500005422E3 /* Core */,
+				78875DF53079D500005422E3 /* DesignSystem */,
 			);
 			productName = UnscrollReportExtension;
 			productReference = 78875DC03079D500005422E3 /* UnscrollReportExtension.appex */;
@@ -1032,6 +1035,10 @@
 		78875DF33079D500005422E3 /* Store */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Store;
+		};
+		78875DF53079D500005422E3 /* DesignSystem */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = DesignSystem;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

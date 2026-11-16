@@ -4,33 +4,39 @@ import SwiftUI
 
 public struct SettingsView: View {
     @State private var model: SettingsModel
+    @State private var path: [Route] = []
 
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.tabBarHidden) private var tabBarHidden
 
     public init(model: SettingsModel) {
         _model = State(initialValue: model)
     }
 
     public var body: some View {
-        NavigationStack {
-            Form {
-                if !model.isReady {
-                    setupSection
+        NavigationStack(path: $path) {
+            ScrollView {
+                VStack(alignment: .leading, spacing: Spacing.medium) {
+                    if !model.isReady {
+                        setupCard
+                    }
+
+                    companionCard
+
+                    blockedAppsCard
+
+                    difficultyCard
+
+                    #if DEBUG
+                    prototypeCard
+                    #endif
                 }
-
-                companionSection
-
-                blockedAppsSection
-
-                difficultySection
-
-                #if DEBUG
-                prototypeSection
-                #endif
+                .padding(.horizontal, Spacing.medium)
+                .padding(.top, Spacing.small)
+                .padding(.bottom, FloatingTabBarMetrics.clearance)
             }
-            .scrollContentBackground(.hidden)
-            .background(Palette.paper)
-            .navigationTitle("設定")
+            .background(PaperBackdrop())
+            .toolbarVisibility(.hidden, for: .navigationBar)
             .navigationDestination(for: Route.self) { route in
                 switch route {
                 case .companion:
@@ -46,7 +52,6 @@ public struct SettingsView: View {
                     BlockedAppsView(model: model)
                 }
             }
-            .tint(Palette.teal)
             .onAppear {
                 model.refresh()
             }
@@ -56,6 +61,9 @@ public struct SettingsView: View {
                 }
 
                 model.refresh()
+            }
+            .onChange(of: path.isEmpty) { _, isEmpty in
+                tabBarHidden.wrappedValue = !isEmpty
             }
         }
     }
@@ -69,43 +77,49 @@ private extension SettingsView {
 }
 
 private extension SettingsView {
-    var setupSection: some View {
-        Section {
+    var setupCard: some View {
+        VStack(alignment: .leading, spacing: Spacing.small + 4) {
             VStack(alignment: .leading, spacing: 4) {
-                Label("旅で止めるには準備が要ります", systemImage: "exclamationmark.triangle.fill")
-                    .font(.headline)
-                    .foregroundStyle(Palette.ink)
-                    .symbolRenderingMode(.multicolor)
+                Label("旅で止めるには、準備が要ります", systemImage: "exclamationmark.triangle.fill")
+                    .font(.subheadline.weight(.heavy))
+                    .foregroundStyle(Palette.coralDeep)
 
                 Text("2 つそろうと、旅の間だけ選んだアプリを止めます")
-                    .font(.footnote)
+                    .font(.caption.weight(.bold))
                     .foregroundStyle(Palette.muted)
             }
-            .padding(.vertical, 4)
 
-            setupStep(number: 1, title: "Screen Time を許可する", isDone: model.isAuthorized) {
-                Button("許可する") {
-                    Task {
-                        await model.requestAuthorization()
-                    }
+            setupStep(
+                number: 1,
+                title: "Screen Time を許可する",
+                isDone: model.isAuthorized,
+                actionTitle: "許可する"
+            ) {
+                Task {
+                    await model.requestAuthorization()
                 }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.small)
             }
 
-            NavigationLink(value: Route.blockedApps) {
-                setupStep(number: 2, title: "止めるアプリを選ぶ", isDone: model.hasSelection) {
-                    EmptyView()
-                }
+            setupStep(
+                number: 2,
+                title: "止めるアプリを選ぶ",
+                isDone: model.hasSelection,
+                actionTitle: "選ぶ"
+            ) {
+                path.append(.blockedApps)
             }
         }
-        .listRowBackground(Palette.coral.opacity(0.16))
+        .roundedCard(fill: LinearGradient(
+            colors: [Palette.coralSoft, Palette.card],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        ))
     }
 
-    var companionSection: some View {
-        Section("相棒") {
-            NavigationLink(value: Route.companion) {
-                HStack(spacing: Spacing.medium) {
+    var companionCard: some View {
+        NavigationLink(value: Route.companion) {
+            HStack(spacing: Spacing.medium) {
+                Group {
                     if let companion = model.companion {
                         CompanionSticker(
                             companion: companion,
@@ -113,32 +127,65 @@ private extension SettingsView {
                             size: 48,
                             breathes: false
                         )
-
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(companion.name)
-                                .font(.headline)
-                                .foregroundStyle(Palette.ink)
-
-                            Text(companion.kindLabel)
-                                .font(.caption)
-                                .foregroundStyle(Palette.muted)
-                        }
                     } else {
-                        Text("相棒を選ぶ")
+                        Image(systemName: "pawprint.fill")
+                            .font(.title2)
+                            .foregroundStyle(Palette.sunDeep)
                     }
                 }
+                .frame(width: 64, height: 64)
+                .background(Palette.sunSoft, in: .rect(cornerRadius: 20))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("いっしょに旅する相棒")
+                        .font(.caption.weight(.heavy))
+                        .foregroundStyle(Palette.teal)
+
+                    Text(model.companion?.name ?? "相棒を選ぶ")
+                        .font(.title3.weight(.heavy))
+                        .foregroundStyle(Palette.ink)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+
+                    if let companion = model.companion {
+                        Text(companion.kindLabel)
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(Palette.muted)
+                    }
+                }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.heavy))
+                    .foregroundStyle(Palette.muted.opacity(0.6))
             }
+            .roundedCard(fill: LinearGradient(
+                colors: [Palette.tealSoft, Palette.card],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ))
         }
-        .listRowBackground(Palette.card)
+        .buttonStyle(.plain)
     }
 
-    var blockedAppsSection: some View {
-        Section("止めるアプリ") {
+    var blockedAppsCard: some View {
+        VStack(spacing: 0) {
             NavigationLink(value: Route.blockedApps) {
-                LabeledContent("止めるアプリ", value: model.selectionSummary)
-            }
+                SettingsRow(title: "止めるアプリ", systemImage: "hand.raised.fill", tint: Palette.coral) {
+                    Text(model.selectionSummary)
 
-            LabeledContent("Screen Time の許可") {
+                    Image(systemName: "chevron.right")
+                        .font(.footnote.weight(.heavy))
+                        .foregroundStyle(Palette.muted.opacity(0.6))
+                }
+            }
+            .buttonStyle(.plain)
+
+            Divider()
+                .overlay(Palette.paperDeep)
+
+            SettingsRow(title: "Screen Time の許可", systemImage: "hourglass", tint: Palette.sky) {
                 if model.isAuthorized {
                     Label("許可あり", systemImage: "checkmark.circle.fill")
                         .foregroundStyle(Palette.teal)
@@ -148,83 +195,142 @@ private extension SettingsView {
                             await model.requestAuthorization()
                         }
                     }
+                    .foregroundStyle(Palette.teal)
                 }
             }
         }
-        .listRowBackground(Palette.card)
+        .roundedCard(padding: Spacing.small)
     }
 
-    var difficultySection: some View {
-        Section {
-            Picker("外しにくさ", selection: $model.strictness) {
-                ForEach(Strictness.allCases, id: \.self) { strictness in
-                    Label {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(title(for: strictness))
-                                .foregroundStyle(Palette.ink)
+    var difficultyCard: some View {
+        VStack(alignment: .leading, spacing: Spacing.small) {
+            Text("外しにくさ")
+                .font(.caption.weight(.heavy))
+                .foregroundStyle(Palette.muted)
+                .padding(.horizontal, Spacing.small)
 
-                            Text(detail(for: strictness))
-                                .font(.caption)
-                                .foregroundStyle(Palette.muted)
-                        }
-                    } icon: {
-                        Image(systemName: symbol(for: strictness))
-                            .foregroundStyle(Palette.teal)
+            VStack(spacing: 0) {
+                ForEach(Strictness.allCases, id: \.self) { strictness in
+                    if strictness != Strictness.allCases.first {
+                        Divider()
+                            .overlay(Palette.paperDeep)
                     }
+
+                    strictnessRow(strictness)
                 }
             }
-            .pickerStyle(.inline)
-            .labelsHidden()
+            .roundedCard(padding: Spacing.small)
             .disabled(model.isTripActive)
-        } header: {
-            Text("外しにくさ")
-        } footer: {
+
             if model.isTripActive {
                 Text("旅が終わったら変えられます")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Palette.muted)
+                    .padding(.horizontal, Spacing.small)
             }
         }
-        .listRowBackground(Palette.card)
     }
 
     #if DEBUG
-    var prototypeSection: some View {
-        Section("試作の記録（開発の版だけ）") {
-            Button("区切りの見張りを始める") {
-                model.startUsageWatch()
-            }
-            .disabled(!model.isReady)
+    var prototypeCard: some View {
+        VStack(alignment: .leading, spacing: Spacing.small) {
+            Text("試作の記録（開発の版だけ）")
+                .font(.caption.weight(.heavy))
+                .foregroundStyle(Palette.muted)
+                .padding(.horizontal, Spacing.small)
 
-            NavigationLink {
-                EventLogView(model: model)
-            } label: {
-                LabeledContent("記録を見る", value: "\(model.logLines.count) 行")
+            VStack(spacing: 0) {
+                Button {
+                    model.startUsageWatch()
+                } label: {
+                    SettingsRow(
+                        title: "区切りの見張りを始める",
+                        systemImage: "eye.fill",
+                        tint: Palette.muted
+                    ) {
+                        EmptyView()
+                    }
+                }
+                .buttonStyle(.plain)
+                .disabled(!model.isReady)
+
+                Divider()
+                    .overlay(Palette.paperDeep)
+
+                NavigationLink {
+                    EventLogView(model: model)
+                } label: {
+                    SettingsRow(title: "記録を見る", systemImage: "list.bullet", tint: Palette.muted) {
+                        Text("\(model.logLines.count) 行")
+                    }
+                }
+                .buttonStyle(.plain)
             }
+            .roundedCard(padding: Spacing.small)
         }
-        .listRowBackground(Palette.card)
     }
     #endif
+
+    func strictnessRow(_ strictness: Strictness) -> some View {
+        let isSelected = model.strictness == strictness
+
+        return Button {
+            model.strictness = strictness
+        } label: {
+            SettingsRow(
+                title: title(for: strictness),
+                detail: detail(for: strictness),
+                systemImage: symbol(for: strictness),
+                tint: tint(for: strictness)
+            ) {
+                if isSelected {
+                    Image(systemName: "checkmark")
+                        .font(.caption.weight(.heavy))
+                        .foregroundStyle(.white)
+                        .frame(width: 24, height: 24)
+                        .background(Palette.teal, in: Circle())
+                }
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
 
     func setupStep(
         number: Int,
         title: String,
         isDone: Bool,
-        @ViewBuilder action: () -> some View
+        actionTitle: String,
+        action: @escaping () -> Void
     ) -> some View {
-        HStack(spacing: Spacing.small) {
-            Image(systemName: isDone ? "checkmark.circle.fill" : "\(number).circle")
-                .font(.title3)
-                .foregroundStyle(isDone ? Palette.teal : Palette.ink)
+        HStack(spacing: Spacing.small + 4) {
+            Text(isDone ? "✓" : "\(number)")
+                .font(.caption.weight(.heavy))
+                .foregroundStyle(.white)
+                .frame(width: 28, height: 28)
+                .background(isDone ? Palette.teal : Palette.coral, in: Circle())
 
             Text(title)
+                .font(.subheadline.weight(.heavy))
                 .foregroundStyle(isDone ? Palette.muted : Palette.ink)
                 .strikethrough(isDone)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
 
-            Spacer()
+            Spacer(minLength: 0)
 
             if !isDone {
-                action()
+                Button(actionTitle, action: action)
+                    .font(.caption.weight(.heavy))
+                    .foregroundStyle(.white)
+                    .padding(.horizontal, Spacing.small + 4)
+                    .padding(.vertical, Spacing.small)
+                    .background(Palette.coral, in: Capsule())
+                    .buttonStyle(.plain)
             }
         }
+        .padding(Spacing.small + 4)
+        .background(.white, in: .rect(cornerRadius: 20))
     }
 }
 
@@ -247,9 +353,17 @@ private extension SettingsView {
 
     func symbol(for strictness: Strictness) -> String {
         switch strictness {
-        case .gentle: "leaf"
+        case .gentle: "leaf.fill"
         case .normal: "hourglass"
-        case .strict: "lock"
+        case .strict: "lock.fill"
+        }
+    }
+
+    func tint(for strictness: Strictness) -> Color {
+        switch strictness {
+        case .gentle: Palette.leaf
+        case .normal: Palette.sun
+        case .strict: Palette.plum
         }
     }
 }

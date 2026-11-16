@@ -19,7 +19,7 @@ private extension UsageReportView {
         let today = Calendar.current.dateInterval(of: .day, for: .now) ?? DateInterval()
 
         return DeviceActivityFilter(
-            segment: .daily(during: today),
+            segment: .hourly(during: today),
             users: .all,
             devices: .init([.iPhone])
         )
