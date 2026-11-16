@@ -34,16 +34,16 @@ private extension JourneyMapCanvas {
     @ViewBuilder
     func marker(_ unit: CGFloat) -> some View {
         let point = currentPosition()
-        let side = 16 * unit
+        let frame = markerFrame(unit)
 
         if let companion {
             CompanionSticker(
                 companion: companion,
                 pose: .walkLeft,
-                size: side,
+                size: frame.width,
                 breathes: false
             )
-            .position(x: point.x * unit, y: (point.y - 6) * unit)
+            .position(x: frame.midX, y: frame.midY)
         } else {
             Rectangle()
                 .fill(Palette.teal)
@@ -57,6 +57,9 @@ private extension JourneyMapCanvas {
     static let passed = Color(hex: 0xC9705F)
     static let ahead = Color(hex: 0x7A6A4E)
     static let outline = Color(hex: 0x4A3428)
+    static let markerSide: CGFloat = 16
+    static let markerLift: CGFloat = 6
+    static let labelBelow: CGFloat = 10
 
     var accessibilityText: String {
         let reached = landmarkPoints().filter { $0.kilometer <= kilometers }.map(\.name)
@@ -145,21 +148,56 @@ private extension JourneyMapCanvas {
                 .foregroundStyle(color)
             let resolved = context.resolve(label)
             let size = resolved.measure(in: CGSize(width: 200 * unit, height: 40 * unit))
-            let center = CGPoint(
-                x: (item.point.x + offset.width) * unit,
-                y: (item.point.y + offset.height) * unit
+            let above = labelPlate(
+                at: item.point,
+                offset: offset,
+                size: size,
+                unit: unit
             )
-            let plate = CGRect(
-                x: center.x - size.width / 2 - 2 * unit,
-                y: center.y - size.height / 2 - 0.5 * unit,
-                width: size.width + 4 * unit,
-                height: size.height + unit
+            let isCovered = companion != nil && above.intersects(markerFrame(unit))
+            let shifted = isCovered ? CGSize(width: offset.width, height: Self.labelBelow) : offset
+            let plate = labelPlate(
+                at: item.point,
+                offset: shifted,
+                size: size,
+                unit: unit
             )
             let opacity = isLit ? 0.92 : 0.7
 
             context.fill(Path(plate), with: .color(Color(hex: 0xFBFAF6).opacity(opacity)))
-            context.draw(resolved, at: center)
+            context.draw(resolved, at: CGPoint(x: plate.midX, y: plate.midY))
         }
+    }
+
+    func labelPlate(
+        at point: CGPoint,
+        offset: CGSize,
+        size: CGSize,
+        unit: CGFloat
+    ) -> CGRect {
+        let center = CGPoint(
+            x: (point.x + offset.width) * unit,
+            y: (point.y + offset.height) * unit
+        )
+
+        return CGRect(
+            x: center.x - size.width / 2 - 2 * unit,
+            y: center.y - size.height / 2 - 0.5 * unit,
+            width: size.width + 4 * unit,
+            height: size.height + unit
+        )
+    }
+
+    func markerFrame(_ unit: CGFloat) -> CGRect {
+        let point = currentPosition()
+        let side = Self.markerSide * unit
+
+        return CGRect(
+            x: point.x * unit - side / 2,
+            y: (point.y - Self.markerLift) * unit - side / 2,
+            width: side,
+            height: side
+        )
     }
 
     func fill(
