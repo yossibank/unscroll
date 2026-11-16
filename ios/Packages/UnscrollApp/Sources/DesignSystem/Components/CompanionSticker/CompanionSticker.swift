@@ -65,6 +65,9 @@ private extension CompanionSticker {
             .shadow(color: .white, radius: 0, x: 0, y: -outline)
             .shadow(color: Palette.ink.opacity(0.22), radius: 4, x: 0, y: 4)
             .accessibilityLabel(accessibilityText)
+            .transaction { transaction in
+                transaction.animation = nil
+            }
     }
 }
 
