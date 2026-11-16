@@ -25,7 +25,7 @@ public extension JourneyProgress {
         at now: Date
     ) throws -> JourneyProgress {
         let trips = try Trip.fetchAll(db)
-        let journeyTrips = try tripsOnJourney(journeyID, in: trips, db)
+        let journeyTrips = try tripsOnJourney(journeyID, db) ?? trips
         let kilometers = journeyTrips.reduce(0) { $0 + $1.kilometers(at: now) }
 
         let activeTrip = trips
@@ -45,22 +45,17 @@ public extension JourneyProgress {
 private extension JourneyProgress {
     static func tripsOnJourney(
         _ journeyID: String,
-        in trips: [Trip],
         _ db: Database
-    ) throws -> [Trip] {
+    ) throws -> [Trip]? {
         let hasJourney = try db.columns(in: "trip").contains { $0.name == "journeyID" }
 
         guard hasJourney else {
-            return trips
+            return nil
         }
 
-        let ids = try String.fetchSet(
-            db,
-            sql: "select id from trip where journeyID = ?",
-            arguments: [journeyID]
-        )
-
-        return trips.filter { ids.contains($0.id.description) }
+        return try Trip
+            .filter(sql: "journeyID = ?", arguments: [journeyID])
+            .fetchAll(db)
     }
 }
 
