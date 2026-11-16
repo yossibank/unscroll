@@ -22,6 +22,16 @@ public enum DayPeriod: CaseIterable, Sendable {
     }
 }
 
+public extension DayPeriod {
+    var roomShade: Color? {
+        self == .night ? Color(hex: 0x282C5C).opacity(0.32) : nil
+    }
+
+    var lampGlow: Color {
+        Color(hex: 0xFFD696).opacity(0.35)
+    }
+}
+
 extension DayPeriod {
     var sky: [Color] {
         switch self {

@@ -19,6 +19,7 @@ public final class RoomModel {
     public private(set) var finishedTrip: Trip?
     public private(set) var finishedArrivals: [Arrival] = []
     public private(set) var decoratedArrivals: [Arrival] = []
+    public private(set) var arrivals: [Arrival] = []
     public private(set) var isAuthorized = false
     public private(set) var hasSelection = false
 
@@ -115,6 +116,7 @@ public extension RoomModel {
         updateFinishedTrip()
         updateFinishedArrivals()
         decoratedArrivals = (try? database.decoratedArrivals()) ?? []
+        arrivals = (try? database.arrivals()) ?? []
     }
 
     func setDecorated(
