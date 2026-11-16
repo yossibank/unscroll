@@ -33,8 +33,16 @@ public final class SettingsModel {
 }
 
 public extension SettingsModel {
+    var hasSelection: Bool {
+        !BlockedApps.isEmpty(selection)
+    }
+
+    var isReady: Bool {
+        isAuthorized && hasSelection
+    }
+
     var selectionSummary: String {
-        BlockedApps.summary(selection)
+        hasSelection ? BlockedApps.summary(selection) : "未選択"
     }
 
     func makeCompanionPicker() -> CompanionPickerModel {
