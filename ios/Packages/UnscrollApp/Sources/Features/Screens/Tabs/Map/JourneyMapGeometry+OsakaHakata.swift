@@ -12,9 +12,9 @@ extension JourneyMapGeometry {
             "博多の屋台": CGPoint(x: 130.41, y: 33.59)
         ],
         labelOffsets: [
-            "道頓堀": CGSize(width: 0, height: -9),
-            "神戸の南京町": CGSize(width: 0, height: 13),
-            "明石": CGSize(width: -10, height: -9),
+            "道頓堀": CGSize(width: 3, height: 12),
+            "神戸の南京町": CGSize(width: -20, height: 12),
+            "明石": CGSize(width: -18, height: -9),
             "岡山": CGSize(width: 0, height: -9),
             "尾道": CGSize(width: 0, height: 10),
             "広島": CGSize(width: 0, height: 10),
