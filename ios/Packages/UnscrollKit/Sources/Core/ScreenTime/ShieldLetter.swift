@@ -3,6 +3,7 @@ import Foundation
 public struct ShieldLetter: Hashable, Sendable {
     public let title: String
     public let body: String
+    public let primaryButton: String
 
     public init(
         companionName: String?,
@@ -10,22 +11,29 @@ public struct ShieldLetter: Hashable, Sendable {
         kilometers: Int?,
         remainingMinutes: Int?
     ) {
-        let name = companionName ?? "相棒"
-        let next = kilometers.flatMap { journey.nextLandmark(after: $0) }
-        var lines = ["まだ帰らないよ。"]
+        var lines: [String] = []
 
         if let kilometers,
-           let next {
-            lines.append("\(next.name)まで、あと \((next.kilometer - kilometers).formatted()) km。")
+           let here = journey.landmarks.last(where: { $0.kilometer <= kilometers }) {
+            lines.append("いま\(here.name)の近くを歩いてるよ。")
+        }
+
+        if let kilometers,
+           let next = journey.nextLandmark(after: kilometers) {
+            let distance = (next.kilometer - kilometers).formatted()
+            lines.append("あと \(distance) km で\(next.name)に着くんだ。")
         }
 
         if let remainingMinutes {
-            lines.append("旅はあと \(remainingMinutes) 分。")
+            lines.append("旅はあと \(remainingMinutes) 分。スマホはお休みしててね。")
         }
 
-        lines.append("いっしょに行こう。")
+        if lines.isEmpty {
+            lines.append("旅の途中だよ。スマホはお休みしててね。")
+        }
 
-        self.title = "\(name)から手紙が届いたよ"
-        self.body = lines.joined()
+        self.title = companionName.map { "\($0)より" } ?? "旅先からの手紙"
+        self.body = lines.joined(separator: "\n")
+        self.primaryButton = companionName.map { "\($0)の旅に戻る" } ?? "旅に戻る"
     }
 }
