@@ -49,6 +49,27 @@ struct ShieldLetterTests {
     }
 
     @Test
+    func groupsDistanceDigitsOverOneThousandKilometers() {
+        let journey = Journey(
+            id: "long",
+            name: "長い旅",
+            landmarks: [
+                Landmark(name: "出発", kilometer: 0, artKey: "start"),
+                Landmark(name: "遠い町", kilometer: 1250, artKey: "far")
+            ]
+        )
+        let letter = ShieldLetter(
+            companionName: "ぽん",
+            journey: journey,
+            kilometers: 0,
+            remainingMinutes: nil
+        )
+        let distance = 1250.formatted()
+
+        #expect(letter.body == "まだ帰らないよ。遠い町まで、あと \(distance) km。いっしょに行こう。")
+    }
+
+    @Test
     func callsCompanionByRoleWithoutName() {
         let letter = ShieldLetter(
             companionName: nil,

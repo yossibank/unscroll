@@ -267,7 +267,7 @@ private extension TripResultSheet {
             return "京都に着きました"
         }
 
-        return "次は\(landmark.name) あと \(remaining) km"
+        return "次は\(landmark.name) あと \(remaining.formatted()) km"
     }
 
     func gift(_ landmark: Landmark) -> String {
@@ -286,6 +286,6 @@ private extension TripResultSheet {
         )
         let time = arrival.arrivedAt.formatted(format)
 
-        return "\(arrival.landmark.kilometer) km · \(time)"
+        return "\(arrival.landmark.kilometer.formatted()) km · \(time)"
     }
 }

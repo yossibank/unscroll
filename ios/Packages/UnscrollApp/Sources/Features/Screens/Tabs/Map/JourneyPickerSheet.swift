@@ -193,7 +193,7 @@ private extension JourneyPickerSheet {
 
     func summary(_ journey: Journey) -> String {
         let focus = JourneyPickerModel.focusText(kilometers: journey.totalKilometers)
-        return "\(journey.totalKilometers) km・\(focus)の集中"
+        return "\(journey.totalKilometers.formatted()) km・\(focus)の集中"
     }
 
     func detail(_ journey: Journey) -> String {
@@ -205,6 +205,6 @@ private extension JourneyPickerSheet {
             return base
         }
 
-        return "\(base)・\(done) km 進んだ"
+        return "\(base)・\(done.formatted()) km 進んだ"
     }
 }

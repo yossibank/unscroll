@@ -65,7 +65,7 @@ private extension JourneyMapCanvas {
     var accessibilityText: String {
         let reached = landmarkPoints().filter { $0.kilometer <= kilometers }.map(\.name)
         let names = reached.joined(separator: "、")
-        return "\(journey.name)の地図。\(kilometers) km 進んだ。通った名所は \(names)"
+        return "\(journey.name)の地図。\(kilometers.formatted()) km 進んだ。通った名所は \(names)"
     }
 
     func drawRoad(

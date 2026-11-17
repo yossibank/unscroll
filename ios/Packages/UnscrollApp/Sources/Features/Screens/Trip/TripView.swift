@@ -132,6 +132,6 @@ private extension TripView {
             return "京都に着きました"
         }
 
-        return "\(landmark.name)まで \(landmark.kilometer - total) km"
+        return "\(landmark.name)まで \((landmark.kilometer - total).formatted()) km"
     }
 }

@@ -357,10 +357,10 @@ private extension TodayUsageView {
         }
 
         guard let reached else {
-            return "この時間を旅にすると \(kilometers) km 進めたよ"
+            return "この時間を旅にすると \(kilometers.formatted()) km 進めたよ"
         }
 
-        return "この時間を旅にすると \(kilometers) km。\(reached.name)まで行けたよ"
+        return "この時間を旅にすると \(kilometers.formatted()) km。\(reached.name)まで行けたよ"
     }
 
     func format(_ duration: TimeInterval) -> String {
