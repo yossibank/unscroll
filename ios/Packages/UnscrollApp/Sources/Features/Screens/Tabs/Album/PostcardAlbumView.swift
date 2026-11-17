@@ -19,7 +19,10 @@ public struct PostcardAlbumView: View {
                 VStack(alignment: .leading, spacing: Spacing.medium) {
                     JournalTitle("絵はがき帳", note: model.journey.name)
 
-                    PostcardStampRally(entries: model.entries)
+                    PostcardStampRally(
+                        entries: model.entries,
+                        collectedCount: model.collectedCount
+                    )
 
                     LazyVGrid(columns: columns, spacing: Spacing.large) {
                         ForEach(

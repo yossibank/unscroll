@@ -75,7 +75,10 @@ private extension SnapshotTests {
         VStack(alignment: .leading, spacing: Spacing.medium) {
             JournalTitle("絵はがき帳", note: Journey.worldHeritage.name)
 
-            PostcardStampRally(entries: entries)
+            PostcardStampRally(
+                entries: entries,
+                collectedCount: entries.count(where: \.isCollected)
+            )
 
             LazyVGrid(
                 columns: [

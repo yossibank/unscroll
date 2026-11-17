@@ -3,6 +3,7 @@ import SwiftUI
 
 struct PostcardStampRally: View {
     let entries: [PostcardAlbumModel.Entry]
+    let collectedCount: Int
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.small + 4) {
@@ -38,10 +39,6 @@ struct PostcardStampRally: View {
 }
 
 private extension PostcardStampRally {
-    var collectedCount: Int {
-        entries.count(where: \.isCollected)
-    }
-
     @ViewBuilder
     func stamp(
         _ entry: PostcardAlbumModel.Entry,

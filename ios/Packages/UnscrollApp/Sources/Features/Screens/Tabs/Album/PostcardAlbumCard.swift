@@ -71,6 +71,7 @@ private extension PostcardAlbumCard {
                 .foregroundStyle(Palette.muted)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
+                .accessibilityLabel(arrivedNote(arrival))
         }
         .padding(Spacing.small)
         .background(Palette.card, in: .rect(cornerRadius: 4))
@@ -85,6 +86,17 @@ private extension PostcardAlbumCard {
                 .offset(y: -10)
         }
         .rotationEffect(.degrees(tilt))
+    }
+
+    func arrivedNote(_ arrival: Arrival) -> String {
+        let format = Date.VerbatimFormatStyle(
+            format: "\(month: .defaultDigits)/\(day: .defaultDigits)",
+            timeZone: .current,
+            calendar: .current
+        )
+        let date = arrival.arrivedAt.formatted(format)
+
+        return "\(entry.landmark.kilometer.formatted()) km 地点、\(date) に届いた"
     }
 }
 
