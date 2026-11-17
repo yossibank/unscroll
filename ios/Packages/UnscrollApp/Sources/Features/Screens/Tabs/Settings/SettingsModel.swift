@@ -19,6 +19,7 @@ public final class SettingsModel {
     public private(set) var companion: Companion?
     public private(set) var isAuthorized = false
     public private(set) var isTripActive = false
+    public private(set) var kilometersTogether = 0
     public private(set) var logLines: [String] = []
 
     @ObservationIgnored private let database: AppDatabase
@@ -53,6 +54,7 @@ public extension SettingsModel {
         companion = try? database.companion()
         isAuthorized = AuthorizationCenter.shared.authorizationStatus == .approved
         isTripActive = (try? database.journeyProgress(at: .now))?.activeTrip != nil
+        kilometersTogether = totalKilometers(at: .now)
         logLines = EventLog.lines()
     }
 
@@ -100,6 +102,13 @@ public extension SettingsModel {
 }
 
 private extension SettingsModel {
+    func totalKilometers(at now: Date) -> Int {
+        Journey.all.reduce(0) { total, journey in
+            let progress = try? database.journeyProgress(journeyID: journey.id, at: now)
+            return total + (progress?.kilometers ?? 0)
+        }
+    }
+
     func makeUsageEvents() -> [DeviceActivityEvent.Name: DeviceActivityEvent] {
         let pairs = ScreenTimeShared.usageThresholdMinutes.map { minutes in
             let name = DeviceActivityEvent.Name(ScreenTimeShared.usageEventName(minutes: minutes))
