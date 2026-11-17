@@ -129,125 +129,55 @@ struct UsageHeadline: View {
     let usage: TodayUsage
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
+        HStack(alignment: .bottom, spacing: Spacing.small) {
             UsageTotal(usage: usage)
+
+            Spacer(minLength: 0)
 
             if let comparison = usage.comparison {
                 Label(comparison.text, systemImage: comparison.symbol)
                     .font(.caption.weight(.heavy))
                     .foregroundStyle(comparison.tint)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .padding(.horizontal, Spacing.small)
+                    .padding(.vertical, 4)
+                    .background(comparison.tint.opacity(0.12), in: Capsule())
+                    .padding(.bottom, 4)
             }
         }
     }
 }
 
-struct UsageFact: View {
-    let value: String
-    let note: String
-    let wash: Color
+struct UsageSectionHeader: View {
+    let title: String
+    let trailing: String?
 
     init(
-        _ value: String,
-        note: String,
-        wash: Color
+        _ title: String,
+        trailing: String? = nil
     ) {
-        self.value = value
-        self.note = note
-        self.wash = wash
+        self.title = title
+        self.trailing = trailing
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(value)
-                .font(.subheadline.weight(.heavy))
-                .monospacedDigit()
+        HStack(spacing: Spacing.small) {
+            Text(title)
+                .foregroundStyle(Palette.muted)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
 
-            Text(note)
-                .font(.system(size: 9, weight: .bold))
-                .foregroundStyle(Palette.muted)
-        }
-        .padding(Spacing.small)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(wash, in: .rect(cornerRadius: 16))
-    }
-}
+            Spacer(minLength: 0)
 
-struct HourBars: View {
-    enum Unit {
-        case time
-        case count
-    }
-
-    let values: [Double]
-    let unit: Unit
-
-    private let barHeight: CGFloat = 56
-    private let axisWidth: CGFloat = 28
-    private let hourLength: Double = 60 * 60
-
-    var body: some View {
-        let peak = max(values.max() ?? 0, 1)
-
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(alignment: .bottom, spacing: 2) {
-                ForEach(values.indices, id: \.self) { hour in
-                    let ratio = unit == .time
-                        ? min(values[hour] / hourLength, 1)
-                        : values[hour] / peak
-
-                    UnevenRoundedRectangle(topLeadingRadius: 3, topTrailingRadius: 3)
-                        .fill(ratio > 0 ? Palette.hour(hour) : Palette.paperDeep)
-                        .frame(height: max(3, barHeight * ratio))
-                        .frame(maxWidth: .infinity)
-                }
+            if let trailing {
+                Text(trailing)
+                    .foregroundStyle(Palette.ink)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             }
-            .frame(height: barHeight, alignment: .bottom)
-            .padding(.trailing, axisWidth)
-            .background(alignment: .top) {
-                if unit == .time {
-                    VStack(spacing: 0) {
-                        guide("60分")
-
-                        Spacer(minLength: 0)
-
-                        guide("30分")
-
-                        Spacer(minLength: 0)
-                    }
-                }
-            }
-
-            HStack {
-                ForEach(["0時", "6", "12", "18", "24"], id: \.self) { label in
-                    Text(label)
-
-                    if label != "24" {
-                        Spacer()
-                    }
-                }
-            }
-            .font(.system(size: 9, weight: .bold))
-            .foregroundStyle(Palette.muted)
-            .padding(.trailing, axisWidth)
         }
-        .accessibilityHidden(true)
-    }
-
-    private func guide(_ label: String) -> some View {
-        HStack(spacing: 4) {
-            Rectangle()
-                .fill(Palette.muted.opacity(0.2))
-                .frame(height: 1)
-
-            Text(label)
-                .font(.system(size: 8, weight: .bold))
-                .foregroundStyle(Palette.muted)
-                .frame(width: axisWidth - 4, alignment: .trailing)
-        }
-        .frame(height: 10)
-        .offset(y: -5)
+        .font(.caption.weight(.bold))
     }
 }
 
@@ -295,85 +225,6 @@ struct CategoryStrip: View {
             }
         }
         .accessibilityElement(children: .combine)
-    }
-}
-
-struct AppIcon: View {
-    let app: AppUsage
-    let tint: Color
-
-    var body: some View {
-        if let token = app.token {
-            Label(token)
-                .labelStyle(.iconOnly)
-                .frame(width: 28, height: 28)
-        } else {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(tint)
-                .frame(width: 28, height: 28)
-        }
-    }
-}
-
-struct AppRow<Badges: View>: View {
-    let app: AppUsage
-    let peak: TimeInterval
-    let tint: Color
-    let badges: Badges
-
-    init(
-        _ app: AppUsage,
-        peak: TimeInterval,
-        tint: Color,
-        @ViewBuilder badges: () -> Badges
-    ) {
-        self.app = app
-        self.peak = max(peak, 1)
-        self.tint = tint
-        self.badges = badges()
-    }
-
-    var body: some View {
-        HStack(spacing: Spacing.small) {
-            AppIcon(app: app, tint: tint)
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(app.name)
-                    .font(.caption.weight(.bold))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-
-                GeometryReader { proxy in
-                    Capsule()
-                        .fill(Palette.paperDeep)
-                        .overlay(alignment: .leading) {
-                            Capsule()
-                                .fill(tint)
-                                .frame(width: proxy.size.width * app.duration / peak)
-                        }
-                }
-                .frame(height: 8)
-
-                badges
-            }
-
-            Text(TodayUsage.format(app.duration))
-                .font(.caption.weight(.bold))
-                .foregroundStyle(Palette.muted)
-                .monospacedDigit()
-        }
-    }
-}
-
-extension AppRow where Badges == EmptyView {
-    init(
-        _ app: AppUsage,
-        peak: TimeInterval,
-        tint: Color
-    ) {
-        self.init(app, peak: peak, tint: tint) {
-            EmptyView()
-        }
     }
 }
 

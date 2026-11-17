@@ -1,0 +1,134 @@
+import DesignSystem
+import FamilyControls
+import SwiftUI
+
+struct AppIcon: View {
+    let app: AppUsage
+    let tint: Color
+
+    var body: some View {
+        if let token = app.token {
+            Label(token)
+                .labelStyle(.iconOnly)
+                .frame(width: 32, height: 32)
+        } else {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(tint)
+                .frame(width: 32, height: 32)
+        }
+    }
+}
+
+struct AppRow<Icon: View>: View {
+    let name: String
+    let value: String
+    let ratio: Double
+    let tint: Color
+    @ViewBuilder let icon: Icon
+
+    var body: some View {
+        HStack(spacing: Spacing.small) {
+            icon
+
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: Spacing.small) {
+                    Text(name)
+                        .foregroundStyle(Palette.ink)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+
+                    Spacer(minLength: 0)
+
+                    Text(value)
+                        .foregroundStyle(Palette.muted)
+                        .monospacedDigit()
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
+                }
+                .font(.caption.weight(.bold))
+
+                GeometryReader { proxy in
+                    Capsule()
+                        .fill(Palette.paperDeep)
+                        .overlay(alignment: .leading) {
+                            Capsule()
+                                .fill(tint)
+                                .frame(width: proxy.size.width * ratio)
+                        }
+                }
+                .frame(height: 8)
+            }
+        }
+    }
+}
+
+struct UsageAppList: View {
+    let usage: TodayUsage
+    let sort: UsageSort
+
+    private let tints = [Palette.coral, Palette.sky, Palette.plum, Palette.sun, Palette.muted]
+
+    var body: some View {
+        let ranked = usage.apps.sorted { sort.value(of: $0) > sort.value(of: $1) }
+        let shown = Array(ranked.prefix(5))
+        let rest = Array(ranked.dropFirst(5))
+        let peak = ranked.first.map { sort.value(of: $0) } ?? 0
+
+        VStack(alignment: .leading, spacing: Spacing.small) {
+            UsageSectionHeader(sort.heading, trailing: sort.total(of: usage))
+
+            VStack(spacing: Spacing.small) {
+                ForEach(Array(shown.enumerated()), id: \.element.id) { index, app in
+                    AppRow(
+                        name: app.name,
+                        value: sort.text(sort.value(of: app)),
+                        ratio: ratio(sort.value(of: app), peak: peak),
+                        tint: tint(at: index)
+                    ) {
+                        AppIcon(app: app, tint: tint(at: index))
+                    }
+                }
+
+                if !rest.isEmpty {
+                    otherRow(rest, peak: peak)
+                }
+            }
+        }
+    }
+}
+
+private extension UsageAppList {
+    func otherRow(
+        _ rest: [AppUsage],
+        peak: Double
+    ) -> some View {
+        let sum = sort == .perPickup ? 0 : rest.reduce(0) { $0 + sort.value(of: $1) }
+
+        return AppRow(
+            name: "その他 \(rest.count) アプリ",
+            value: sort.text(sum),
+            ratio: ratio(sum, peak: peak),
+            tint: sort == .time ? Palette.muted : sort.tint
+        ) {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(Palette.paperDeep)
+                .frame(width: 32, height: 32)
+                .overlay {
+                    Text("…")
+                        .font(.caption.weight(.heavy))
+                        .foregroundStyle(Palette.muted)
+                }
+        }
+    }
+
+    func tint(at index: Int) -> Color {
+        sort == .time ? tints[index % tints.count] : sort.tint
+    }
+
+    func ratio(
+        _ value: Double,
+        peak: Double
+    ) -> Double {
+        peak > 0 ? min(value / peak, 1) : 0
+    }
+}
