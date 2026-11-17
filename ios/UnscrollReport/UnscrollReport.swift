@@ -9,9 +9,5 @@ struct UnscrollReport: DeviceActivityReportExtension {
         TodayUsageReport(context: .init(ScreenTimeShared.reportContextName)) { usage in
             TodayUsageView(usage: usage)
         }
-
-        TodayUsageReport(context: .init(ScreenTimeShared.reportDetailContextName)) { usage in
-            TodayUsageDetailView(usage: usage)
-        }
     }
 }

@@ -8,7 +8,6 @@ public enum ScreenTimeShared {
     public static let usageActivityName = "usage"
     public static let usageThresholdMinutes = [1, 5, 15]
     public static let reportContextName = "todayUsage"
-    public static let reportDetailContextName = "todayUsageDetail"
 
     public static func usageEventName(minutes: Int) -> String {
         "usage.\(minutes)m"
