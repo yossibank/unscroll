@@ -172,9 +172,12 @@ private extension SettingsView {
     var blockedAppsCard: some View {
         VStack(spacing: 0) {
             NavigationLink(value: Route.blockedApps) {
-                SettingsRow(title: "止めるアプリ", systemImage: "hand.raised.fill", tint: Palette.coral) {
-                    Text(model.selectionSummary)
-
+                SettingsRow(
+                    title: "止めるアプリ",
+                    detail: model.selectionSummary,
+                    systemImage: "hand.raised.fill",
+                    tint: Palette.coral
+                ) {
                     Image(systemName: "chevron.right")
                         .font(.footnote.weight(.heavy))
                         .foregroundStyle(Palette.muted.opacity(0.6))
