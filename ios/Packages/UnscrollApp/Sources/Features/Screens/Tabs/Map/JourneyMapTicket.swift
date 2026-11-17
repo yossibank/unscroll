@@ -50,18 +50,8 @@ private extension JourneyMapTicket {
             .lineLimit(1)
             .minimumScaleFactor(0.8)
 
-            Capsule()
-                .fill(Palette.tealSoft)
-                .frame(height: 8)
-                .overlay(alignment: .leading) {
-                    GeometryReader { proxy in
-                        Capsule()
-                            .fill(Palette.teal)
-                            .frame(width: proxy.size.width * model.progressRatio)
-                    }
-                }
+            TicketGauge(ratio: model.progressRatio)
                 .padding(.top, 4)
-                .accessibilityHidden(true)
 
             Text(distanceNote)
                 .font(.caption.weight(.bold))
@@ -123,31 +113,5 @@ private extension JourneyMapTicket {
             }
         }
         .padding(.top, 4)
-    }
-}
-
-private struct TicketShape: Shape {
-    let stubWidth: CGFloat
-
-    func path(in rect: CGRect) -> Path {
-        let notch: CGFloat = 8
-        let x = rect.maxX - stubWidth
-        let body = RoundedRectangle(cornerRadius: 16).path(in: rect)
-
-        let top = Path(ellipseIn: CGRect(
-            x: x - notch,
-            y: rect.minY - notch,
-            width: notch * 2,
-            height: notch * 2
-        ))
-
-        let bottom = Path(ellipseIn: CGRect(
-            x: x - notch,
-            y: rect.maxY - notch,
-            width: notch * 2,
-            height: notch * 2
-        ))
-
-        return body.subtracting(top).subtracting(bottom)
     }
 }

@@ -20,11 +20,11 @@ public struct RoomView: View {
             VStack(spacing: Spacing.medium) {
                 topBar
 
-                companionCard
+                RoomPhoto(model: model, pose: pose) {
+                    poke()
+                }
 
-                distanceCard
-
-                RoomTripCard(model: model)
+                RoomTicket(model: model)
 
                 usageCard
             }
@@ -122,108 +122,6 @@ private extension RoomView {
         }
     }
 
-    var companionCard: some View {
-        scene
-            .overlay {
-                GeometryReader { proxy in
-                    bubble
-                        .position(x: proxy.size.width * 0.27, y: proxy.size.height * 0.5)
-                }
-                .allowsHitTesting(false)
-            }
-            .overlay(alignment: .bottomLeading) {
-                if let companion = model.companion {
-                    Text(companion.name)
-                        .font(.footnote.weight(.heavy))
-                        .foregroundStyle(Palette.ink)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-                        .padding(.horizontal, Spacing.small + 4)
-                        .padding(.vertical, 4)
-                        .background(.white.opacity(0.92), in: Capsule())
-                        .padding(Spacing.small + 4)
-                        .allowsHitTesting(false)
-                }
-            }
-            .clipShape(.rect(cornerRadius: RoundedCard.radius))
-            .shadow(color: Palette.shadow, radius: 12, y: 8)
-    }
-
-    var scene: some View {
-        RoomScene(
-            companion: model.companion,
-            look: model.look,
-            pose: pose,
-            window: model.nextLandmark ?? model.journey.landmarks.last,
-            postcards: model.hungPostcards,
-            nextRemaining: model.kilometersToNext,
-            souvenirs: model.arrivals.map(\.landmark).filter { $0.souvenir != nil },
-            onPoke: {
-                poke()
-            }
-        )
-    }
-
-    var bubble: some View {
-        Text(pose == .joy ? "うれしい！" : "そろそろ出かける？")
-            .font(.caption2.weight(.heavy))
-            .foregroundStyle(Palette.ink)
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
-            .padding(.horizontal, Spacing.small)
-            .padding(.vertical, 4)
-            .background(alignment: .bottomTrailing) {
-                Image(systemName: "triangleshape.fill")
-                    .font(.system(size: 8))
-                    .foregroundStyle(.white)
-                    .rotationEffect(.degrees(150))
-                    .offset(x: 2, y: 4)
-            }
-            .background(.white, in: Capsule())
-            .shadow(color: Palette.ink.opacity(0.12), radius: 4, y: 3)
-            .contentTransition(.opacity)
-            .animation(.snappy, value: pose == .joy)
-    }
-
-    var distanceCard: some View {
-        VStack(alignment: .leading, spacing: Spacing.small) {
-            CardLabel(
-                "進んだ距離",
-                systemImage: "figure.walk",
-                tint: Palette.teal,
-                wash: Palette.tealSoft
-            ) {
-                Text(nextNote)
-                    .foregroundStyle(Palette.teal)
-            }
-
-            HStack(alignment: .lastTextBaseline, spacing: 4) {
-                Text("\(model.kilometers)")
-                    .font(.system(size: 44, weight: .heavy))
-                    .foregroundStyle(Palette.teal)
-                    .contentTransition(.numericText())
-
-                Text("/ \(model.journey.totalKilometers) km")
-                    .font(.subheadline.weight(.heavy))
-                    .foregroundStyle(Palette.muted)
-            }
-
-            JourneyTrack(ratio: progressRatio)
-                .padding(.top, 4)
-
-            HStack {
-                Text(model.journey.landmarks.first?.name ?? "")
-
-                Spacer()
-
-                Text(model.journey.landmarks.last?.name ?? "")
-            }
-            .font(.caption2.weight(.bold))
-            .foregroundStyle(Palette.muted)
-        }
-        .roundedCard()
-    }
-
     var usageCard: some View {
         VStack(alignment: .leading, spacing: Spacing.small) {
             CardLabel(
@@ -244,19 +142,6 @@ private extension RoomView {
     var postcardCount: String {
         let total = model.journey.landmarks.count - 1
         return "\(model.arrivals.count) / \(total) 枚"
-    }
-
-    var nextNote: String {
-        guard let landmark = model.nextLandmark, let remaining = model.kilometersToNext else {
-            return "京都に着きました"
-        }
-
-        return "あと \(remaining.formatted()) km で\(landmark.name)"
-    }
-
-    var progressRatio: Double {
-        let total = max(1, model.journey.totalKilometers)
-        return Double(model.kilometers) / Double(total)
     }
 
     var tripBinding: Binding<Bool> {
