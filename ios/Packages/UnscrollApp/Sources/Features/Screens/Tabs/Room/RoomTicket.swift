@@ -115,11 +115,11 @@ private extension RoomTicket {
                 Image(systemName: "backpack.fill")
                     .font(.headline)
             }
-            .foregroundStyle(model.canStart ? Color.white : Palette.muted)
+            .foregroundStyle(stubForeground)
             .padding(.horizontal, Spacing.small)
             .frame(width: Self.stubWidth)
             .frame(maxHeight: .infinity)
-            .background(model.canStart ? Palette.teal : Palette.paperDeep)
+            .background(stubBackground)
             .overlay(alignment: .leading) {
                 Rectangle()
                     .stroke(stubEdge, style: StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
@@ -136,6 +136,9 @@ private extension RoomTicket {
 
     func presetButton(_ minutes: Int) -> some View {
         let isSelected = model.selectedMinutes == minutes
+        let foreground = isSelected ? Color.white : Palette.muted
+        let background = isSelected ? Palette.ink : Palette.paperDeep
+        let traits: AccessibilityTraits = isSelected ? .isSelected : []
 
         return Button {
             model.selectedMinutes = minutes
@@ -143,20 +146,17 @@ private extension RoomTicket {
             Text(lengthTitle(minutes))
                 .font(.caption.weight(.heavy))
                 .monospacedDigit()
-                .foregroundStyle(isSelected ? Color.white : Palette.muted)
+                .foregroundStyle(foreground)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
                 .padding(.vertical, Spacing.small)
                 .frame(maxWidth: .infinity)
-                .background(
-                    isSelected ? Palette.ink : Palette.paperDeep,
-                    in: .rect(cornerRadius: 8)
-                )
+                .background(background, in: .rect(cornerRadius: 8))
                 .animation(.snappy, value: isSelected)
         }
         .buttonStyle(.plain)
         .accessibilityLabel("\(minutes) 分にする")
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
+        .accessibilityAddTraits(traits)
     }
 }
 
@@ -177,6 +177,14 @@ private extension RoomTicket {
         }
 
         return "あと \(remaining.formatted()) km・次の絵はがきまで"
+    }
+
+    var stubForeground: Color {
+        model.canStart ? .white : Palette.muted
+    }
+
+    var stubBackground: Color {
+        model.canStart ? Palette.teal : Palette.paperDeep
     }
 
     var stubEdge: Color {
