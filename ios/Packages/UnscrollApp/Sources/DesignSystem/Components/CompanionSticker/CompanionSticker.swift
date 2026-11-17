@@ -59,11 +59,7 @@ private extension CompanionSticker {
             .interpolation(.none)
             .resizable()
             .frame(width: size, height: size)
-            .shadow(color: .white, radius: 0, x: outline, y: 0)
-            .shadow(color: .white, radius: 0, x: -outline, y: 0)
-            .shadow(color: .white, radius: 0, x: 0, y: outline)
-            .shadow(color: .white, radius: 0, x: 0, y: -outline)
-            .shadow(color: Palette.ink.opacity(0.22), radius: 4, x: 0, y: 4)
+            .stickerOutline(size: size)
             .accessibilityLabel(accessibilityText)
             .transaction { transaction in
                 transaction.animation = nil
@@ -71,11 +67,19 @@ private extension CompanionSticker {
     }
 }
 
-private extension CompanionSticker {
-    var outline: CGFloat {
-        max(size / 32, 2)
-    }
+extension View {
+    func stickerOutline(size: CGFloat) -> some View {
+        let outline = max(size / 32, 2)
 
+        return shadow(color: .white, radius: 0, x: outline, y: 0)
+            .shadow(color: .white, radius: 0, x: -outline, y: 0)
+            .shadow(color: .white, radius: 0, x: 0, y: outline)
+            .shadow(color: .white, radius: 0, x: 0, y: -outline)
+            .shadow(color: Palette.ink.opacity(0.22), radius: 4, x: 0, y: 4)
+    }
+}
+
+private extension CompanionSticker {
     var accessibilityText: String {
         "\(companion.kindLabel)の\(companion.name)"
     }

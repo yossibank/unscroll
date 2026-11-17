@@ -13,8 +13,12 @@ public struct MainView: View {
     @State private var isTabBarHidden = false
 
     private let database: AppDatabase
+    private let isRevealed: Bool
 
-    public init(database: AppDatabase) {
+    public init(
+        database: AppDatabase,
+        isRevealed: Bool = true
+    ) {
         _room = State(initialValue: RoomModel(database: database))
         _journeyMap = State(initialValue: JourneyMapModel(database: database))
         _postcardAlbum = State(initialValue: PostcardAlbumModel(database: database))
@@ -22,6 +26,7 @@ public struct MainView: View {
         _needsOnboarding = State(initialValue: !OnboardingModel.isCompleted())
 
         self.database = database
+        self.isRevealed = isRevealed
     }
 
     public var body: some View {
@@ -69,7 +74,7 @@ public struct MainView: View {
         .fontDesign(.rounded)
         .tint(Palette.teal)
         .preferredColorScheme(.light)
-        .fullScreenCover(isPresented: $needsOnboarding) {
+        .fullScreenCover(isPresented: showsOnboarding) {
             OnboardingView(model: OnboardingModel(database: database, settings: settings)) {
                 room.refresh()
                 settings.refresh()
@@ -89,6 +94,17 @@ private extension MainView {
 }
 
 private extension MainView {
+    var showsOnboarding: Binding<Bool> {
+        Binding(
+            get: {
+                needsOnboarding && isRevealed
+            },
+            set: { isPresented in
+                needsOnboarding = isPresented
+            }
+        )
+    }
+
     var tabBar: some View {
         FloatingTabBar(
             selection: $tab,
