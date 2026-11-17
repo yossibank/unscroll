@@ -5,12 +5,9 @@ import SwiftUI
 struct AppLaunchView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
-    @State private var pose = Companion.Pose.sleep
+    @State private var pose = Companion.Pose.walk
     @State private var dawn = 0.0
-    @State private var travel: CGFloat = 0
-    @State private var lift: CGFloat = 0
-    @State private var holdsBag = false
-    @State private var hasDeparted = false
+    @State private var hasGreeted = false
     @State private var reveal: CGFloat = 0
     @State private var isLeaving = false
 
@@ -26,12 +23,9 @@ struct AppLaunchView: View {
 
             ZStack {
                 LaunchScenery(
-                    companion: traveler,
+                    companion: shownCompanion,
                     pose: pose,
-                    dawn: dawn,
-                    travel: travel,
-                    lift: lift,
-                    holdsBag: holdsBag
+                    dawn: dawn
                 )
 
                 Palette.paper
@@ -51,69 +45,45 @@ struct AppLaunchView: View {
                 return
             }
 
-            await depart()
+            await greet()
         }
-        .onChange(of: hasDeparted) {
+        .onChange(of: hasGreeted) {
             open()
         }
     }
 }
 
 private extension AppLaunchView {
-    var traveler: Companion? {
+    var shownCompanion: Companion? {
         isReady ? companion ?? .starter : nil
     }
 
-    func depart() async {
+    func greet() async {
         guard !reduceMotion else {
             dawn = 2
-            pose = .jump
-            holdsBag = true
+            pose = .wave
 
-            try? await Task.sleep(for: .milliseconds(500))
+            try? await Task.sleep(for: .milliseconds(400))
 
-            hasDeparted = true
+            hasGreeted = true
             return
         }
 
-        try? await Task.sleep(for: .milliseconds(350))
-
-        pose = .blink
-
-        withAnimation(.easeInOut(duration: 0.35)) {
-            dawn = 1
-        }
-
-        try? await Task.sleep(for: .milliseconds(350))
+        try? await Task.sleep(for: .milliseconds(100))
 
         pose = .jump
-        holdsBag = true
 
-        withAnimation(.easeInOut(duration: 0.3)) {
+        withAnimation(.easeInOut(duration: 0.5)) {
             dawn = 2
         }
 
-        withAnimation(.easeOut(duration: 0.15)) {
-            lift = 0.14
-        }
+        try? await Task.sleep(for: .milliseconds(350))
 
-        try? await Task.sleep(for: .milliseconds(150))
+        pose = .wave
 
-        withAnimation(.easeIn(duration: 0.15)) {
-            lift = 0
-        }
+        try? await Task.sleep(for: .milliseconds(300))
 
-        try? await Task.sleep(for: .milliseconds(250))
-
-        pose = .walk
-
-        withAnimation(.easeIn(duration: 0.5)) {
-            travel = 1
-        }
-
-        try? await Task.sleep(for: .milliseconds(500))
-
-        hasDeparted = true
+        hasGreeted = true
     }
 
     func open() {
@@ -122,7 +92,7 @@ private extension AppLaunchView {
             return
         }
 
-        withAnimation(.easeIn(duration: 0.3)) {
+        withAnimation(.easeIn(duration: 0.25)) {
             reveal = 1
         } completion: {
             leave()
@@ -130,7 +100,7 @@ private extension AppLaunchView {
     }
 
     func leave() {
-        withAnimation(.easeOut(duration: 0.2)) {
+        withAnimation(.easeOut(duration: 0.15)) {
             isLeaving = true
         } completion: {
             onFinish()

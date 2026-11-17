@@ -1,7 +1,7 @@
 # 構成
 
 > [!NOTE]
-> 共通の形から外れた点と、ID など Unscroll だけの事実が分かる。共通の形は claude-config の `docs/app/ios-architecture.md` にある。
+> 共通の形から外れた点と、ID などおるすマホだけの事実が分かる。共通の形は claude-config の `docs/app/ios-architecture.md` にある。
 
 ## 🖥️ ドット絵
 
@@ -28,7 +28,9 @@
 | `tanuki` | `brown`・`dark`・`gray`・`white` |
 | `penguin` | `gray`・`black`・`emperor`・`king` |
 
-名所・おみやげ・旅の景色・地図の描き方は道のりごとに `scripts/journeys/<道のり>/` の `landmark.py`・`souvenir.py`・`trip.py`・`map.py` にあり、共通の部品は `scripts/artlib/` にある。スクリプトは `scripts/journeys/` の下の道のりをすべて読むので、道のりを足す時はフォルダを 1 つ足す。
+名所・おみやげ・旅の景色・地図の描き方は、道のりごとに `scripts/journeys/<道のり>/` にある。ファイルは `landmark.py`・`souvenir.py`・`trip.py`・`map.py` である。共通の部品は `scripts/artlib/` にある。
+
+スクリプトは `scripts/journeys/` の下の道のりをすべて読むので、道のりを足す時はフォルダを 1 つ足す。
 
 絵を描き直す時は、次のコマンドを走らせる。種や名所を省くと、すべてを描く。出力先を `.xcassets` でないフォルダにすると、並べた見本も書く。
 
@@ -41,7 +43,7 @@ python3 -I scripts/room-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Res
 python3 -I scripts/map-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Maps.xcassets
 ```
 
-部屋の絵の窓・紐・棚・座布団の位置は、`RoomScene.swift` の座標とそろえる。地図の経度と緯度の写し方は、`JourneyMapGeometry+<道のり>.swift` と `scripts/journeys/<道のり>/map.py` でそろえる。
+部屋の絵の窓・紐・棚・座布団の位置は、`RoomScene.swift` の座標とそろえる。地図の経度と緯度の写し方は、2 つのファイルでそろえる。`JourneyMapGeometry+<道のり>.swift` と `scripts/journeys/<道のり>/map.py` である。
 
 ## 🪟 Screen Time の拡張
 
@@ -85,6 +87,6 @@ Family Controls の権限を、アプリと 4 つの拡張に付けている。
 
 > [!WARNING]
 > - シミュレーターで許可と見張りが動くかは、確かめていない
-> - 止めた画面のボタンは、Unscroll を開けない。`.close` で止めたアプリを閉じ、ホーム画面に戻る
+> - 止めた画面のボタンは、おるすマホを開けない。`.close` で止めたアプリを閉じ、ホーム画面に戻る
 > - 区切りは、選んだアプリを使った時間で数える。止めた画面が出ている間は数えない
 > - 記録は、アプリと拡張が同時に書くと 1 行が消えることがある。拡張が動かなかったと決める前に、記録の抜けを疑う
