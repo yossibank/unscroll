@@ -8,31 +8,9 @@ struct RoomPhoto: View {
     let onPoke: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: Spacing.small) {
+        TapedPhoto(caption: caption) {
             companionScene
-
-            Text(caption)
-                .handwritingFont(size: 15)
-                .foregroundStyle(Palette.muted)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .padding(.horizontal, 4)
         }
-        .padding(Spacing.small)
-        .background(Palette.card, in: .rect(cornerRadius: 4))
-        .shadow(color: Palette.ink.opacity(0.14), radius: 8, y: 6)
-        .overlay(alignment: .topLeading) {
-            MaskingTape(tint: Palette.sun)
-                .rotationEffect(.degrees(-36))
-                .offset(x: -16, y: 0)
-        }
-        .overlay(alignment: .topTrailing) {
-            MaskingTape(tint: Palette.teal)
-                .rotationEffect(.degrees(36))
-                .offset(x: 16, y: 0)
-        }
-        .rotationEffect(.degrees(1))
-        .padding(.vertical, Spacing.small)
     }
 }
 
@@ -69,7 +47,6 @@ private extension RoomPhoto {
                     .allowsHitTesting(false)
             }
         }
-        .clipShape(.rect(cornerRadius: 2))
     }
 
     var bubble: some View {

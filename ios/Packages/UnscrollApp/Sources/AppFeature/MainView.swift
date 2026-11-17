@@ -8,20 +8,18 @@ public struct MainView: View {
     @State private var journeyMap: JourneyMapModel
     @State private var postcardAlbum: PostcardAlbumModel
     @State private var settings: SettingsModel
-    @State private var needsCompanion: Bool
+    @State private var needsOnboarding: Bool
     @State private var tab = Tab.room
     @State private var isTabBarHidden = false
 
     private let database: AppDatabase
 
     public init(database: AppDatabase) {
-        let hasCompanion = (try? database.companion()) != nil
-
         _room = State(initialValue: RoomModel(database: database))
         _journeyMap = State(initialValue: JourneyMapModel(database: database))
         _postcardAlbum = State(initialValue: PostcardAlbumModel(database: database))
         _settings = State(initialValue: SettingsModel(database: database))
-        _needsCompanion = State(initialValue: !hasCompanion)
+        _needsOnboarding = State(initialValue: !OnboardingModel.isCompleted())
 
         self.database = database
     }
@@ -71,15 +69,12 @@ public struct MainView: View {
         .fontDesign(.rounded)
         .tint(Palette.teal)
         .preferredColorScheme(.light)
-        .fullScreenCover(isPresented: $needsCompanion) {
-            CompanionPickerView(
-                model: CompanionPickerModel(database: database),
-                isFirstTime: true,
-                onSaved: {
-                    room.refresh()
-                    settings.refresh()
-                }
-            )
+        .fullScreenCover(isPresented: $needsOnboarding) {
+            OnboardingView(model: OnboardingModel(database: database, settings: settings)) {
+                room.refresh()
+                settings.refresh()
+                needsOnboarding = false
+            }
         }
     }
 }

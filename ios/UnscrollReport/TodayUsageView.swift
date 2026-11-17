@@ -189,7 +189,7 @@ private extension TodayUsageView {
                     let ratio = min(usage.hours[hour] / Self.hourLength, 1)
 
                     UnevenRoundedRectangle(topLeadingRadius: 3, topTrailingRadius: 3)
-                        .fill(ratio > 0 ? tint(forHour: hour) : Palette.paperDeep)
+                        .fill(ratio > 0 ? Palette.hour(hour) : Palette.paperDeep)
                         .frame(height: max(3, Self.barHeight * ratio))
                         .frame(maxWidth: .infinity)
                 }
@@ -341,14 +341,6 @@ private extension TodayUsageView {
         }
 
         return firstPickup.formatted(date: .omitted, time: .shortened)
-    }
-
-    func tint(forHour hour: Int) -> Color {
-        switch hour {
-        case 5..<11: Palette.sun
-        case 11..<18: Palette.sky
-        default: Palette.plum
-        }
     }
 
     func journeyText(_ kilometers: Int) -> String {
