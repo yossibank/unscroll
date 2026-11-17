@@ -315,7 +315,11 @@ private extension OnboardingView {
     }
 
     var canPrimary: Bool {
-        model.page != .companion || model.companion.draft != nil
+        switch model.page {
+        case .companion: model.companion.draft != nil
+        case .permission: !model.isRequesting
+        default: true
+        }
     }
 
     var showsLater: Bool {
@@ -336,7 +340,9 @@ private extension OnboardingView {
 
         case .permission where !model.settings.isAuthorized:
             Task {
-                await model.requestAuthorization()
+                if await model.requestAuthorization() {
+                    turn(forward: true)
+                }
             }
 
         case .apps:
