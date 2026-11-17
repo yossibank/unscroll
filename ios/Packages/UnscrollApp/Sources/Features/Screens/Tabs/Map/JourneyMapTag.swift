@@ -61,11 +61,12 @@ private extension JourneyMapTag {
                 .padding(4)
                 .background(.white)
                 .rotationEffect(.degrees(4))
-        } else if let landmark = nextLandmark {
-            LandmarkArt(landmark: landmark)
-                .grayscale(1)
-                .opacity(0.35)
-                .frame(width: 64)
+        } else {
+            Image(systemName: "questionmark")
+                .font(.system(size: 14, weight: .heavy))
+                .foregroundStyle(Palette.muted.opacity(0.6))
+                .frame(width: 64, height: 64 / LandmarkArt.aspectRatio)
+                .background(Palette.paperDeep)
                 .padding(4)
                 .background(.white)
                 .rotationEffect(.degrees(4))
