@@ -41,10 +41,6 @@ public extension JourneyMapModel {
         progress?.activeTrip != nil
     }
 
-    var remainingKilometers: Int {
-        max(0, journey.totalKilometers - kilometers)
-    }
-
     var progressRatio: Double {
         guard journey.totalKilometers > 0 else {
             return 0
@@ -52,10 +48,6 @@ public extension JourneyMapModel {
 
         let ratio = Double(kilometers) / Double(journey.totalKilometers)
         return min(1, max(0, ratio))
-    }
-
-    func isReached(_ landmark: Landmark) -> Bool {
-        landmark.kilometer <= kilometers
     }
 
     func makeJourneyPicker() -> JourneyPickerModel {

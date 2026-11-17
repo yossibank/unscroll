@@ -16,10 +16,7 @@ struct JourneyMapModelTests {
         #expect(model.kilometers == 0)
         #expect(model.nextLandmark?.name == "芦ノ湖")
         #expect(model.kilometersToNext == 90)
-        #expect(model.remainingKilometers == 500)
         #expect(model.progressRatio == 0)
-        #expect(model.isReached(model.journey.landmarks[0]))
-        #expect(!model.isReached(model.journey.landmarks[1]))
     }
 
     @Test
@@ -34,10 +31,7 @@ struct JourneyMapModelTests {
         #expect(model.kilometers == 100)
         #expect(model.nextLandmark?.name == "三保の松原")
         #expect(model.kilometersToNext == 70)
-        #expect(model.remainingKilometers == 400)
         #expect(model.progressRatio == 0.2)
-        #expect(model.isReached(model.journey.landmarks[1]))
-        #expect(!model.isReached(model.journey.landmarks[2]))
     }
 
     @Test
@@ -51,7 +45,6 @@ struct JourneyMapModelTests {
 
         #expect(model.kilometers == 500)
         #expect(model.nextLandmark == nil)
-        #expect(model.remainingKilometers == 0)
         #expect(model.progressRatio == 1)
     }
 }
