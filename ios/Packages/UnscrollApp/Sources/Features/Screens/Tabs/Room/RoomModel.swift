@@ -118,7 +118,7 @@ public extension RoomModel {
         let reached = journey.landmarkReached(from: kilometers, to: kilometers + distance)
 
         guard let reached else {
-            return "+\(distance) km"
+            return "+\(distance.formatted()) km"
         }
 
         return "\(reached.name)に着く"

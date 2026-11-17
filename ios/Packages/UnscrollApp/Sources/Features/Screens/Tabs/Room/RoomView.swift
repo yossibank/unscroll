@@ -252,7 +252,7 @@ private extension RoomView {
             return "京都に着きました"
         }
 
-        return "あと \(remaining) km で\(landmark.name)"
+        return "あと \(remaining.formatted()) km で\(landmark.name)"
     }
 
     var progressRatio: Double {

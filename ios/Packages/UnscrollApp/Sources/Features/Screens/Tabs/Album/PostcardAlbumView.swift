@@ -196,7 +196,7 @@ private extension PostcardAlbumView {
             return "旅が終わると届く"
         }
 
-        return "あと \(kilometers) km"
+        return "あと \(kilometers.formatted()) km"
     }
 
     func arrivedDate(_ arrival: Arrival) -> String {

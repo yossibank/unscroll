@@ -137,7 +137,7 @@ private extension LandmarkArrivalView {
             calendar: .current
         )
 
-        return "\(arrival.landmark.kilometer) km ・ \(arrival.arrivedAt.formatted(format))"
+        return "\(arrival.landmark.kilometer.formatted()) km ・ \(arrival.arrivedAt.formatted(format))"
     }
 
     func setDecorated(_ value: Bool) {

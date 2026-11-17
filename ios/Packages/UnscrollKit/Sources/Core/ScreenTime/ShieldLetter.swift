@@ -16,7 +16,7 @@ public struct ShieldLetter: Hashable, Sendable {
 
         if let kilometers,
            let next {
-            lines.append("\(next.name)まで、あと \(next.kilometer - kilometers) km。")
+            lines.append("\(next.name)まで、あと \((next.kilometer - kilometers).formatted()) km。")
         }
 
         if let remainingMinutes {

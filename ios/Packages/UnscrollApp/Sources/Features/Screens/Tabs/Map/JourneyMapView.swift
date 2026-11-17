@@ -234,11 +234,11 @@ private extension JourneyMapView {
 
     var distanceNote: String {
         let total = model.journey.totalKilometers
-        return "\(model.kilometers) / \(total) km ・ あと \(model.remainingKilometers) km"
+        return "\(model.kilometers.formatted()) / \(total.formatted()) km ・ あと \(model.remainingKilometers.formatted()) km"
     }
 
     func note(remaining: Int) -> String {
         let minutes = remaining / Trip.kilometersPerMinute
-        return "あと \(remaining) km ・ 約 \(minutes) 分の旅で届く"
+        return "あと \(remaining.formatted()) km ・ 約 \(minutes) 分の旅で届く"
     }
 }
