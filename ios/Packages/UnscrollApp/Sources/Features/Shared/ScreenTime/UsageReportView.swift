@@ -3,11 +3,7 @@ import DeviceActivity
 import SwiftUI
 
 public struct UsageReportView: View {
-    private let isDetailed: Bool
-
-    public init(isDetailed: Bool = false) {
-        self.isDetailed = isDetailed
-    }
+    public init() {}
 
     public var body: some View {
         DeviceActivityReport(reportContext, filter: filter)
@@ -16,11 +12,7 @@ public struct UsageReportView: View {
 
 private extension UsageReportView {
     var reportContext: DeviceActivityReport.Context {
-        DeviceActivityReport.Context(
-            isDetailed
-                ? ScreenTimeShared.reportDetailContextName
-                : ScreenTimeShared.reportContextName
-        )
+        DeviceActivityReport.Context(ScreenTimeShared.reportContextName)
     }
 
     var filter: DeviceActivityFilter {

@@ -34,11 +34,7 @@ extension SnapshotTests {
 private extension SnapshotTests {
     static let directory = "__OUT__"
 
-    static let card = CGSize(width: 361, height: 480)
-
-    static let host = CGSize(width: 361, height: 332)
-
-    static let sheet = CGSize(width: 393, height: 1100)
+    static let card = CGSize(width: 361, height: 504)
 
     static var busy: TodayUsage {
         var hours = Array(repeating: TimeInterval(0), count: 24)
@@ -124,23 +120,29 @@ private extension SnapshotTests {
 
     static func cases() -> [Case] {
         [
-            Case(name: "usage-busy", size: card) {
-                AnyView(TodayUsageView(usage: busy))
+            Case(name: "usage-busy-hours", size: card) {
+                SnapshotTab.index = 0
+                return AnyView(TodayUsageView(usage: busy))
             },
-            Case(name: "usage-light", size: card) {
-                AnyView(TodayUsageView(usage: light))
+            Case(name: "usage-busy-apps", size: card) {
+                SnapshotTab.index = 1
+                return AnyView(TodayUsageView(usage: busy))
             },
-            Case(name: "usage-empty", size: card) {
-                AnyView(TodayUsageView(usage: empty))
+            Case(name: "usage-busy-categories", size: card) {
+                SnapshotTab.index = 2
+                return AnyView(TodayUsageView(usage: busy))
             },
-            Case(name: "usage-busy-host", size: host, alignment: .center) {
-                AnyView(TodayUsageView(usage: busy))
+            Case(name: "usage-light-hours", size: card) {
+                SnapshotTab.index = 0
+                return AnyView(TodayUsageView(usage: light))
             },
-            Case(name: "usage-detail-busy", size: sheet) {
-                AnyView(TodayUsageDetailContent(usage: busy))
+            Case(name: "usage-empty-hours", size: card) {
+                SnapshotTab.index = 0
+                return AnyView(TodayUsageView(usage: empty))
             },
-            Case(name: "usage-detail-empty", size: sheet) {
-                AnyView(TodayUsageDetailContent(usage: empty))
+            Case(name: "usage-empty-apps", size: card) {
+                SnapshotTab.index = 1
+                return AnyView(TodayUsageView(usage: empty))
             }
         ]
     }
