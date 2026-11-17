@@ -13,7 +13,7 @@ struct ShieldLetterTests {
         let here = Journey.tokyoToKyoto.landmarks.last { $0.kilometer <= 78 }?.name ?? ""
 
         #expect(letter.title == "ぽんより")
-        #expect(letter.primaryButton == "ぽんの旅に戻る")
+        #expect(letter.primaryButton == "旅に戻る")
         #expect(letter.body.hasPrefix("いま\(here)の近くを歩いてるよ。\n"))
         #expect(letter.body.contains("あと 12 km で芦ノ湖に着くんだ。"))
         #expect(letter.body.hasSuffix("旅はあと 23 分。スマホはお休みしててね。"))

@@ -2,7 +2,7 @@ import Core
 import UIKit
 
 public extension CompanionSticker {
-    static func uiImage(
+    nonisolated static func uiImage(
         of companion: Companion,
         pose: Companion.Pose,
         side: CGFloat
