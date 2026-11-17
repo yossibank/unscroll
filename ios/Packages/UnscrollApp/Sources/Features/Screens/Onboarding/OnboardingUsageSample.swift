@@ -25,7 +25,7 @@ struct OnboardingUsageSample: View {
                 }
                 .foregroundStyle(Palette.ink)
 
-                Label("昨日より 20 分少ない", systemImage: "arrow.down")
+                Label("昨日より 20 分少ないです", systemImage: "arrow.down")
                     .font(.caption2.weight(.heavy))
                     .foregroundStyle(Palette.tealDeep)
                     .lineLimit(1)
@@ -37,7 +37,7 @@ struct OnboardingUsageSample: View {
 
             bars
 
-            Text("21 時台に一番使った（52 分）")
+            Text("21 時台に一番使いました（52 分）")
                 .font(.caption2.weight(.heavy))
                 .foregroundStyle(Palette.coralDeep)
 
@@ -57,7 +57,7 @@ struct OnboardingUsageSample: View {
         }
         .rotationEffect(.degrees(1))
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("今日のスマホの見本。合計 2 時間 14 分、21 時台に一番使った")
+        .accessibilityLabel("今日のスマホの見本。合計 2 時間 14 分、21 時台に一番使いました")
     }
 }
 

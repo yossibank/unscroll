@@ -70,7 +70,7 @@ struct SettingsRow<Trailing: View>: View {
 
         SettingsRow(
             title: "ふつう",
-            detail: "10 秒待つと開ける",
+            detail: "10 秒待つと開けます",
             systemImage: "hourglass",
             tint: Palette.sun
         ) {

@@ -145,7 +145,7 @@ private extension TodayUsageDetailContent {
                 }
 
                 if let busiest {
-                    Text("\(busiest.hour) 時台に一番使った（\(busiest.minutes) 分）")
+                    Text("\(busiest.hour) 時台に一番使いました（\(busiest.minutes) 分）")
                 }
             }
             .font(.caption.weight(.bold))

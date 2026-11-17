@@ -29,10 +29,10 @@ extension TodayUsage {
         }
 
         if difference < 0 {
-            return ("昨日の同じ時刻より \(-difference) 分少ない", "arrow.down", Palette.tealDeep)
+            return ("昨日の同じ時刻より \(-difference) 分少ないです", "arrow.down", Palette.tealDeep)
         }
 
-        return ("昨日の同じ時刻より \(difference) 分多い", "arrow.up", Palette.coralDeep)
+        return ("昨日の同じ時刻より \(difference) 分多いです", "arrow.up", Palette.coralDeep)
     }
 
     var firstPickupText: String {

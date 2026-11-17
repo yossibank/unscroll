@@ -11,7 +11,7 @@ struct SettingsPassport: View {
             photo
 
             VStack(alignment: .leading, spacing: 2) {
-                Text("旅券　相棒")
+                Text("旅券")
                     .font(.caption2.weight(.heavy))
                     .tracking(2)
                     .opacity(0.8)

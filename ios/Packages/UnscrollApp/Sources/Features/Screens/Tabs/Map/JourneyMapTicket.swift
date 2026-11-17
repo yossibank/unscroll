@@ -93,7 +93,7 @@ private extension JourneyMapTicket {
     var changeButton: some View {
         VStack(alignment: .leading, spacing: 2) {
             Button(action: onChange) {
-                Label("道のりを替える", systemImage: "arrow.triangle.swap")
+                Label("道のりを変える", systemImage: "arrow.triangle.swap")
                     .font(.caption.weight(.heavy))
                     .foregroundStyle(model.isOnTrip ? Palette.muted : Palette.tealDeep)
                     .padding(.horizontal, Spacing.small + 4)
@@ -107,7 +107,7 @@ private extension JourneyMapTicket {
             .disabled(model.isOnTrip)
 
             if model.isOnTrip {
-                Text("旅から戻ると替えられる")
+                Text("旅から戻ると変えられます")
                     .font(.caption2.weight(.bold))
                     .foregroundStyle(Palette.muted)
             }

@@ -172,7 +172,7 @@ private extension OnboardingIntro {
         switch page {
         case .walk: ["止めた時間のぶん、", "道のりを歩く"]
         case .postcard: ["名所に着くと、", "絵はがきが届く"]
-        case .usage: ["1 日に、どのアプリを", "どれだけ使ったか見返せる"]
+        case .usage: ["1 日に、どのアプリを", "どれだけ使ったか見返せます"]
         default: ["旅に出ると、", "スマホがひと休み"]
         }
     }
