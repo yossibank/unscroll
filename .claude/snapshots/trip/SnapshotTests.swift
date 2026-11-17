@@ -20,6 +20,12 @@ struct SnapshotTests {
         try Self.write(TripView(model: trip), to: "trip-active.png")
 
         try Self.write(
+            TripView(model: trip),
+            to: "trip-active-small.png",
+            size: Self.small
+        )
+
+        try Self.write(
             TripResultSheet(trip: finished, model: result) {}
                 .fixedSize(horizontal: false, vertical: true),
             to: "trip-result.png"
@@ -31,6 +37,8 @@ private extension SnapshotTests {
     static let directory = "__OUT__"
 
     static let page = CGSize(width: 393, height: 852)
+
+    static let small = CGSize(width: 375, height: 647)
 
     static func registerFonts() {
         let fonts = URL(fileURLWithPath: #filePath)
@@ -70,10 +78,11 @@ private extension SnapshotTests {
 
     static func write(
         _ view: some View,
-        to name: String
+        to name: String,
+        size: CGSize = page
     ) throws {
         let root = view
-            .frame(width: page.width, height: page.height, alignment: .top)
+            .frame(width: size.width, height: size.height, alignment: .top)
             .fontDesign(.rounded)
             .environment(\.colorScheme, .light)
         let renderer = ImageRenderer(content: root)

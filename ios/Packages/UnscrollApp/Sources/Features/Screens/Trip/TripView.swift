@@ -10,14 +10,12 @@ public struct TripView: View {
     }
 
     public var body: some View {
-        GeometryReader { proxy in
-            VStack(spacing: 0) {
-                scenery
-                    .frame(height: proxy.size.height * 0.6)
+        VStack(spacing: 0) {
+            scenery
+                .frame(maxHeight: .infinity)
 
-                if let trip = model.progress?.activeTrip {
-                    panel(trip)
-                }
+            if let trip = model.progress?.activeTrip {
+                panel(trip)
             }
         }
         .background(Palette.paper)
@@ -214,16 +212,18 @@ private extension TripView {
     func route(at now: Date) -> some View {
         let total = model.kilometers(at: now)
         let start = model.journey.landmarks.last { $0.kilometer <= total }
-        let next = model.journey.nextLandmark(after: total) ?? model.journey.landmarks.last
+        let next = model.journey.nextLandmark(after: total)
 
         return HStack(spacing: Spacing.small) {
             Text(start?.name ?? "")
 
-            Image(systemName: "arrow.right")
-                .font(.footnote.weight(.black))
-                .foregroundStyle(Palette.coral)
+            if let next {
+                Image(systemName: "arrow.right")
+                    .font(.footnote.weight(.black))
+                    .foregroundStyle(Palette.coral)
 
-            Text(next?.name ?? "")
+                Text(next.name)
+            }
         }
         .journalTitleFont(size: 17)
         .foregroundStyle(Palette.ink)
@@ -258,7 +258,7 @@ private extension TripView {
         let total = model.kilometers(at: now)
 
         guard let landmark = model.journey.nextLandmark(after: total) else {
-            return "京都に着きました"
+            return "\(model.journey.landmarks.last?.name ?? "")に着きました"
         }
 
         return "\(landmark.name)まで \((landmark.kilometer - total).formatted()) km"
