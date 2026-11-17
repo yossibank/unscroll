@@ -2,72 +2,79 @@ import DesignSystem
 import SwiftUI
 
 struct TodayUsageDetailView: View {
+    let usage: TodayUsage
+
+    var body: some View {
+        ScrollView {
+            TodayUsageDetailContent(usage: usage)
+                .padding(Spacing.medium)
+        }
+        .scrollBounceBehavior(.basedOnSize)
+    }
+}
+
+struct TodayUsageDetailContent: View {
     @State private var metric = Metric.time
 
     let usage: TodayUsage
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.small + 4) {
-                UsageHeadline(usage: usage)
+        VStack(alignment: .leading, spacing: Spacing.small + 4) {
+            UsageHeadline(usage: usage)
 
-                facts
+            facts
 
-                heading("時間ごと")
+            heading("時間ごと")
 
-                Picker("", selection: $metric) {
-                    ForEach(Metric.allCases, id: \.self) { metric in
-                        Text(metric.title)
-                    }
-                }
-                .pickerStyle(.segmented)
+            CapsulePicker(
+                Metric.allCases,
+                selection: $metric,
+                title: \.title
+            )
 
-                HourBars(values: values, unit: metric == .time ? .time : .count)
+            HourBars(values: values, unit: metric == .time ? .time : .count)
 
-                summaryBand
+            summaryBand
 
-                heading("アプリ")
+            heading("アプリ")
 
-                if usage.apps.isEmpty {
-                    Text("まだ記録がありません")
-                        .font(.footnote.weight(.bold))
-                        .foregroundStyle(Palette.muted)
-                }
-
-                VStack(spacing: Spacing.small + 4) {
-                    ForEach(
-                        Array(usage.apps.prefix(5).enumerated()),
-                        id: \.element.id
-                    ) { index, app in
-                        let tint = Self.appTints[index % Self.appTints.count]
-
-                        AppRow(
-                            app,
-                            peak: usage.apps.first?.duration ?? 1,
-                            tint: tint
-                        ) {
-                            badges(for: app)
-                        }
-                    }
-                }
-
-                if !usage.categories.isEmpty {
-                    heading("種類")
-
-                    CategoryStrip(categories: usage.categories)
-                }
-
-                JourneyNote(usage: usage)
+            if usage.apps.isEmpty {
+                Text("まだ記録がありません")
+                    .font(.footnote.weight(.bold))
+                    .foregroundStyle(Palette.muted)
             }
-            .padding(Spacing.medium)
+
+            VStack(spacing: Spacing.small + 4) {
+                ForEach(
+                    Array(usage.apps.prefix(5).enumerated()),
+                    id: \.element.id
+                ) { index, app in
+                    let tint = Self.appTints[index % Self.appTints.count]
+
+                    AppRow(
+                        app,
+                        peak: usage.apps.first?.duration ?? 1,
+                        tint: tint
+                    ) {
+                        badges(for: app)
+                    }
+                }
+            }
+
+            if !usage.categories.isEmpty {
+                heading("種類")
+
+                CategoryStrip(categories: usage.categories)
+            }
+
+            JourneyNote(usage: usage)
         }
-        .scrollBounceBehavior(.basedOnSize)
         .fontDesign(.rounded)
         .foregroundStyle(Palette.ink)
     }
 }
 
-private extension TodayUsageDetailView {
+private extension TodayUsageDetailContent {
     enum Metric: CaseIterable {
         case time
         case pickups

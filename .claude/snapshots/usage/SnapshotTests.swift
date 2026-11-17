@@ -36,7 +36,9 @@ private extension SnapshotTests {
 
     static let card = CGSize(width: 361, height: 480)
 
-    static let host = CGSize(width: 361, height: 472)
+    static let host = CGSize(width: 361, height: 332)
+
+    static let sheet = CGSize(width: 393, height: 1100)
 
     static var busy: TodayUsage {
         var hours = Array(repeating: TimeInterval(0), count: 24)
@@ -47,14 +49,26 @@ private extension SnapshotTests {
         hours[21] = 42 * 60
         hours[22] = 31 * 60
 
+        var hourPickups = Array(repeating: 0, count: 24)
+        hourPickups[7] = 6
+        hourPickups[8] = 9
+        hourPickups[12] = 11
+        hourPickups[18] = 7
+        hourPickups[21] = 13
+        hourPickups[22] = 8
+
         return TodayUsage(
             total: hours.reduce(0, +),
             apps: [
-                AppUsage(id: "X", name: "X", token: nil, duration: 48 * 60),
-                AppUsage(id: "YouTube", name: "YouTube", token: nil, duration: 35 * 60),
-                AppUsage(id: "Instagram", name: "Instagram", token: nil, duration: 22 * 60)
+                app("X", minutes: 48, pickups: 21, notifications: 63),
+                app("YouTube", minutes: 35, pickups: 9, notifications: 4),
+                app("Instagram", minutes: 22, pickups: 14, notifications: 18),
+                app("LINE", minutes: 9, pickups: 8, notifications: 11),
+                app("TikTok", minutes: 3, pickups: 2, notifications: 0)
             ],
             hours: hours,
+            hourPickups: hourPickups,
+            hourNotifications: hourPickups.map { $0 * 2 },
             pickups: 54,
             notifications: 96,
             firstPickup: Date(timeIntervalSince1970: 1_763_272_800),
@@ -78,9 +92,11 @@ private extension SnapshotTests {
         return TodayUsage(
             total: hours.reduce(0, +),
             apps: [
-                AppUsage(id: "LINE", name: "LINE", token: nil, duration: 7 * 60)
+                app("LINE", minutes: 7, pickups: 6, notifications: 8)
             ],
             hours: hours,
+            hourPickups: Array(repeating: 0, count: 24),
+            hourNotifications: Array(repeating: 0, count: 24),
             pickups: 6,
             notifications: 8,
             firstPickup: nil,
@@ -96,6 +112,8 @@ private extension SnapshotTests {
             total: 0,
             apps: [],
             hours: Array(repeating: 0, count: 24),
+            hourPickups: Array(repeating: 0, count: 24),
+            hourNotifications: Array(repeating: 0, count: 24),
             pickups: 0,
             notifications: 0,
             firstPickup: nil,
@@ -117,8 +135,30 @@ private extension SnapshotTests {
             },
             Case(name: "usage-busy-host", size: host, alignment: .center) {
                 AnyView(TodayUsageView(usage: busy))
+            },
+            Case(name: "usage-detail-busy", size: sheet) {
+                AnyView(TodayUsageDetailContent(usage: busy))
+            },
+            Case(name: "usage-detail-empty", size: sheet) {
+                AnyView(TodayUsageDetailContent(usage: empty))
             }
         ]
+    }
+
+    static func app(
+        _ name: String,
+        minutes: Double,
+        pickups: Int,
+        notifications: Int
+    ) -> AppUsage {
+        AppUsage(
+            id: name,
+            name: name,
+            token: nil,
+            duration: minutes * 60,
+            pickups: pickups,
+            notifications: notifications
+        )
     }
 
     static func write(

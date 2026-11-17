@@ -3,8 +3,6 @@ import DesignSystem
 import SwiftUI
 
 struct RoomDecorSheet: View {
-    @Namespace private var tabCapsule
-
     @State private var tab = Tab.wall
     @State private var original: (look: RoomLook, postcards: [Landmark])
 
@@ -37,7 +35,12 @@ struct RoomDecorSheet: View {
                 .disabled(!isChanged)
             }
 
-            tabPicker
+            CapsulePicker(
+                Tab.allCases,
+                selection: $tab,
+                title: \.title,
+                systemImage: \.systemImage
+            )
 
             ScrollView {
                 switch tab {
@@ -87,17 +90,6 @@ private extension RoomDecorSheet {
             case .postcards: "envelope.fill"
             }
         }
-    }
-
-    var tabPicker: some View {
-        HStack(spacing: 4) {
-            ForEach(Tab.allCases, id: \.self) { item in
-                tabButton(item)
-            }
-        }
-        .padding(4)
-        .background(Palette.paperDeep, in: Capsule())
-        .animation(.snappy, value: tab)
     }
 
     var wallGrid: some View {
@@ -183,32 +175,6 @@ private extension RoomDecorSheet {
                 RoundedRectangle(cornerRadius: 20)
                     .strokeBorder(isSelected ? Palette.teal : .clear, lineWidth: 3)
             }
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
-    }
-
-    func tabButton(_ item: Tab) -> some View {
-        let isSelected = tab == item
-
-        return Button {
-            tab = item
-        } label: {
-            Label(item.title, systemImage: item.systemImage)
-                .font(.subheadline.weight(.heavy))
-                .foregroundStyle(isSelected ? Color.white : Palette.muted)
-                .lineLimit(1)
-                .minimumScaleFactor(0.8)
-                .frame(maxWidth: .infinity, minHeight: 44)
-                .background {
-                    if isSelected {
-                        Capsule()
-                            .fill(Palette.teal)
-                            .shadow(color: Palette.teal.opacity(0.3), radius: 6, y: 4)
-                            .matchedGeometryEffect(id: "tab", in: tabCapsule)
-                    }
-                }
-                .contentShape(.capsule)
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
