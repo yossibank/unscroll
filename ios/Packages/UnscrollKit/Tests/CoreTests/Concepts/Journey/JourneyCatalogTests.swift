@@ -19,6 +19,16 @@ struct JourneyCatalogTests {
     }
 
     @Test
+    func givesEveryLandmarkExceptTheStartARemark() {
+        for journey in Journey.all {
+            let remarks = journey.landmarks.dropFirst().map(\.remark)
+
+            #expect(remarks.allSatisfy { $0?.isEmpty == false })
+            #expect(journey.landmarks.first?.remark == nil)
+        }
+    }
+
+    @Test
     func findsJourneyByID() {
         #expect(Journey.with(id: "tokaido") == .tokyoToKyoto)
         #expect(Journey.with(id: "unknown") == nil)
