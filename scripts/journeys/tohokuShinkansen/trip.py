@@ -1,21 +1,5 @@
 import math
-from artlib.trip_kit import H, Layer, W, cedar, dirt, fuji, grass, mix, noise, pine, ridge, shade, water, wave
-
-
-def snow(layer, top, bottom, seed=3):
-    light, base, shadow = (250, 252, 255), (232, 240, 248), (200, 214, 232)
-    for y in range(top, bottom):
-        for x in range(W):
-            r = noise(x, y, seed)
-            layer.put(x, y, light if y == top else shadow if r < 0.12 else light if r > 0.9 else base)
-
-
-def capped(layer, x0, base, h, color=(36, 72, 58)):
-    cedar(layer, x0, base, h, color)
-    for y in range(base - h, base - h // 3):
-        for x in range(x0 - 8, x0 + 9):
-            if layer.get(x, y) is not None and noise(x, y, 11) > 0.45 and (x + y) % 2 == 0:
-                layer.put(x, y, (246, 250, 255))
+from artlib.trip_kit import H, Layer, W, capped, cedar, dirt, fuji, grass, mix, noise, pine, ridge, shade, snow, water, wave
 
 
 def paddies(layer, top, bottom, seed=2):
