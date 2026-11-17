@@ -30,9 +30,9 @@ public extension Companion {
     static let nameLimit = 8
 
     static let starter = Companion(
-        species: .shiba,
-        coat: Species.shiba.coats[0],
-        name: Species.shiba.defaultName
+        species: .starter,
+        coat: Species.starter.coats[0],
+        name: Species.starter.defaultName
     )
 
     var kindLabel: String {

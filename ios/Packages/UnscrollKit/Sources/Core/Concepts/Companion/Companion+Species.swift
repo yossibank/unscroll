@@ -32,6 +32,8 @@ public extension Companion {
 }
 
 public extension Companion.Species {
+    static let starter = Companion.Species.penguin
+
     var label: String {
         switch self {
         case .penguin: "ペンギン"

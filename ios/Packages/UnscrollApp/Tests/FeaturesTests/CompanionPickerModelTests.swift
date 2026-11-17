@@ -6,12 +6,12 @@ import Testing
 @MainActor
 struct CompanionPickerModelTests {
     @Test
-    func startsWithShibaWhenNoCompanion() throws {
+    func startsWithPenguinWhenNoCompanion() throws {
         let model = try CompanionPickerModel(database: AppDatabase.inMemory())
 
-        #expect(model.species == .shiba)
-        #expect(model.coat == .black)
-        #expect(model.name == "こむぎ")
+        #expect(model.species == .penguin)
+        #expect(model.coat == .gray)
+        #expect(model.name == "ぺんた")
     }
 
     @Test
@@ -65,7 +65,7 @@ struct CompanionPickerModelTests {
 
         #expect(model.draft == nil)
         #expect(!model.save())
-        #expect(model.preview?.name == "こむぎ")
+        #expect(model.preview?.name == "ぺんた")
     }
 
     @Test
