@@ -160,7 +160,8 @@ struct UsageSortButton: View {
         .buttonStyle(.plain)
         .background(alignment: .top) { thickness }
         .animation(.spring(duration: 0.25, bounce: 0.3), value: isSelected)
-        .accessibilityLabel(sort.accessibilityLabel)
+        .accessibilityLabel("\(note) \(value)")
+        .accessibilityHint(sort.accessibilityLabel)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }

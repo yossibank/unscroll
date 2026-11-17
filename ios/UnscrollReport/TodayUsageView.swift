@@ -88,7 +88,10 @@ private extension TodayUsageView {
             VStack(alignment: .leading, spacing: Spacing.small) {
                 UsageSectionHeader("1 日の流れ", trailing: busiestText)
 
-                HourBars(hours: usage.hours)
+                HourBars(
+                    hours: usage.hours,
+                    peakHour: usage.busiest?.hour
+                )
 
                 if let rest = usage.longestRest {
                     UsageRest(start: rest.start, length: rest.length)

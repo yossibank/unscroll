@@ -3,6 +3,7 @@ import SwiftUI
 
 struct HourBars: View {
     let hours: [TimeInterval]
+    let peakHour: Int?
 
     private let barHeight: CGFloat = 84
     private let hourLength: Double = 60 * 60
@@ -15,9 +16,6 @@ struct HourBars: View {
     ]
 
     var body: some View {
-        let peak = hours.max() ?? 0
-        let peakHour = peak > 0 ? hours.firstIndex(of: peak) : nil
-
         VStack(spacing: 4) {
             HStack(alignment: .bottom, spacing: 2) {
                 ForEach(hours.indices, id: \.self) { hour in
