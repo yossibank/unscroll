@@ -40,11 +40,14 @@ private extension SnapshotTests {
             Companion(species: .shiba, coat: Companion.Species.shiba.coats[0], name: "こむぎ")
         )
 
+        let geometry = try #require(JourneyMapGeometry.for(Journey.tokyoToKyoto.id))
+
         return kilometers.map { kilometer in
             Case(name: "map-\(kilometer)", size: map) {
                 AnyView(
                     JourneyMapCanvas(
                         journey: .tokyoToKyoto,
+                        geometry: geometry,
                         kilometers: kilometer,
                         companion: companion
                     )

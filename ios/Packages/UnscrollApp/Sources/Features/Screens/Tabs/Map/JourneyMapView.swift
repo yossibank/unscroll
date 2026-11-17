@@ -16,13 +16,9 @@ public struct JourneyMapView: View {
             VStack(alignment: .leading, spacing: Spacing.medium) {
                 header
 
-                JourneyMapCanvas(
-                    journey: model.journey,
-                    kilometers: model.kilometers,
-                    companion: model.companion
-                )
-                .clipShape(.rect(cornerRadius: 16))
-                .roundedCard(padding: Spacing.small)
+                map
+                    .clipShape(.rect(cornerRadius: 16))
+                    .roundedCard(padding: Spacing.small)
 
                 nextCard
 
@@ -50,6 +46,22 @@ public struct JourneyMapView: View {
 }
 
 private extension JourneyMapView {
+    @ViewBuilder
+    var map: some View {
+        if let geometry = JourneyMapGeometry.for(model.journey.id) {
+            JourneyMapCanvas(
+                journey: model.journey,
+                geometry: geometry,
+                kilometers: model.kilometers,
+                companion: model.companion
+            )
+        } else {
+            Rectangle()
+                .fill(Palette.paperDeep)
+                .aspectRatio(MapBackdrop.aspectRatio, contentMode: .fit)
+        }
+    }
+
     var header: some View {
         HStack(spacing: Spacing.medium) {
             ProgressRing(

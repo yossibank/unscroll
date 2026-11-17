@@ -18,7 +18,7 @@
 | `scripts/souvenir-art.py` | おみやげの食べ物。48×48 px | `Souvenirs.xcassets` | `souvenir_<名所>` |
 | `scripts/trip-art.py` | 旅の途中の景色。320×210 px の 3 層 | `Trips.xcassets` | `trip_<名所>_<層>` |
 | `scripts/room-art.py` | 部屋の壁・床・家具を、180×140 px の別々の絵に描く。窓は透明 | `Rooms.xcassets` | `room_back`・`room_wall_<柄>`・`room_floor_<柄>` |
-| `scripts/map-art.py` | 地図の土台。228×150 px | `Maps.xcassets` | `map_back` |
+| `scripts/map-art.py` | 地図の土台。228×150 px | `Maps.xcassets` | `map_<道のり>` |
 
 名所の英字の名前は `Landmark.artName`（`Landmark+Art.swift`）で決める。景色の層は `SceneryLayer` の `far`・`mid`・`near` である。相棒の絵の名前の種と色は、次のとおりである。
 
@@ -27,6 +27,8 @@
 | `shiba` | `red`・`black`・`white`・`sesame` |
 | `tanuki` | `brown`・`dark`・`gray`・`white` |
 | `penguin` | `gray`・`black`・`emperor`・`king` |
+
+名所・おみやげ・旅の景色・地図の描き方は道のりごとに `scripts/journeys/<道のり>/` の `landmark.py`・`souvenir.py`・`trip.py`・`map.py` にあり、共通の部品は `scripts/artlib/` にある。スクリプトは `scripts/journeys/` の下の道のりをすべて読むので、道のりを足す時はフォルダを 1 つ足す。
 
 絵を描き直す時は、次のコマンドを走らせる。種や名所を省くと、すべてを描く。出力先を `.xcassets` でないフォルダにすると、並べた見本も書く。
 
@@ -39,7 +41,7 @@ python3 -I scripts/room-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Res
 python3 -I scripts/map-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Resources/Maps.xcassets
 ```
 
-部屋の絵の窓・紐・棚・座布団の位置は、`RoomScene.swift` の座標とそろえる。地図の経度と緯度の写し方は、`JourneyMapGeometry.swift` と `map-art.py` でそろえる。
+部屋の絵の窓・紐・棚・座布団の位置は、`RoomScene.swift` の座標とそろえる。地図の経度と緯度の写し方は、`JourneyMapGeometry+<道のり>.swift` と `scripts/journeys/<道のり>/map.py` でそろえる。
 
 ## 🪟 Screen Time の拡張
 

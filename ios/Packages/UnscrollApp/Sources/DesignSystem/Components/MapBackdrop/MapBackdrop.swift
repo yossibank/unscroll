@@ -1,10 +1,14 @@
 import SwiftUI
 
 public struct MapBackdrop: View {
-    public init() {}
+    private let name: String
+
+    public init(name: String) {
+        self.name = name
+    }
 
     public var body: some View {
-        Image("map_back", bundle: .module)
+        Image(name, bundle: .module)
             .interpolation(.none)
             .resizable()
             .aspectRatio(Self.aspectRatio, contentMode: .fit)
