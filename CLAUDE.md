@@ -1,6 +1,6 @@
-# Unscroll
+# おるすマホ
 
-個人開発の iOS アプリ「Unscroll」。人が読む入口は [README.md](README.md)。
+個人開発の iOS アプリ「おるすマホ」。リポジトリとコードの名前は unscroll のままにする。人が読む入口は [README.md](README.md)。
 
 ## 作業の進め方
 
