@@ -26,10 +26,12 @@ public struct TripScenery: View {
                 ZStack {
                     LinearGradient(colors: period.sky, startPoint: .top, endPoint: .bottom)
 
-                    ForEach(SceneryLayer.allCases, id: \.self) { layer in
-                        strip(layer, size: proxy.size, seconds: seconds)
+                    if proxy.size.height > 0 {
+                        ForEach(SceneryLayer.allCases, id: \.self) { layer in
+                            strip(layer, size: proxy.size, seconds: seconds)
+                        }
+                        .colorMultiply(period.light)
                     }
-                    .colorMultiply(period.light)
                 }
             }
         }
