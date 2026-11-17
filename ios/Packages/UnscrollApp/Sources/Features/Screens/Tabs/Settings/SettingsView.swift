@@ -16,19 +16,27 @@ public struct SettingsView: View {
     public var body: some View {
         NavigationStack(path: $path) {
             ScrollView {
-                VStack(alignment: .leading, spacing: Spacing.medium) {
+                VStack(alignment: .leading, spacing: Spacing.medium + 4) {
+                    JournalTitle("旅の支度", note: "出かける前に、ととのえる")
+
                     if !model.isReady {
                         setupCard
                     }
 
-                    companionCard
+                    NavigationLink(value: Route.companion) {
+                        SettingsPassport(
+                            companion: model.companion,
+                            kilometers: model.kilometersTogether
+                        )
+                    }
+                    .buttonStyle(.plain)
 
-                    blockedAppsCard
+                    blockedAppsPage
 
-                    difficultyCard
+                    strictnessPage
 
                     #if DEBUG
-                    prototypeCard
+                    prototypePage
                     #endif
                 }
                 .padding(.horizontal, Spacing.medium)
@@ -116,61 +124,8 @@ private extension SettingsView {
         ))
     }
 
-    var companionCard: some View {
-        NavigationLink(value: Route.companion) {
-            HStack(spacing: Spacing.medium) {
-                Group {
-                    if let companion = model.companion {
-                        CompanionSticker(
-                            companion: companion,
-                            pose: .walk,
-                            size: 48,
-                            breathes: false
-                        )
-                    } else {
-                        Image(systemName: "pawprint.fill")
-                            .font(.title2)
-                            .foregroundStyle(Palette.sunDeep)
-                    }
-                }
-                .frame(width: 64, height: 64)
-                .background(Palette.sunSoft, in: .rect(cornerRadius: 20))
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("いっしょに旅する相棒")
-                        .font(.caption.weight(.heavy))
-                        .foregroundStyle(Palette.teal)
-
-                    Text(model.companion?.name ?? "相棒を選ぶ")
-                        .font(.title3.weight(.heavy))
-                        .foregroundStyle(Palette.ink)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
-
-                    if let companion = model.companion {
-                        Text(companion.kindLabel)
-                            .font(.caption.weight(.bold))
-                            .foregroundStyle(Palette.muted)
-                    }
-                }
-
-                Spacer(minLength: 0)
-
-                Image(systemName: "chevron.right")
-                    .font(.footnote.weight(.heavy))
-                    .foregroundStyle(Palette.muted.opacity(0.6))
-            }
-            .roundedCard(fill: LinearGradient(
-                colors: [Palette.tealSoft, Palette.card],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            ))
-        }
-        .buttonStyle(.plain)
-    }
-
-    var blockedAppsCard: some View {
-        VStack(spacing: 0) {
+    var blockedAppsPage: some View {
+        SettingsPage("旅で止めるもの", tint: Palette.coral) {
             NavigationLink(value: Route.blockedApps) {
                 SettingsRow(
                     title: "止めるアプリ",
@@ -185,8 +140,7 @@ private extension SettingsView {
             }
             .buttonStyle(.plain)
 
-            Divider()
-                .overlay(Palette.paperDeep)
+            SettingsRule()
 
             SettingsRow(title: "Screen Time の許可", systemImage: "hourglass", tint: Palette.sky) {
                 if model.isAuthorized {
@@ -202,102 +156,57 @@ private extension SettingsView {
                 }
             }
         }
-        .roundedCard(padding: Spacing.small)
     }
 
-    var difficultyCard: some View {
-        VStack(alignment: .leading, spacing: Spacing.small) {
-            Text("外しにくさ")
-                .font(.caption.weight(.heavy))
-                .foregroundStyle(Palette.muted)
-                .padding(.horizontal, Spacing.small)
+    var strictnessPage: some View {
+        let opacity = model.isTripActive ? 0.5 : 1
 
-            VStack(spacing: 0) {
-                ForEach(Strictness.allCases, id: \.self) { strictness in
-                    if strictness != Strictness.allCases.first {
-                        Divider()
-                            .overlay(Palette.paperDeep)
-                    }
-
-                    strictnessRow(strictness)
-                }
-            }
-            .roundedCard(padding: Spacing.small)
-            .disabled(model.isTripActive)
+        return SettingsPage("外しにくさ", tint: Palette.sun) {
+            SettingsStrictness(strictness: $model.strictness)
+                .padding(.top, 4)
+                .disabled(model.isTripActive)
+                .opacity(opacity)
 
             if model.isTripActive {
                 Text("旅が終わったら変えられます")
                     .font(.caption.weight(.bold))
                     .foregroundStyle(Palette.muted)
                     .padding(.horizontal, Spacing.small)
+                    .padding(.top, 4)
             }
         }
     }
 
     #if DEBUG
-    var prototypeCard: some View {
-        VStack(alignment: .leading, spacing: Spacing.small) {
-            Text("試作の記録（開発の版だけ）")
-                .font(.caption.weight(.heavy))
-                .foregroundStyle(Palette.muted)
-                .padding(.horizontal, Spacing.small)
-
-            VStack(spacing: 0) {
-                Button {
-                    model.startUsageWatch()
-                } label: {
-                    SettingsRow(
-                        title: "区切りの見張りを始める",
-                        systemImage: "eye.fill",
-                        tint: Palette.muted
-                    ) {
-                        EmptyView()
-                    }
+    var prototypePage: some View {
+        SettingsPage("試作の記録（開発の版だけ）", tint: Palette.muted) {
+            Button {
+                model.startUsageWatch()
+            } label: {
+                SettingsRow(
+                    title: "区切りの見張りを始める",
+                    systemImage: "eye.fill",
+                    tint: Palette.muted
+                ) {
+                    EmptyView()
                 }
-                .buttonStyle(.plain)
-                .disabled(!model.isReady)
-
-                Divider()
-                    .overlay(Palette.paperDeep)
-
-                NavigationLink {
-                    EventLogView(model: model)
-                } label: {
-                    SettingsRow(title: "記録を見る", systemImage: "list.bullet", tint: Palette.muted) {
-                        Text("\(model.logLines.count) 行")
-                    }
-                }
-                .buttonStyle(.plain)
             }
-            .roundedCard(padding: Spacing.small)
+            .buttonStyle(.plain)
+            .disabled(!model.isReady)
+
+            SettingsRule()
+
+            NavigationLink {
+                EventLogView(model: model)
+            } label: {
+                SettingsRow(title: "記録を見る", systemImage: "list.bullet", tint: Palette.muted) {
+                    Text("\(model.logLines.count) 行")
+                }
+            }
+            .buttonStyle(.plain)
         }
     }
     #endif
-
-    func strictnessRow(_ strictness: Strictness) -> some View {
-        let isSelected = model.strictness == strictness
-
-        return Button {
-            model.strictness = strictness
-        } label: {
-            SettingsRow(
-                title: title(for: strictness),
-                detail: detail(for: strictness),
-                systemImage: symbol(for: strictness),
-                tint: tint(for: strictness)
-            ) {
-                if isSelected {
-                    Image(systemName: "checkmark")
-                        .font(.caption.weight(.heavy))
-                        .foregroundStyle(.white)
-                        .frame(width: 24, height: 24)
-                        .background(Palette.teal, in: Circle())
-                }
-            }
-        }
-        .buttonStyle(.plain)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
-    }
 
     func setupStep(
         number: Int,
@@ -306,16 +215,20 @@ private extension SettingsView {
         actionTitle: String,
         action: @escaping () -> Void
     ) -> some View {
-        HStack(spacing: Spacing.small + 4) {
-            Text(isDone ? "✓" : "\(number)")
+        let mark = isDone ? "✓" : "\(number)"
+        let markFill = isDone ? Palette.teal : Palette.coral
+        let titleInk = isDone ? Palette.muted : Palette.ink
+
+        return HStack(spacing: Spacing.small + 4) {
+            Text(mark)
                 .font(.caption.weight(.heavy))
                 .foregroundStyle(.white)
                 .frame(width: 28, height: 28)
-                .background(isDone ? Palette.teal : Palette.coral, in: Circle())
+                .background(markFill, in: Circle())
 
             Text(title)
                 .font(.subheadline.weight(.heavy))
-                .foregroundStyle(isDone ? Palette.muted : Palette.ink)
+                .foregroundStyle(titleInk)
                 .strikethrough(isDone)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -334,39 +247,5 @@ private extension SettingsView {
         }
         .padding(Spacing.small + 4)
         .background(.white, in: .rect(cornerRadius: 20))
-    }
-}
-
-private extension SettingsView {
-    func title(for strictness: Strictness) -> String {
-        switch strictness {
-        case .gentle: "やさしい"
-        case .normal: "ふつう"
-        case .strict: "きびしい"
-        }
-    }
-
-    func detail(for strictness: Strictness) -> String {
-        switch strictness {
-        case .gentle: "止めたアプリを 1 分だけ開ける"
-        case .normal: "10 秒待つと開ける"
-        case .strict: "旅が終わるまで開けない"
-        }
-    }
-
-    func symbol(for strictness: Strictness) -> String {
-        switch strictness {
-        case .gentle: "leaf.fill"
-        case .normal: "hourglass"
-        case .strict: "lock.fill"
-        }
-    }
-
-    func tint(for strictness: Strictness) -> Color {
-        switch strictness {
-        case .gentle: Palette.leaf
-        case .normal: Palette.sun
-        case .strict: Palette.plum
-        }
     }
 }
