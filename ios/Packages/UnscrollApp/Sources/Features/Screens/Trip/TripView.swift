@@ -110,16 +110,24 @@ private extension TripView {
     }
 
     func bubble(_ remark: String) -> some View {
-        Text(remark)
+        let text = Text(remark)
             .handwritingFont(size: 15)
             .foregroundStyle(Palette.ink)
             .multilineTextAlignment(.leading)
-            .frame(maxWidth: 200, alignment: .leading)
-            .padding(.horizontal, Spacing.medium)
-            .padding(.vertical, Spacing.small + 2)
-            .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
-            .shadow(color: Palette.shadow, radius: 6, y: 4)
-            .rotationEffect(.degrees(-3))
+
+        return ViewThatFits(in: .horizontal) {
+            text
+                .fixedSize(horizontal: true, vertical: false)
+
+            text
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(maxWidth: 200, alignment: .leading)
+        .padding(.horizontal, Spacing.medium)
+        .padding(.vertical, Spacing.small + 2)
+        .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
+        .shadow(color: Palette.shadow, radius: 6, y: 4)
+        .rotationEffect(.degrees(-3))
     }
 
     func panel(_ trip: Trip) -> some View {
@@ -128,7 +136,7 @@ private extension TripView {
 
             awayBand
 
-            Button("旅を切り上げる（進んだ分は残る）", role: .destructive) {
+            Button("旅を切り上げる（進んだ分は残ります）", role: .destructive) {
                 model.stopTrip()
             }
             .font(.footnote.weight(.bold))

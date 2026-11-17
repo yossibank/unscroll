@@ -205,6 +205,6 @@ private extension JourneyPickerSheet {
             return base
         }
 
-        return "\(base)・\(done.formatted()) km 進んだ"
+        return "\(base)・\(done.formatted()) km 進みました"
     }
 }

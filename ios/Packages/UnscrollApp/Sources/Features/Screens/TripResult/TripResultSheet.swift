@@ -86,8 +86,10 @@ private extension TripResultSheet {
                 }
             }
             .overlay(alignment: .bottomTrailing) {
-                Postmark(date: trip.endedAt ?? trip.plannedEnd)
-                    .offset(x: Spacing.small, y: Spacing.large)
+                if !model.finishedArrivals.isEmpty {
+                    Postmark(date: trip.endedAt ?? trip.plannedEnd)
+                        .offset(x: Spacing.small, y: Spacing.large)
+                }
             }
             .padding(.bottom, Spacing.large)
         }
@@ -246,13 +248,17 @@ private extension TripResultSheet {
         trip.endedAt == nil ? .joy : .wave
     }
 
+    var destination: String {
+        model.journey.landmarks.last?.name ?? "目的地"
+    }
+
     var badge: String {
         if let arrival = model.finishedArrivals.last {
             return "\(arrival.landmark.name)に着いた！"
         }
 
         guard let landmark = model.nextLandmark else {
-            return "京都に着いた"
+            return "\(destination)に着いた"
         }
 
         return "\(landmark.name)へ向かう途中"
@@ -271,7 +277,7 @@ private extension TripResultSheet {
             let landmark = model.nextLandmark,
             let remaining = model.kilometersToNext
         else {
-            return "京都に着きました"
+            return "\(destination)に着きました"
         }
 
         return "次は\(landmark.name) あと \(remaining.formatted()) km"

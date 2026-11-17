@@ -95,9 +95,9 @@ private extension SettingsStrictness {
 
     func detail(for item: Strictness) -> String {
         switch item {
-        case .gentle: "止めたアプリを 1 分だけ開ける"
-        case .normal: "10 秒待つと開ける"
-        case .strict: "旅が終わるまで開けない"
+        case .gentle: "止めたアプリを 1 分だけ開けます"
+        case .normal: "10 秒待つと開けます"
+        case .strict: "旅が終わるまで開けません"
         }
     }
 

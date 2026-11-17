@@ -127,7 +127,7 @@ private extension RoomDecorSheet {
     var postcardGrid: some View {
         VStack(alignment: .leading, spacing: Spacing.small) {
             HStack {
-                Text("押した順に左から飾る")
+                Text("押した順に左から飾ります")
 
                 Spacer()
 
@@ -144,7 +144,7 @@ private extension RoomDecorSheet {
                 }
             }
 
-            Text("まだ着いていない名所は、着くと選べる")
+            Text("まだ着いていない名所は、着くと選べます")
                 .font(.caption2.weight(.bold))
                 .foregroundStyle(Palette.muted)
         }
@@ -233,7 +233,7 @@ private extension RoomDecorSheet {
         .buttonStyle(.plain)
         .disabled(!isArrived)
         .accessibilityLabel(landmark.name)
-        .accessibilityValue(order.map { "\($0 + 1) 番目に飾っている" } ?? "")
+        .accessibilityValue(order.map { "\($0 + 1) 番目に飾っています" } ?? "")
     }
 }
 

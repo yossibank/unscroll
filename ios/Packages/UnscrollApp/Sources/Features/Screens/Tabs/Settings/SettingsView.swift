@@ -17,7 +17,7 @@ public struct SettingsView: View {
         NavigationStack(path: $path) {
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.medium + 4) {
-                    JournalTitle("旅の支度", note: "出かける前に、ととのえる")
+                    JournalTitle("旅の支度", note: "出かける前に、ととのえましょう")
 
                     if !model.isReady {
                         setupCard

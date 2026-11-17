@@ -55,7 +55,7 @@ private extension PostcardAlbumCard {
                             .frame(width: 24, height: 24)
                             .background(.white, in: .rect(cornerRadius: 4))
                             .padding(4)
-                            .accessibilityLabel("部屋に飾っている")
+                            .accessibilityLabel("部屋に飾っています")
                     }
                 }
 
@@ -96,7 +96,7 @@ private extension PostcardAlbumCard {
         )
         let date = arrival.arrivedAt.formatted(format)
 
-        return "\(entry.landmark.kilometer.formatted()) km 地点、\(date) に届いた"
+        return "\(entry.landmark.kilometer.formatted()) km 地点、\(date) に届きました"
     }
 }
 
