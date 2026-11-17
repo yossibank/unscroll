@@ -4,7 +4,7 @@ import SwiftUI
 
 struct SettingsPassport: View {
     let companion: Companion?
-    let kilometers: Int
+    let kilometers: Int?
 
     var body: some View {
         HStack(spacing: Spacing.small + 4) {
@@ -30,9 +30,11 @@ struct SettingsPassport: View {
 
             Spacer(minLength: 0)
 
-            Image(systemName: "chevron.right")
-                .font(.footnote.weight(.heavy))
-                .opacity(0.7)
+            if kilometers != nil {
+                Image(systemName: "chevron.right")
+                    .font(.footnote.weight(.heavy))
+                    .opacity(0.7)
+            }
         }
         .foregroundStyle(.white)
         .padding(Spacing.medium)
@@ -98,6 +100,10 @@ private extension SettingsPassport {
     var note: String {
         guard let companion else {
             return "いっしょに旅する相棒"
+        }
+
+        guard let kilometers else {
+            return companion.kindLabel
         }
 
         return "\(companion.kindLabel)・いっしょに \(kilometers.formatted()) km"

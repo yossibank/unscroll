@@ -8,6 +8,6 @@ struct CompanionPickerViewTests {
     func makesBody() throws {
         let model = try CompanionPickerModel(database: AppDatabase.inMemory())
 
-        _ = CompanionPickerView(model: model, isFirstTime: true).body
+        _ = CompanionPickerView(model: model).body
     }
 }

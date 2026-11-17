@@ -17,13 +17,7 @@ public struct JournalTitle: View {
             Text(title)
                 .journalTitleFont(size: 28)
                 .foregroundStyle(Palette.ink)
-                .padding(.horizontal, 4)
-                .background(alignment: .bottom) {
-                    RoundedRectangle(cornerRadius: 2)
-                        .fill(Palette.sun.opacity(0.55))
-                        .frame(height: 12)
-                        .offset(y: -4)
-                }
+                .journalMarker()
                 .accessibilityAddTraits(.isHeader)
 
             Text(note)
@@ -34,6 +28,18 @@ public struct JournalTitle: View {
                 .padding(.horizontal, 4)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
+public extension View {
+    func journalMarker() -> some View {
+        padding(.horizontal, 4)
+            .background(alignment: .bottom) {
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(Palette.sun.opacity(0.55))
+                    .frame(height: 12)
+                    .offset(y: -4)
+            }
     }
 }
 

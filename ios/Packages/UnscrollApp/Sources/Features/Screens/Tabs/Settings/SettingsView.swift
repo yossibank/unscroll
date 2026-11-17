@@ -50,7 +50,6 @@ public struct SettingsView: View {
                 case .companion:
                     CompanionPickerView(
                         model: model.makeCompanionPicker(),
-                        isFirstTime: false,
                         onSaved: {
                             model.refresh()
                         }

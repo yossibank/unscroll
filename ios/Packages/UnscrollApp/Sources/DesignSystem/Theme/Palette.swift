@@ -26,3 +26,13 @@ public enum Palette {
     public static let leaf = Color(hex: 0x7CC08A)
     public static let shadow = Color(hex: 0x1F3A3D).opacity(0.08)
 }
+
+public extension Palette {
+    static func hour(_ hour: Int) -> Color {
+        switch hour {
+        case 5..<11: sun
+        case 11..<18: sky
+        default: plum
+        }
+    }
+}
