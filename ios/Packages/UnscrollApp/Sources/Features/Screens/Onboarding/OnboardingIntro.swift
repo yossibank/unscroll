@@ -29,11 +29,7 @@ struct OnboardingIntro: View {
 }
 
 private extension OnboardingIntro {
-    static let sample = Companion(
-        species: .shiba,
-        coat: Companion.Species.shiba.coats[0],
-        name: Companion.Species.shiba.defaultName
-    )
+    static let sample = Companion.starter
 
     static let fujisan = Journey.all
         .flatMap(\.landmarks)

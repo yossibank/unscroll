@@ -15,10 +15,10 @@ public final class CompanionPickerModel {
 
     public init(database: AppDatabase) {
         let current = try? database.companion()
-        let species = current?.species ?? .shiba
+        let species = current?.species ?? .starter
 
         self.species = species
-        self.coat = current?.coat ?? .black
+        self.coat = current?.coat ?? species.coats[0]
         self.name = current?.name ?? species.defaultName
         self.isNameEdited = current != nil
         self.database = database

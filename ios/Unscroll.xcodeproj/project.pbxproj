@@ -614,7 +614,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Unscroll/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_CFBundleDisplayName = "おるすマホ";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
@@ -653,7 +653,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Unscroll/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_CFBundleDisplayName = "おるすマホ";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
@@ -689,7 +689,7 @@
 				DEVELOPMENT_TEAM = 6WHPY5MQSB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = UnscrollMonitor/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_CFBundleDisplayName = "おるすマホ";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -722,7 +722,7 @@
 				DEVELOPMENT_TEAM = 6WHPY5MQSB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = UnscrollMonitor/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_CFBundleDisplayName = "おるすマホ";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -755,7 +755,7 @@
 				DEVELOPMENT_TEAM = 6WHPY5MQSB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = UnscrollReport/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_CFBundleDisplayName = "おるすマホ";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -788,7 +788,7 @@
 				DEVELOPMENT_TEAM = 6WHPY5MQSB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = UnscrollReport/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_CFBundleDisplayName = "おるすマホ";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -821,7 +821,7 @@
 				DEVELOPMENT_TEAM = 6WHPY5MQSB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = UnscrollShield/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_CFBundleDisplayName = "おるすマホ";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -854,7 +854,7 @@
 				DEVELOPMENT_TEAM = 6WHPY5MQSB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = UnscrollShield/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_CFBundleDisplayName = "おるすマホ";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -887,7 +887,7 @@
 				DEVELOPMENT_TEAM = 6WHPY5MQSB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = UnscrollShieldAction/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_CFBundleDisplayName = "おるすマホ";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -920,7 +920,7 @@
 				DEVELOPMENT_TEAM = 6WHPY5MQSB;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = UnscrollShieldAction/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = Unscroll;
+				INFOPLIST_KEY_CFBundleDisplayName = "おるすマホ";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (

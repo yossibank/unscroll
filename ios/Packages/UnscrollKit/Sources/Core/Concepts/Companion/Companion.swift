@@ -29,6 +29,12 @@ public struct Companion: Hashable, Sendable {
 public extension Companion {
     static let nameLimit = 8
 
+    static let starter = Companion(
+        species: .starter,
+        coat: Species.starter.coats[0],
+        name: Species.starter.defaultName
+    )
+
     var kindLabel: String {
         "\(species.label(of: coat))の\(species.label)"
     }
