@@ -27,9 +27,33 @@ public struct PaperBackdrop: View {
                     startRadius: 0,
                     endRadius: radius
                 )
+
+                dots
             }
         }
         .ignoresSafeArea()
+    }
+}
+
+private extension PaperBackdrop {
+    var dots: some View {
+        Canvas { context, size in
+            var path = Path()
+            var y: CGFloat = 8
+
+            while y < size.height {
+                var x: CGFloat = 8
+
+                while x < size.width {
+                    path.addEllipse(in: CGRect(x: x - 1, y: y - 1, width: 2, height: 2))
+                    x += 16
+                }
+
+                y += 16
+            }
+
+            context.fill(path, with: .color(Palette.ink.opacity(0.08)))
+        }
     }
 }
 

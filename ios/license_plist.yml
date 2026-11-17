@@ -1,1 +1,7 @@
-manual: []
+manual:
+  - name: Klee One
+    source: https://github.com/fontworks-fonts/Klee
+    file: Unscroll/Fonts/KleeOne-OFL.txt
+  - name: Zen Maru Gothic
+    source: https://github.com/googlefonts/zen-marugothic
+    file: Unscroll/Fonts/ZenMaruGothic-OFL.txt
