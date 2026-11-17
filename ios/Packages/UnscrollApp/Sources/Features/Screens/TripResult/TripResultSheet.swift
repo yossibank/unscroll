@@ -35,74 +35,63 @@ public struct TripResultSheet: View {
 private extension TripResultSheet {
     var content: some View {
         ScrollView {
-            VStack(spacing: 0) {
+            VStack(spacing: Spacing.medium) {
                 header
 
-                VStack(spacing: Spacing.medium) {
-                    VStack(spacing: Spacing.small) {
-                        Text("おかえり！")
-                            .font(.title.weight(.bold))
-                            .foregroundStyle(Palette.ink)
+                VStack(spacing: Spacing.small) {
+                    Text("おかえり！")
+                        .handwritingFont(size: 34)
+                        .foregroundStyle(Palette.ink)
 
-                        Text(summary)
-                            .font(.subheadline)
-                            .foregroundStyle(Palette.muted)
+                    Text(summary)
+                        .font(.subheadline)
+                        .foregroundStyle(Palette.muted)
 
-                        Text("+\(trip.kilometers(at: .now)) km")
-                            .font(.system(size: 48, weight: .bold, design: .rounded))
-                            .foregroundStyle(Palette.teal)
-                    }
-
-                    if !model.finishedArrivals.isEmpty {
-                        receivedCard
-                    }
-
-                    routeCard
-
-                    Button {
-                        onClose()
-                    } label: {
-                        Text("部屋に戻る")
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(Palette.teal)
+                    Text("+\(trip.kilometers(at: .now)) km")
+                        .font(.system(size: 48, weight: .bold, design: .rounded))
+                        .foregroundStyle(Palette.teal)
                 }
-                .padding(Spacing.medium)
-                .padding(.top, Spacing.small)
-                .background(
-                    Palette.paper,
-                    in: UnevenRoundedRectangle(topLeadingRadius: 24, topTrailingRadius: 24)
-                )
-                .offset(y: -Spacing.large)
+
+                if !model.finishedArrivals.isEmpty {
+                    receivedCard
+                }
+
+                routeCard
+
+                Button("部屋に戻る") {
+                    onClose()
+                }
+                .buttonStyle(.pill)
             }
+            .padding(Spacing.medium)
         }
         .scrollBounceBehavior(.basedOnSize)
-        .background(Palette.paper)
+        .background(PaperBackdrop())
     }
 
     var header: some View {
-        Color.clear
-            .aspectRatio(LandmarkArt.aspectRatio, contentMode: .fit)
-            .overlay {
-                headerArt
+        VStack(spacing: Spacing.small) {
+            TapedPhoto(caption: badge, tilt: -1.5) {
+                Color.clear
+                    .aspectRatio(LandmarkArt.aspectRatio, contentMode: .fit)
+                    .overlay {
+                        headerArt
+                    }
+                    .clipped()
             }
-            .overlay(alignment: .topLeading) {
-                Text(badge)
-                    .font(.caption.bold())
-                    .foregroundStyle(Palette.ink)
-                    .padding(.horizontal, Spacing.small)
-                    .padding(.vertical, 4)
-                    .background(Palette.card, in: Capsule())
-                    .padding(Spacing.medium)
-            }
-            .overlay(alignment: .bottom) {
+            .overlay(alignment: .bottomLeading) {
                 if let companion = model.companion {
-                    CompanionSticker(companion: companion, pose: pose, size: 96)
-                        .padding(.bottom, Spacing.large)
+                    CompanionSticker(companion: companion, pose: pose, size: 80)
+                        .offset(x: -Spacing.small, y: -Spacing.large - Spacing.medium)
                 }
             }
-            .clipped()
+            .overlay(alignment: .bottomTrailing) {
+                Postmark(date: trip.endedAt ?? trip.plannedEnd)
+                    .offset(x: Spacing.small, y: Spacing.large)
+            }
+            .padding(.bottom, Spacing.large)
+        }
+        .padding(.top, Spacing.small)
     }
 
     @ViewBuilder
@@ -120,9 +109,12 @@ private extension TripResultSheet {
 
     var receivedCard: some View {
         VStack(alignment: .leading, spacing: Spacing.medium) {
-            Text("届いたもの")
-                .font(.footnote.bold())
-                .foregroundStyle(Palette.muted)
+            CardLabel(
+                "届いたもの",
+                systemImage: "envelope.fill",
+                tint: Palette.coralDeep,
+                wash: Palette.coralSoft
+            )
 
             ForEach(model.finishedArrivals, id: \.landmark.name) { arrival in
                 NavigationLink(value: arrival.landmark) {
@@ -133,14 +125,19 @@ private extension TripResultSheet {
         }
         .padding(Spacing.medium)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
+        .background(Palette.card)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: Palette.shadow, radius: 12, y: 8)
     }
 
     var routeCard: some View {
         VStack(alignment: .leading, spacing: Spacing.medium) {
-            Text("道のり")
-                .font(.footnote.bold())
-                .foregroundStyle(Palette.muted)
+            CardLabel(
+                "道のり",
+                systemImage: "map.fill",
+                tint: Palette.tealDeep,
+                wash: Palette.tealSoft
+            )
 
             JourneyRoute(
                 journey: model.journey,
@@ -168,7 +165,9 @@ private extension TripResultSheet {
         }
         .padding(Spacing.medium)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(Palette.card, in: RoundedRectangle(cornerRadius: 16))
+        .background(Palette.card)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: Palette.shadow, radius: 12, y: 8)
     }
 
     func receivedRow(_ arrival: Arrival) -> some View {
@@ -229,7 +228,15 @@ private extension TripResultSheet {
 private extension TripResultSheet {
     var summary: String {
         guard trip.endedAt != nil else {
-            return "\(trip.plannedMinutes) 分の旅が終わりました"
+            let hours = trip.plannedMinutes / 60
+            let minutes = trip.plannedMinutes % 60
+            let length = switch (hours, minutes) {
+            case (0, _): "\(minutes) 分"
+            case (_, 0): "\(hours) 時間"
+            default: "\(hours) 時間 \(minutes) 分"
+            }
+
+            return "\(length)、スマホを置いて旅してきたよ"
         }
 
         return "\(trip.focusedMinutes(at: .now)) 分で切り上げました"
@@ -241,7 +248,7 @@ private extension TripResultSheet {
 
     var badge: String {
         if let arrival = model.finishedArrivals.last {
-            return "\(arrival.landmark.name)に着いた"
+            return "\(arrival.landmark.name)に着いた！"
         }
 
         guard let landmark = model.nextLandmark else {
