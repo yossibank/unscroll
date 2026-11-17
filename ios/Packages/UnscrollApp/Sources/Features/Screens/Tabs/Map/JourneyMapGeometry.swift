@@ -14,7 +14,8 @@ struct JourneyMapGeometry {
 extension JourneyMapGeometry {
     static let all: [String: JourneyMapGeometry] = [
         "tokaido": .tokaido,
-        "tohokuShinkansen": .tohokuShinkansen
+        "tohokuShinkansen": .tohokuShinkansen,
+        "okinawa": .okinawa
     ]
 
     static func `for`(_ journeyID: String) -> JourneyMapGeometry? {
