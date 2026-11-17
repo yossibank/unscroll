@@ -162,4 +162,23 @@ struct JourneyWriteTests {
         #expect(try database.currentJourney() == .tokyoToKyoto)
         #expect(progress.kilometers == 25)
     }
+
+    @Test
+    func countsTripsWithUppercaseIDs() throws {
+        let database = try AppDatabase.inMemory()
+
+        try database.writer.write { db in
+            try db.execute(
+                sql: """
+                insert into trip (id, startedAt, plannedMinutes, endedAt, journeyID)
+                values ('6B9C2E70-F402-4F5C-8568-FE996A89AC79', ?, 60, ?, 'tokaido')
+                """,
+                arguments: [start, start.addingTimeInterval(60 * 60)]
+            )
+        }
+
+        let progress = try database.journeyProgress(at: start.addingTimeInterval(2 * 60 * 60))
+
+        #expect(progress.kilometers == 60)
+    }
 }
