@@ -137,6 +137,7 @@ public extension RoomModel {
         companion = try? database.companion()
         progress = try? database.journeyProgress(at: now())
 
+        saveShieldSnapshot()
         recordArrivals()
         updateFinishedTrip()
         updateFinishedArrivals()
@@ -256,6 +257,22 @@ private extension RoomModel {
     static let selectedMinutesKey = "room.selectedMinutes"
     static let acknowledgedTripKey = "room.acknowledgedTripID"
     static let hangStep: TimeInterval = 0.01
+
+    func saveShieldSnapshot() {
+        let snapshot = ShieldSnapshot(
+            companion: companion,
+            journey: journey,
+            totalKilometers: progress?.kilometers ?? 0,
+            activeTrip: progress?.activeTrip,
+            at: now()
+        )
+
+        if let snapshot {
+            snapshot.save()
+        } else {
+            ShieldSnapshot.clear()
+        }
+    }
 
     func recordArrivals() {
         do {

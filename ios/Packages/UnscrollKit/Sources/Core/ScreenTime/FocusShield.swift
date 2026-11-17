@@ -69,6 +69,7 @@ public enum FocusShield {
         defaults?.removeObject(forKey: ScreenTimeShared.focusEndsAtKey)
         defaults?.removeObject(forKey: ShieldUnlock.openUntilKey)
         defaults?.removeObject(forKey: Strictness.tripKey)
+        ShieldSnapshot.clear(defaults: defaults)
         clearPress()
         store.clearAllSettings()
 

@@ -34,6 +34,6 @@ public struct ShieldLetter: Hashable, Sendable {
 
         self.title = companionName.map { "\($0)より" } ?? "旅先からの手紙"
         self.body = lines.joined(separator: "\n")
-        self.primaryButton = companionName.map { "\($0)の旅に戻る" } ?? "旅に戻る"
+        self.primaryButton = "旅に戻る"
     }
 }

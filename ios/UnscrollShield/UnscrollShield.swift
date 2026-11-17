@@ -3,7 +3,6 @@ import DesignSystem
 import Foundation
 import ManagedSettings
 import ManagedSettingsUI
-import Store
 import SwiftUI
 import UIKit
 
@@ -42,30 +41,13 @@ private extension UnscrollShield {
         let muted = UIColor(Palette.muted)
         let teal = UIColor(Palette.teal)
         let now = Date.now
-        let database = attempt(.openDatabase) { try AppDatabase.appGroupReader() }
-        let companionRead = database.flatMap { database in
-            attempt(.readCompanion) { try database.companion() }
-        }
-        let companion = companionRead?.flatMap(\.self)
-        let journey = database.flatMap { database in
-            attempt(.readJourney) { try database.currentJourney() }
-        }
-        let progress = database.flatMap { database in
-            attempt(.readProgress) { try database.journeyProgress(at: now) }
-        }
-
-        if journey != nil,
-           progress != nil,
-           companionRead != nil {
-            let found = companion == nil ? "相棒なし" : "相棒あり"
-            ShieldReadLog.recordSuccess("読めた（\(found)）", date: now)
-        }
-
-        let letter = ShieldLetter(
-            companionName: companion?.name,
-            journey: journey ?? .tokyoToKyoto,
-            kilometers: progress?.kilometers,
-            remainingMinutes: progress?.activeTrip?.remainingMinutes(at: now)
+        let snapshot = ShieldSnapshot.load()
+        let companion = snapshot?.companion
+        let letter = snapshot?.letter(at: now) ?? ShieldLetter(
+            companionName: nil,
+            journey: .tokyoToKyoto,
+            kilometers: nil,
+            remainingMinutes: nil
         )
 
         let secondary = secondaryLabel(for: target).map {
@@ -85,18 +67,6 @@ private extension UnscrollShield {
             primaryButtonBackgroundColor: teal,
             secondaryButtonLabel: secondary
         )
-    }
-
-    func attempt<Value>(
-        _ stage: ShieldReadLog.Stage,
-        _ work: () throws -> Value
-    ) -> Value? {
-        do {
-            return try work()
-        } catch {
-            ShieldReadLog.recordFailure(at: stage, error: error)
-            return nil
-        }
     }
 
     func icon(for companion: Companion?) -> UIImage? {
