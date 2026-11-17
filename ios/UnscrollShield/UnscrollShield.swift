@@ -42,14 +42,28 @@ private extension UnscrollShield {
         let muted = UIColor(Palette.muted)
         let teal = UIColor(Palette.teal)
         let now = Date.now
-        let database = try? AppDatabase.appGroupReader()
-        let companion = try? database?.companion()
-        let progress = try? database?.journeyProgress(at: now)
-        let journey = (try? database?.currentJourney()) ?? .tokyoToKyoto
+        let database = attempt(.openDatabase) { try AppDatabase.appGroupReader() }
+        let companionRead = database.flatMap { database in
+            attempt(.readCompanion) { try database.companion() }
+        }
+        let companion = companionRead?.flatMap(\.self)
+        let journey = database.flatMap { database in
+            attempt(.readJourney) { try database.currentJourney() }
+        }
+        let progress = database.flatMap { database in
+            attempt(.readProgress) { try database.journeyProgress(at: now) }
+        }
+
+        if journey != nil,
+           progress != nil,
+           companionRead != nil {
+            let found = companion == nil ? "相棒なし" : "相棒あり"
+            ShieldReadLog.recordSuccess("読めた（\(found)）", date: now)
+        }
 
         let letter = ShieldLetter(
             companionName: companion?.name,
-            journey: journey,
+            journey: journey ?? .tokyoToKyoto,
             kilometers: progress?.kilometers,
             remainingMinutes: progress?.activeTrip?.remainingMinutes(at: now)
         )
@@ -64,10 +78,25 @@ private extension UnscrollShield {
             icon: icon(for: companion),
             title: ShieldConfiguration.Label(text: letter.title, color: ink),
             subtitle: ShieldConfiguration.Label(text: letter.body, color: muted),
-            primaryButtonLabel: ShieldConfiguration.Label(text: "旅に戻る", color: .white),
+            primaryButtonLabel: ShieldConfiguration.Label(
+                text: letter.primaryButton,
+                color: .white
+            ),
             primaryButtonBackgroundColor: teal,
             secondaryButtonLabel: secondary
         )
+    }
+
+    func attempt<Value>(
+        _ stage: ShieldReadLog.Stage,
+        _ work: () throws -> Value
+    ) -> Value? {
+        do {
+            return try work()
+        } catch {
+            ShieldReadLog.recordFailure(at: stage, error: error)
+            return nil
+        }
     }
 
     func icon(for companion: Companion?) -> UIImage? {

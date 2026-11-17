@@ -55,7 +55,7 @@ public extension SettingsModel {
         isAuthorized = AuthorizationCenter.shared.authorizationStatus == .approved
         isTripActive = (try? database.journeyProgress(at: .now))?.activeTrip != nil
         kilometersTogether = totalKilometers(at: .now)
-        logLines = EventLog.lines()
+        logLines = ShieldReadLog.lines() + EventLog.lines()
     }
 
     func requestAuthorization() async {
@@ -97,6 +97,7 @@ public extension SettingsModel {
 
     func clearLog() {
         EventLog.clear()
+        ShieldReadLog.clear()
         refresh()
     }
 }

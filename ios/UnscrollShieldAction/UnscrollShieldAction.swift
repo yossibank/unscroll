@@ -40,7 +40,7 @@ private extension UnscrollShieldAction {
 
         case .secondaryButtonPressed:
             let message = switch FocusShield.press(target, at: .now) {
-            case .closed: "止めた画面：きびしいので開けない"
+            case .closed: "止めた画面：きびしい設定なので開けません"
             case .startWaiting: "止めた画面：10 秒待ち始めた"
             case .keepWaiting: "止めた画面：まだ 10 秒たっていない"
             case .open: "止めた画面：1 分開いた"
