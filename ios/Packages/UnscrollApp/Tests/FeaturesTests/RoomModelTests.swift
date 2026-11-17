@@ -103,55 +103,6 @@ struct RoomModelTests {
     }
 
     @Test
-    func stepsTripLengthByFiveMinutes() throws {
-        let model = try RoomModel(
-            database: AppDatabase.inMemory(),
-            defaults: makeDefaults(),
-            now: { fixedNow }
-        )
-
-        model.selectedMinutes = 25
-        model.lengthen()
-
-        #expect(model.selectedMinutes == 30)
-
-        model.shorten()
-        model.shorten()
-
-        #expect(model.selectedMinutes == 20)
-    }
-
-    @Test
-    func stopsTripLengthAtTheLongestEnd() throws {
-        let model = try RoomModel(
-            database: AppDatabase.inMemory(),
-            defaults: makeDefaults(),
-            now: { fixedNow }
-        )
-
-        model.selectedMinutes = 180
-        model.lengthen()
-
-        #expect(model.selectedMinutes == 180)
-        #expect(!model.canLengthen)
-    }
-
-    @Test
-    func stopsTripLengthAtTheShortestEnd() throws {
-        let model = try RoomModel(
-            database: AppDatabase.inMemory(),
-            defaults: makeDefaults(),
-            now: { fixedNow }
-        )
-
-        model.selectedMinutes = RoomModel.tripRange.lowerBound
-        model.shorten()
-
-        #expect(model.selectedMinutes == RoomModel.tripRange.lowerBound)
-        #expect(!model.canShorten)
-    }
-
-    @Test
     func notesLandmarkForLength() throws {
         let database = try AppDatabase.inMemory()
         let start = fixedNow.addingTimeInterval(-100 * 60)

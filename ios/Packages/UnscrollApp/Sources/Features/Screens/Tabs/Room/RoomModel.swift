@@ -65,14 +65,6 @@ public extension RoomModel {
 
     static let tripStep = 5
 
-    var canShorten: Bool {
-        selectedMinutes > Self.tripRange.lowerBound
-    }
-
-    var canLengthen: Bool {
-        selectedMinutes < Self.tripRange.upperBound
-    }
-
     var tripEndsAt: Date? {
         progress?.activeTrip?.plannedEnd
     }
@@ -122,16 +114,6 @@ public extension RoomModel {
         }
 
         return "\(reached.name)に着く"
-    }
-
-    func shorten() {
-        let previous = (selectedMinutes - 1) / Self.tripStep * Self.tripStep
-        selectedMinutes = max(previous, Self.tripRange.lowerBound)
-    }
-
-    func lengthen() {
-        let next = (selectedMinutes / Self.tripStep + 1) * Self.tripStep
-        selectedMinutes = min(next, Self.tripRange.upperBound)
     }
 
     func kilometers(at date: Date) -> Int {
