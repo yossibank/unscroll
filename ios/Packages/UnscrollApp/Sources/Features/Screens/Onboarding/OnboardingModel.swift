@@ -12,12 +12,16 @@ public final class OnboardingModel {
     public let companion: CompanionPickerModel
     public let settings: SettingsModel
 
+    @ObservationIgnored private let defaults: UserDefaults
+
     public init(
         database: AppDatabase,
-        settings: SettingsModel
+        settings: SettingsModel,
+        defaults: UserDefaults = .standard
     ) {
         self.companion = CompanionPickerModel(database: database)
         self.settings = settings
+        self.defaults = defaults
     }
 }
 
@@ -34,6 +38,7 @@ public extension OnboardingModel {
 
     static let introPages: [Page] = [.travel, .walk, .postcard, .usage]
     static let setupPages: [Page] = [.companion, .permission, .apps]
+    static let completedKey = "onboardingCompleted"
 
     var isIntro: Bool {
         Self.introPages.contains(page)
@@ -55,6 +60,10 @@ public extension OnboardingModel {
         isIntro
     }
 
+    static func isCompleted(in defaults: UserDefaults = .standard) -> Bool {
+        defaults.bool(forKey: completedKey)
+    }
+
     func next() {
         guard let next = Page(rawValue: page.rawValue + 1) else {
             return
@@ -69,6 +78,10 @@ public extension OnboardingModel {
         }
 
         page = previous
+    }
+
+    func complete() {
+        defaults.set(true, forKey: Self.completedKey)
     }
 
     func skipIntro() {

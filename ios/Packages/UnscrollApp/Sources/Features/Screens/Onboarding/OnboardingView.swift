@@ -346,7 +346,7 @@ private extension OnboardingView {
             }
 
         case .apps:
-            onFinish()
+            finish()
 
         default:
             turn(forward: true)
@@ -355,10 +355,15 @@ private extension OnboardingView {
 
     func laterAction() {
         if model.page == .apps {
-            onFinish()
+            finish()
         } else {
             turn(forward: true)
         }
+    }
+
+    func finish() {
+        model.complete()
+        onFinish()
     }
 
     func turn(forward: Bool) {

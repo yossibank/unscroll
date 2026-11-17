@@ -15,13 +15,11 @@ public struct MainView: View {
     private let database: AppDatabase
 
     public init(database: AppDatabase) {
-        let hasCompanion = (try? database.companion()) != nil
-
         _room = State(initialValue: RoomModel(database: database))
         _journeyMap = State(initialValue: JourneyMapModel(database: database))
         _postcardAlbum = State(initialValue: PostcardAlbumModel(database: database))
         _settings = State(initialValue: SettingsModel(database: database))
-        _needsOnboarding = State(initialValue: !hasCompanion)
+        _needsOnboarding = State(initialValue: !OnboardingModel.isCompleted())
 
         self.database = database
     }

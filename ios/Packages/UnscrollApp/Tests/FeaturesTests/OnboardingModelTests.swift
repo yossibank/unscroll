@@ -1,4 +1,5 @@
 @testable import Features
+import Foundation
 import Store
 import Testing
 
@@ -66,6 +67,26 @@ struct OnboardingModelTests {
         #expect(model.page == .permission)
         #expect(try database.companion() != nil)
         #expect(settings.companion != nil)
+    }
+
+    @Test
+    func remembersCompletion() throws {
+        let database = try AppDatabase.inMemory()
+        let defaults = try #require(UserDefaults(suiteName: "OnboardingModelTests"))
+
+        defaults.removePersistentDomain(forName: "OnboardingModelTests")
+
+        let model = OnboardingModel(
+            database: database,
+            settings: SettingsModel(database: database),
+            defaults: defaults
+        )
+
+        #expect(!OnboardingModel.isCompleted(in: defaults))
+
+        model.complete()
+
+        #expect(OnboardingModel.isCompleted(in: defaults))
     }
 
     @Test
