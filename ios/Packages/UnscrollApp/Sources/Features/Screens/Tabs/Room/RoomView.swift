@@ -6,6 +6,7 @@ public struct RoomView: View {
     @State private var model: RoomModel
     @State private var isTripCoverShown = false
     @State private var isDecorShown = false
+    @State private var isUsageShown = false
     @State private var pose = Companion.Pose.walk
     @State private var pokes = 0
 
@@ -85,6 +86,13 @@ public struct RoomView: View {
             }
             .presentationDetents([.medium, .large])
         }
+        .sheet(isPresented: $isUsageShown) {
+            UsageDetailSheet {
+                isUsageShown = false
+            }
+            .presentationDetents([.large])
+            .presentationDragIndicator(.visible)
+        }
     }
 }
 
@@ -132,7 +140,22 @@ private extension RoomView {
             )
 
             UsageReportView()
-                .frame(height: 440)
+                .frame(height: 300)
+
+            Button {
+                isUsageShown = true
+            } label: {
+                HStack(spacing: 4) {
+                    Text("くわしく見る")
+
+                    Image(systemName: "chevron.right")
+                }
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(Palette.skyDeep)
+                .frame(minHeight: 44)
+            }
+            .buttonStyle(.plain)
+            .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .roundedCard()
     }

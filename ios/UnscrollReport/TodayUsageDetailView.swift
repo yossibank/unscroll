@@ -1,0 +1,192 @@
+import DesignSystem
+import SwiftUI
+
+struct TodayUsageDetailView: View {
+    let usage: TodayUsage
+
+    var body: some View {
+        ScrollView {
+            TodayUsageDetailContent(usage: usage)
+                .padding(Spacing.medium)
+        }
+        .scrollBounceBehavior(.basedOnSize)
+    }
+}
+
+struct TodayUsageDetailContent: View {
+    @State private var metric = Metric.time
+
+    let usage: TodayUsage
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: Spacing.small + 4) {
+            UsageHeadline(usage: usage)
+
+            facts
+
+            heading("時間ごと")
+
+            CapsulePicker(
+                Metric.allCases,
+                selection: $metric,
+                title: \.title
+            )
+
+            HourBars(values: values, unit: metric == .time ? .time : .count)
+
+            summaryBand
+
+            heading("アプリ")
+
+            if usage.apps.isEmpty {
+                Text("まだ記録がありません")
+                    .font(.footnote.weight(.bold))
+                    .foregroundStyle(Palette.muted)
+            }
+
+            VStack(spacing: Spacing.small + 4) {
+                ForEach(
+                    Array(usage.apps.prefix(5).enumerated()),
+                    id: \.element.id
+                ) { index, app in
+                    let tint = Self.appTints[index % Self.appTints.count]
+
+                    AppRow(
+                        app,
+                        peak: usage.apps.first?.duration ?? 1,
+                        tint: tint
+                    ) {
+                        badges(for: app)
+                    }
+                }
+            }
+
+            if !usage.categories.isEmpty {
+                heading("種類")
+
+                CategoryStrip(categories: usage.categories)
+            }
+
+            JourneyNote(usage: usage)
+        }
+        .fontDesign(.rounded)
+        .foregroundStyle(Palette.ink)
+    }
+}
+
+private extension TodayUsageDetailContent {
+    enum Metric: CaseIterable {
+        case time
+        case pickups
+        case notifications
+
+        var title: String {
+            switch self {
+            case .time: "使った時間"
+            case .pickups: "手に取った回数"
+            case .notifications: "通知"
+            }
+        }
+    }
+
+    static let appTints = [Palette.coral, Palette.sky, Palette.plum, Palette.sun, Palette.muted]
+
+    var values: [Double] {
+        switch metric {
+        case .time: usage.hours
+        case .pickups: usage.hourPickups.map(Double.init)
+        case .notifications: usage.hourNotifications.map(Double.init)
+        }
+    }
+
+    var facts: some View {
+        VStack(spacing: Spacing.small) {
+            HStack(spacing: Spacing.small) {
+                UsageFact(
+                    "\(usage.pickups) 回",
+                    note: "手に取った",
+                    wash: Palette.sunSoft
+                )
+
+                UsageFact(
+                    usage.perPickup ?? "-",
+                    note: "1 回あたり",
+                    wash: Palette.skySoft
+                )
+            }
+
+            HStack(spacing: Spacing.small) {
+                UsageFact(
+                    "\(usage.notifications) 件",
+                    note: "通知",
+                    wash: Palette.plumSoft
+                )
+
+                UsageFact(
+                    usage.firstPickupText,
+                    note: "最初に見た",
+                    wash: Palette.coralSoft
+                )
+            }
+        }
+    }
+
+    @ViewBuilder
+    var summaryBand: some View {
+        let rest = usage.longestRest
+        let busiest = usage.busiest
+
+        if rest != nil || busiest != nil {
+            VStack(alignment: .leading, spacing: 4) {
+                if let rest {
+                    Text(
+                        "いちばん長く置いたのは \(rest.start)時〜\(rest.start + rest.length - 1)時台（\(rest.length) 時間）"
+                    )
+                }
+
+                if let busiest {
+                    Text("\(busiest.hour) 時台に一番使った（\(busiest.minutes) 分）")
+                }
+            }
+            .font(.caption.weight(.bold))
+            .padding(Spacing.small)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Palette.sunSoft, in: .rect(cornerRadius: 16))
+        }
+    }
+
+    func heading(_ title: String) -> some View {
+        Text(title)
+            .font(.subheadline.weight(.heavy))
+            .padding(.top, Spacing.small)
+    }
+
+    func badges(for app: AppUsage) -> some View {
+        HStack(spacing: 6) {
+            badge("\(app.pickups) 回", wash: Palette.sunSoft)
+
+            badge("\(app.notifications) 件", wash: Palette.plumSoft)
+
+            if app.pickups > 0 {
+                let minutes = Int(app.duration / Double(app.pickups) / 60)
+
+                badge(
+                    minutes < 1 ? "1 回 1 分未満" : "1 回 \(minutes) 分",
+                    wash: Palette.skySoft
+                )
+            }
+        }
+    }
+
+    func badge(
+        _ text: String,
+        wash: Color
+    ) -> some View {
+        Text(text)
+            .font(.system(size: 10, weight: .bold))
+            .monospacedDigit()
+            .padding(.horizontal, 8)
+            .padding(.vertical, 2)
+            .background(wash, in: Capsule())
+    }
+}
