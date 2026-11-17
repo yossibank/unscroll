@@ -87,26 +87,26 @@ private extension JourneyPickerSheet {
             VStack(spacing: 0) {
                 band(journey)
 
-                VStack(alignment: .leading, spacing: 4) {
-                    HStack(alignment: .firstTextBaseline) {
+                HStack(alignment: .firstTextBaseline, spacing: Spacing.small) {
+                    VStack(alignment: .leading, spacing: 4) {
                         Text(journey.name)
                             .font(.headline.weight(.heavy))
                             .lineLimit(1)
                             .minimumScaleFactor(0.8)
 
-                        Spacer()
-
-                        Text("\(journey.totalKilometers) km")
-                            .font(.subheadline.weight(.heavy))
-                            .foregroundStyle(Palette.tealDeep)
-                            .monospacedDigit()
+                        Text(detail(journey))
+                            .font(.caption.weight(.bold))
+                            .foregroundStyle(Palette.muted)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.8)
                     }
 
-                    Text(detail(journey))
-                        .font(.caption.weight(.bold))
-                        .foregroundStyle(Palette.muted)
-                        .lineLimit(1)
-                        .minimumScaleFactor(0.8)
+                    Spacer()
+
+                    Text("\(journey.totalKilometers) km")
+                        .font(.subheadline.weight(.heavy))
+                        .foregroundStyle(Palette.tealDeep)
+                        .monospacedDigit()
                 }
                 .padding(Spacing.small + 4)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -124,19 +124,45 @@ private extension JourneyPickerSheet {
     }
 
     func band(_ journey: Journey) -> some View {
-        bandColor(journey)
-            .frame(height: 52)
-            .overlay(alignment: .bottomLeading) {
-                if model.isCurrent(journey) {
-                    Text("今の道のり")
-                        .font(.caption2.weight(.heavy))
-                        .foregroundStyle(Palette.tealDeep)
-                        .padding(.horizontal, Spacing.small)
-                        .frame(minHeight: 24)
-                        .background(Palette.card, in: Capsule())
-                        .padding(Spacing.small)
-                }
+        let landmarks = journey.landmarks
+        let middle = landmarks.dropFirst(landmarks.count / 2).first
+        let picks = [landmarks.first, middle, landmarks.last].compactMap(\.self)
+        let isSelected = model.selectedID == journey.id
+
+        return HStack(spacing: 2) {
+            ForEach(picks.indices, id: \.self) { index in
+                LandmarkArt(landmark: picks[index])
+                    .scaledToFill()
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 76)
+                    .clipped()
             }
+        }
+        .frame(height: 76)
+        .clipped()
+        .overlay(alignment: .bottomLeading) {
+            if model.isCurrent(journey) {
+                Text(currentText(journey))
+                    .font(.caption2.weight(.heavy))
+                    .foregroundStyle(Palette.tealDeep)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .padding(.horizontal, Spacing.small)
+                    .frame(minHeight: 24)
+                    .background(Palette.card, in: Capsule())
+                    .padding(Spacing.small)
+            }
+        }
+        .overlay(alignment: .topTrailing) {
+            if isSelected {
+                Image(systemName: "checkmark")
+                    .font(.caption.weight(.heavy))
+                    .foregroundStyle(Palette.teal)
+                    .frame(width: 24, height: 24)
+                    .background(Palette.card, in: Circle())
+                    .padding(Spacing.small)
+            }
+        }
     }
 
     func landmarkRow(_ journey: Journey) -> some View {
@@ -159,10 +185,12 @@ private extension JourneyPickerSheet {
                         Text(landmarks[index].name)
                             .font(.caption2.weight(.heavy))
                             .foregroundStyle(Palette.muted)
-                            .lineLimit(1)
+                            .multilineTextAlignment(.center)
+                            .lineLimit(2)
                             .minimumScaleFactor(0.8)
+                            .fixedSize(horizontal: false, vertical: true)
                     }
-                    .frame(width: 64)
+                    .frame(width: 60)
                 }
             }
         }
@@ -178,19 +206,6 @@ private extension JourneyPickerSheet {
 }
 
 private extension JourneyPickerSheet {
-    func bandColor(_ journey: Journey) -> Color {
-        let colors = [
-            Palette.tealSoft,
-            Palette.coralSoft,
-            Palette.sunSoft,
-            Palette.skySoft,
-            Palette.plumSoft
-        ]
-        let index = Journey.all.firstIndex(of: journey) ?? 0
-
-        return colors[index % colors.count]
-    }
-
     func summary(_ journey: Journey) -> String {
         let focus = JourneyPickerModel.focusText(kilometers: journey.totalKilometers)
         return "\(journey.totalKilometers.formatted()) km・\(focus)の集中"
@@ -198,13 +213,11 @@ private extension JourneyPickerSheet {
 
     func detail(_ journey: Journey) -> String {
         let focus = JourneyPickerModel.focusText(kilometers: journey.totalKilometers)
+        return "名所 \(journey.landmarks.count)・\(focus)"
+    }
+
+    func currentText(_ journey: Journey) -> String {
         let done = model.kilometers(of: journey)
-        let base = "名所 \(journey.landmarks.count) か所・\(focus)の集中"
-
-        guard done > 0 else {
-            return base
-        }
-
-        return "\(base)・\(done.formatted()) km 進みました"
+        return "今の道のり・\(done.formatted()) km 進みました"
     }
 }
