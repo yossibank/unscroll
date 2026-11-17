@@ -77,7 +77,6 @@ public struct RoomView: View {
                         model.acknowledgeFinishedTrip()
                     }
                 )
-                .presentationDetents([.medium, .large])
             }
         )
         .sheet(isPresented: $isDecorShown) {
