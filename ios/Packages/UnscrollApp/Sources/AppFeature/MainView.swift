@@ -32,9 +32,15 @@ public struct MainView: View {
                 .tag(Tab.room)
                 .toolbarVisibility(.hidden, for: .tabBar)
 
-            JourneyMapView(model: journeyMap)
-                .tag(Tab.map)
-                .toolbarVisibility(.hidden, for: .tabBar)
+            JourneyMapView(
+                model: journeyMap,
+                onJourneyChanged: {
+                    room.refresh()
+                    postcardAlbum.refresh()
+                }
+            )
+            .tag(Tab.map)
+            .toolbarVisibility(.hidden, for: .tabBar)
 
             PostcardAlbumView(model: postcardAlbum)
                 .tag(Tab.album)

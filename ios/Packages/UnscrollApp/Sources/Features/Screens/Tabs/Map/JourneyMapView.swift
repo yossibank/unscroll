@@ -4,11 +4,18 @@ import SwiftUI
 
 public struct JourneyMapView: View {
     @State private var model: JourneyMapModel
+    @State private var picker: JourneyPickerModel?
 
     @Environment(\.scenePhase) private var scenePhase
 
-    public init(model: JourneyMapModel) {
+    private let onJourneyChanged: () -> Void
+
+    public init(
+        model: JourneyMapModel,
+        onJourneyChanged: @escaping () -> Void = {}
+    ) {
         _model = State(initialValue: model)
+        self.onJourneyChanged = onJourneyChanged
     }
 
     public var body: some View {
@@ -41,6 +48,14 @@ public struct JourneyMapView: View {
         }
         .refreshable {
             model.refresh()
+        }
+        .sheet(item: $picker) { picker in
+            JourneyPickerSheet(model: picker) {
+                self.picker = nil
+                model.refresh()
+                onJourneyChanged()
+            }
+            .presentationDetents([.fraction(0.65), .large])
         }
     }
 }
@@ -80,9 +95,38 @@ private extension JourneyMapView {
                     .font(.caption.weight(.bold))
                     .foregroundStyle(Palette.teal)
                     .monospacedDigit()
+
+                changeButton
             }
         }
         .roundedCard()
+    }
+
+    var changeButton: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Button {
+                picker = model.makeJourneyPicker()
+            } label: {
+                Label("道のりを替える", systemImage: "arrow.triangle.swap")
+                    .font(.caption.weight(.heavy))
+                    .foregroundStyle(model.isOnTrip ? Palette.muted : Palette.tealDeep)
+                    .padding(.horizontal, Spacing.small + 4)
+                    .frame(minHeight: 28)
+                    .background(
+                        model.isOnTrip ? Palette.paperDeep : Palette.tealSoft,
+                        in: Capsule()
+                    )
+            }
+            .buttonStyle(.plain)
+            .disabled(model.isOnTrip)
+
+            if model.isOnTrip {
+                Text("旅から戻ると替えられる")
+                    .font(.caption2.weight(.bold))
+                    .foregroundStyle(Palette.muted)
+            }
+        }
+        .padding(.top, 4)
     }
 
     var nextCard: some View {
