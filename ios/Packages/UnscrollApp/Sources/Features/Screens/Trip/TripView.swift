@@ -48,7 +48,7 @@ private extension TripView {
                 }
 
                 if let companion = model.companion {
-                    CompanionSticker(companion: companion, pose: .walk, size: 96)
+                    CompanionWalker(companion: companion, size: 96)
                         .position(x: size.width / 2, y: size.height * TripScenery.roadLine - 48)
                 }
 
