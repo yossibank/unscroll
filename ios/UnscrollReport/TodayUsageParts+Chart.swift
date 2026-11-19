@@ -31,6 +31,7 @@ struct HourBars: View {
         .padding(.bottom, Spacing.small)
         .background { background }
         .accessibilityHidden(true)
+        .allowsHitTesting(false)
     }
 }
 
