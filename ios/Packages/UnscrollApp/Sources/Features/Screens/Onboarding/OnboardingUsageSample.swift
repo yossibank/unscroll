@@ -22,9 +22,14 @@ struct OnboardingUsageSample: View {
 
             HStack(spacing: 6) {
                 fact("48 回", note: "手に取った", ink: Palette.sunDeep, wash: Palette.sunSoft)
+
                 fact("3 分", note: "1 回あたり", ink: Palette.skyDeep, wash: Palette.skySoft)
+
                 fact("86 件", note: "通知", ink: Palette.plumDeep, wash: Palette.plumSoft)
+
+                firstPickup
             }
+            .padding(.bottom, 4)
 
             HStack {
                 Text("1 日の流れ")
@@ -164,6 +169,32 @@ private extension OnboardingUsageSample {
         }
     }
 
+    var firstPickup: some View {
+        VStack(alignment: .leading, spacing: 1) {
+            Text("6:42")
+                .font(.caption.weight(.heavy))
+                .foregroundStyle(Palette.ink)
+                .monospacedDigit()
+
+            Text("最初に見た")
+                .font(.system(size: 7, weight: .bold))
+                .foregroundStyle(Palette.muted)
+        }
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
+        .padding(6)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(height: 44)
+        .background(Palette.coralSoft, in: .rect(cornerRadius: 10))
+        .overlay {
+            RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(
+                    Palette.coral.opacity(0.4),
+                    style: StrokeStyle(lineWidth: 1.5, dash: [3, 3])
+                )
+        }
+    }
+
     func bar(_ hour: Int) -> some View {
         let ratio = Self.minutes[hour] / 60
         let fill = ratio > 0 ? Palette.hour(hour) : Palette.paperDeep
@@ -188,24 +219,47 @@ private extension OnboardingUsageSample {
         ink: Color,
         wash: Color
     ) -> some View {
-        VStack(alignment: .leading, spacing: 0) {
+        let shape = RoundedRectangle(cornerRadius: 10)
+
+        return VStack(alignment: .leading, spacing: 1) {
             Text(value)
-                .font(.footnote.weight(.heavy))
+                .font(.caption.weight(.heavy))
                 .foregroundStyle(Palette.ink)
+                .monospacedDigit()
 
             Text(note)
-                .font(.system(size: 9, weight: .bold))
+                .font(.system(size: 7, weight: .bold))
+                .foregroundStyle(Palette.muted)
+
+            Label("並べる", systemImage: "arrow.up.arrow.down")
+                .font(.system(size: 7, weight: .heavy))
                 .foregroundStyle(ink)
         }
         .lineLimit(1)
         .minimumScaleFactor(0.8)
-        .padding(.horizontal, Spacing.small)
-        .padding(.vertical, 6)
+        .padding(6)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(wash, in: .rect(cornerRadius: 8))
-        .overlay {
-            RoundedRectangle(cornerRadius: 8)
-                .strokeBorder(ink, lineWidth: 1.5)
+        .frame(height: 44)
+        .background {
+            ZStack {
+                shape.fill(wash)
+
+                shape.fill(
+                    LinearGradient(
+                        colors: [Palette.card.opacity(0.75), Palette.card.opacity(0)],
+                        startPoint: .top,
+                        endPoint: UnitPoint(x: 0.5, y: 0.55)
+                    )
+                )
+
+                shape.strokeBorder(ink, lineWidth: 1.5)
+            }
+        }
+        .background(alignment: .top) {
+            shape
+                .fill(ink)
+                .shadow(color: Palette.ink.opacity(0.22), radius: 5, y: 6)
+                .offset(y: 4)
         }
     }
 
