@@ -29,6 +29,29 @@ struct FocusEndTests {
     }
 
     @Test
+    func keepsTheNewTripWhenTheOldWatchIsStopped() {
+        let entry = FocusEndFile.Entry(endsAt: now.addingTimeInterval(-60), activity: "focus.new")
+        #expect(!FocusEnd.shouldEnd(entry, activity: "focus.old", at: now))
+    }
+
+    @Test
+    func endsWhenTheTripWatchEnds() {
+        let entry = FocusEndFile.Entry(endsAt: now.addingTimeInterval(-1), activity: "focus.new")
+        #expect(FocusEnd.shouldEnd(entry, activity: "focus.new", at: now))
+    }
+
+    @Test
+    func keepsTheTripBeforeItsEnd() {
+        let entry = FocusEndFile.Entry(endsAt: now.addingTimeInterval(60), activity: "focus.new")
+        #expect(!FocusEnd.shouldEnd(entry, activity: "focus.new", at: now))
+    }
+
+    @Test
+    func endsWhenNoEntryIsSaved() {
+        #expect(FocusEnd.shouldEnd(nil, activity: "focus.old", at: now))
+    }
+
+    @Test
     func findsAShieldLeftAfterTheTripEnded() {
         let endsAt = now.addingTimeInterval(-60)
         #expect(FocusEnd.isLeftOver(endsAt: endsAt, hasActiveTrip: false, at: now))

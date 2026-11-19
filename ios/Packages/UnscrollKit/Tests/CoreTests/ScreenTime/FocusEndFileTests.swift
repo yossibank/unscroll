@@ -7,13 +7,16 @@ struct FocusEndFileTests {
         url: FileManager.default.temporaryDirectory.appending(path: "focus-ends-at-\(UUID())")
     )
 
+    private let entry = FocusEndFile.Entry(
+        endsAt: Date(timeIntervalSince1970: 1_000_000),
+        activity: "focus.12"
+    )
+
     @Test
-    func readsTheWrittenEnd() throws {
-        let end = Date(timeIntervalSince1970: 1_000_000)
+    func readsTheWrittenEntry() throws {
+        try file.write(entry)
 
-        try file.write(end)
-
-        #expect(file.read() == end)
+        #expect(file.read() == entry)
         file.remove()
     }
 
@@ -24,7 +27,7 @@ struct FocusEndFileTests {
 
     @Test
     func readsNothingAfterRemoving() throws {
-        try file.write(Date(timeIntervalSince1970: 1_000_000))
+        try file.write(entry)
 
         file.remove()
 

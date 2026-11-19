@@ -309,7 +309,7 @@ private extension RoomModel {
         let oldWatches = center.activities.filter { ScreenTimeShared.isFocusActivity($0.rawValue) }
 
         center.stopMonitoring(oldWatches)
-        FocusShield.startTrip(endsAt: trip.plannedEnd)
+        FocusShield.startTrip(endsAt: trip.plannedEnd, activity: name)
 
         do {
             try center.startMonitoring(DeviceActivityName(name), during: schedule)

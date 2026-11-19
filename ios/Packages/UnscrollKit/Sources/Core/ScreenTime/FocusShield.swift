@@ -35,7 +35,7 @@ public enum FocusShield {
     }
 
     public static var tripEndsAt: Date? {
-        FocusEndFile.shared?.read()
+        FocusEndFile.shared?.read()?.endsAt
     }
 
     private static var unlockName: DeviceActivityName {
@@ -61,9 +61,14 @@ public enum FocusShield {
         return saved
     }
 
-    public static func startTrip(endsAt end: Date) {
+    public static func startTrip(
+        endsAt end: Date,
+        activity: String
+    ) {
+        let entry = FocusEndFile.Entry(endsAt: end, activity: activity)
+
         do {
-            try FocusEndFile.shared?.write(end)
+            try FocusEndFile.shared?.write(entry)
         } catch {
             EventLog.append("旅：終わりの時刻を保存できない（\(error.localizedDescription)）")
         }
@@ -86,8 +91,13 @@ public enum FocusShield {
         DeviceActivityCenter().stopMonitoring([unlockName])
     }
 
-    public static func endTripIfFinished(at now: Date) -> Bool {
-        guard FocusEnd.hasEnded(endsAt: tripEndsAt, at: now) else {
+    public static func endTripIfFinished(
+        activity: String,
+        at now: Date
+    ) -> Bool {
+        let entry = FocusEndFile.shared?.read()
+
+        guard FocusEnd.shouldEnd(entry, activity: activity, at: now) else {
             return false
         }
 

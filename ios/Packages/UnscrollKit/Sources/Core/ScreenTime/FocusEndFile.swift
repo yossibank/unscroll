@@ -9,26 +9,36 @@ public struct FocusEndFile: Sendable {
 }
 
 public extension FocusEndFile {
+    struct Entry: Codable, Equatable, Sendable {
+        public let endsAt: Date
+        public let activity: String
+
+        public init(
+            endsAt: Date,
+            activity: String
+        ) {
+            self.endsAt = endsAt
+            self.activity = activity
+        }
+    }
+
     static var shared: FocusEndFile? {
         FileManager.default
             .containerURL(forSecurityApplicationGroupIdentifier: ScreenTimeShared.appGroup)
             .map { FocusEndFile(url: $0.appending(path: "focus-ends-at")) }
     }
 
-    func read() -> Date? {
-        guard
-            let data = try? Data(contentsOf: url),
-            let seconds = TimeInterval(String(decoding: data, as: UTF8.self))
-        else {
+    func read() -> Entry? {
+        guard let data = try? Data(contentsOf: url) else {
             return nil
         }
 
-        return Date(timeIntervalSince1970: seconds)
+        return try? JSONDecoder().decode(Entry.self, from: data)
     }
 
-    func write(_ date: Date) throws {
-        let text = String(date.timeIntervalSince1970)
-        try Data(text.utf8).write(to: url, options: .atomic)
+    func write(_ entry: Entry) throws {
+        let data = try JSONEncoder().encode(entry)
+        try data.write(to: url, options: .atomic)
     }
 
     func remove() {
