@@ -17,18 +17,25 @@ public final class SettingsModel {
     }
 
     public private(set) var companion: Companion?
+    public private(set) var activeSetID: UUID?
     public private(set) var isAuthorized = false
     public private(set) var isTripActive = false
     public private(set) var kilometersTogether = 0
     public private(set) var logLines: [String] = []
 
+    private(set) var sets: [BlockedAppSet]
+
     @ObservationIgnored private let database: AppDatabase
     @ObservationIgnored private let center = DeviceActivityCenter()
 
     public init(database: AppDatabase) {
+        let sets = BlockedApps.loadSets()
+
         self.database = database
         self.selection = BlockedApps.load()
         self.strictness = FocusShield.strictness
+        self.sets = sets
+        self.activeSetID = BlockedApps.loadActiveSetID(in: sets)
         refresh()
     }
 }
@@ -44,6 +51,14 @@ public extension SettingsModel {
 
     var selectionSummary: String {
         hasSelection ? BlockedApps.summary(selection) : "未選択"
+    }
+
+    var activeSetName: String {
+        activeSetIndex.map { sets[$0].name } ?? "止めるアプリ"
+    }
+
+    var canAddSet: Bool {
+        sets.count < BlockedApps.maxSetCount && !isTripActive
     }
 
     func makeCompanionPicker() -> CompanionPickerModel {
@@ -70,8 +85,70 @@ public extension SettingsModel {
     }
 
     func saveSelection() {
+        if let index = activeSetIndex {
+            sets[index].selection = selection
+        }
+
         BlockedApps.save(selection)
+        BlockedApps.saveSets(sets, activeID: activeSetID)
         refresh()
+    }
+
+    func selectSet(_ id: UUID) {
+        guard
+            !isTripActive,
+            let set = sets.first(where: { $0.id == id })
+        else {
+            return
+        }
+
+        activeSetID = id
+        selection = set.selection
+        saveSelection()
+    }
+
+    func addSet(named name: String) {
+        guard canAddSet else {
+            return
+        }
+
+        let set = BlockedAppSet(
+            id: UUID(),
+            name: trimmedName(name, fallback: "セット \(sets.count + 1)"),
+            selection: FamilyActivitySelection()
+        )
+
+        sets.append(set)
+        selectSet(set.id)
+    }
+
+    func renameSet(
+        _ id: UUID,
+        to name: String
+    ) {
+        guard let index = sets.firstIndex(where: { $0.id == id }) else {
+            return
+        }
+
+        sets[index].name = trimmedName(name, fallback: sets[index].name)
+        BlockedApps.saveSets(sets, activeID: activeSetID)
+    }
+
+    func deleteSet(_ id: UUID) {
+        guard
+            sets.count > 1,
+            !isTripActive
+        else {
+            return
+        }
+
+        sets.removeAll { $0.id == id }
+
+        if activeSetID == id, let first = sets.first {
+            selectSet(first.id)
+        } else {
+            BlockedApps.saveSets(sets, activeID: activeSetID)
+        }
     }
 
     func startUsageWatch() {
@@ -102,6 +179,18 @@ public extension SettingsModel {
 }
 
 private extension SettingsModel {
+    var activeSetIndex: Int? {
+        sets.firstIndex { $0.id == activeSetID }
+    }
+
+    func trimmedName(
+        _ name: String,
+        fallback: String
+    ) -> String {
+        let trimmed = name.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed.isEmpty ? fallback : String(trimmed.prefix(8))
+    }
+
     func totalKilometers(at now: Date) -> Int {
         Journey.all.reduce(0) { total, journey in
             let progress = try? database.journeyProgress(journeyID: journey.id, at: now)

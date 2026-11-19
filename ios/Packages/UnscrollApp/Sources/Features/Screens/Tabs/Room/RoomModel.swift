@@ -64,6 +64,7 @@ public extension RoomModel {
     #endif
 
     static let tripStep = 5
+    static let practiceMinutes = 1
 
     var tripEndsAt: Date? {
         progress?.activeTrip?.plannedEnd
@@ -204,7 +205,14 @@ public extension RoomModel {
     }
 
     func startTrip() {
-        let minutes = selectedMinutes
+        startTrip(minutes: selectedMinutes)
+    }
+
+    func startPracticeTrip() {
+        startTrip(minutes: Self.practiceMinutes)
+    }
+
+    func startTrip(minutes: Int) {
         let start = now()
         let end = start.addingTimeInterval(TimeInterval(minutes * 60))
         let schedule = FocusShield.schedule(from: start, to: end)

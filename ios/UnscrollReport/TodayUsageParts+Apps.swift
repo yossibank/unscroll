@@ -92,12 +92,30 @@ struct UsageAppList: View {
                 if !rest.isEmpty {
                     otherRow(rest, peak: peak)
                 }
+
+                ForEach(0..<emptySlots(shown: shown, rest: rest), id: \.self) { _ in
+                    emptyRow
+                }
             }
         }
     }
 }
 
 private extension UsageAppList {
+    static let slotCount = 6
+
+    var emptyRow: some View {
+        HStack(spacing: Spacing.small) {
+            RoundedRectangle(cornerRadius: 8)
+                .strokeBorder(Palette.paperDeep, style: StrokeStyle(lineWidth: 1.5, dash: [3, 3]))
+                .frame(width: 32, height: 32)
+
+            Capsule()
+                .fill(Palette.paperDeep.opacity(0.6))
+                .frame(height: 8)
+        }
+    }
+
     func otherRow(
         _ rest: [AppUsage],
         peak: Double
@@ -119,6 +137,14 @@ private extension UsageAppList {
                         .foregroundStyle(Palette.muted)
                 }
         }
+    }
+
+    func emptySlots(
+        shown: [AppUsage],
+        rest: [AppUsage]
+    ) -> Int {
+        let filled = shown.count + (rest.isEmpty ? 0 : 1)
+        return max(Self.slotCount - filled, 0)
     }
 
     func tint(at index: Int) -> Color {

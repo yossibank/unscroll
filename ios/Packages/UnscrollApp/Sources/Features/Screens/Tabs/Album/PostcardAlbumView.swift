@@ -60,9 +60,6 @@ public struct PostcardAlbumView: View {
             .onChange(of: path.isEmpty) { _, isEmpty in
                 tabBarHidden.wrappedValue = !isEmpty
             }
-            .refreshable {
-                model.refresh()
-            }
         }
     }
 }

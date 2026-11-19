@@ -51,8 +51,8 @@ struct OnboardingModelTests {
             model.next()
         }
 
-        #expect(model.page == .apps)
-        #expect(model.setupStep == 3)
+        #expect(model.page == .practice)
+        #expect(model.setupStep == 4)
     }
 
     @Test

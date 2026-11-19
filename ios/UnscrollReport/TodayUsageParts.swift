@@ -209,7 +209,7 @@ struct CategoryStrip: View {
             }
             .frame(height: 10)
 
-            HStack(spacing: Spacing.small) {
+            VStack(alignment: .leading, spacing: 4) {
                 ForEach(parts.indices, id: \.self) { index in
                     HStack(spacing: 4) {
                         Circle()
@@ -218,8 +218,6 @@ struct CategoryStrip: View {
 
                         Text("\(parts[index].0) \(Int((parts[index].1 / sum * 100).rounded()))%")
                             .font(.caption2.weight(.bold))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
                     }
                 }
             }

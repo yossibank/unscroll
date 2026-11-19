@@ -8,11 +8,11 @@ public struct OnboardingView: View {
     @State private var isForward = true
     @State private var isPickerPresented = false
 
-    private let onFinish: () -> Void
+    private let onFinish: (_ startsPractice: Bool) -> Void
 
     public init(
         model: OnboardingModel,
-        onFinish: @escaping () -> Void
+        onFinish: @escaping (_ startsPractice: Bool) -> Void
     ) {
         _model = State(initialValue: model)
 
@@ -130,6 +130,9 @@ private extension OnboardingView {
         case .apps:
             appsPage
 
+        case .practice:
+            practicePage
+
         default:
             OnboardingIntro(page: model.page)
         }
@@ -225,6 +228,36 @@ private extension OnboardingView {
         }
     }
 
+    var practicePage: some View {
+        VStack(alignment: .leading, spacing: Spacing.large) {
+            JournalTitle("練習の旅に出てみよう", note: "1 分だけ、旅の流れを試せます")
+
+            TapedPhoto(caption: "1 分で 1 km、いっしょに歩きます", tilt: 1.5) {
+                RoomScene(
+                    companion: model.settings.companion,
+                    look: RoomLook(defaults: .standard),
+                    pose: .walk,
+                    window: Journey.tokyoToKyoto.nextLandmark(after: 0),
+                    postcards: [],
+                    nextRemaining: nil,
+                    souvenirs: [],
+                    onPoke: {}
+                )
+                .allowsHitTesting(false)
+            }
+            .padding(.horizontal, Spacing.large)
+            .accessibilityHidden(true)
+
+            SettingsPage("練習でできること", tint: Palette.teal) {
+                promise("選んだアプリを開くと、相棒から手紙が届きます")
+
+                SettingsRule()
+
+                promise("1 分たつと旅が終わり、アプリが元に戻ります")
+            }
+        }
+    }
+
     var bottomButtons: some View {
         let laterOpacity = showsLater ? 1.0 : 0
 
@@ -235,7 +268,7 @@ private extension OnboardingView {
             .buttonStyle(.pill)
             .disabled(!canPrimary)
 
-            Button("あとで設定する") {
+            Button(laterTitle) {
                 laterAction()
             }
             .font(.footnote.weight(.heavy))
@@ -309,15 +342,20 @@ private extension OnboardingView {
         switch model.page {
         case .usage: "旅の支度をする"
         case .permission: model.settings.isAuthorized ? "次へ" : "許可する"
-        case .apps: "旅をはじめる"
+        case .practice: "練習の旅に出る"
         default: "次へ"
         }
+    }
+
+    var laterTitle: String {
+        model.page == .practice ? "練習せずにはじめる" : "あとで設定する"
     }
 
     var canPrimary: Bool {
         switch model.page {
         case .companion: model.companion.draft != nil
         case .permission: !model.isRequesting
+        case .apps: model.settings.hasSelection
         default: true
         }
     }
@@ -326,6 +364,7 @@ private extension OnboardingView {
         switch model.page {
         case .permission: !model.settings.isAuthorized
         case .apps: !model.settings.hasSelection
+        case .practice: true
         default: false
         }
     }
@@ -345,8 +384,8 @@ private extension OnboardingView {
                 }
             }
 
-        case .apps:
-            finish()
+        case .practice:
+            finish(startsPractice: true)
 
         default:
             turn(forward: true)
@@ -354,16 +393,18 @@ private extension OnboardingView {
     }
 
     func laterAction() {
-        if model.page == .apps {
-            finish()
-        } else {
+        switch model.page {
+        case .apps, .practice:
+            finish(startsPractice: false)
+
+        default:
             turn(forward: true)
         }
     }
 
-    func finish() {
+    func finish(startsPractice: Bool) {
         model.complete()
-        onFinish()
+        onFinish(startsPractice)
     }
 
     func turn(forward: Bool) {

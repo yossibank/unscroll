@@ -34,10 +34,11 @@ public extension OnboardingModel {
         case companion
         case permission
         case apps
+        case practice
     }
 
     static let introPages: [Page] = [.travel, .walk, .postcard, .usage]
-    static let setupPages: [Page] = [.companion, .permission, .apps]
+    static let setupPages: [Page] = [.companion, .permission, .apps, .practice]
     static let completedKey = "onboardingCompleted"
 
     var isIntro: Bool {

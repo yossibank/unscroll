@@ -6,15 +6,66 @@ struct SettingsStrictness: View {
     @Binding var strictness: Strictness
 
     var body: some View {
-        HStack(spacing: Spacing.small) {
-            ForEach(Strictness.allCases, id: \.self) { item in
-                stamp(item)
+        VStack(alignment: .leading, spacing: Spacing.medium) {
+            HStack(spacing: Spacing.small) {
+                ForEach(Strictness.allCases, id: \.self) { item in
+                    stamp(item)
+                }
             }
+
+            shieldSample
+
+            Text(example(for: strictness))
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Palette.muted)
+                .fixedSize(horizontal: false, vertical: true)
         }
+        .animation(.snappy, value: strictness)
     }
 }
 
 private extension SettingsStrictness {
+    var shieldSample: some View {
+        let secondaryInk = strictness == .strict ? Palette.muted : Palette.teal
+
+        return VStack(spacing: Spacing.small) {
+            Image(systemName: "envelope.open.fill")
+                .font(.title3)
+                .foregroundStyle(Palette.teal)
+
+            Text("旅先からの手紙")
+                .font(.footnote.weight(.heavy))
+                .foregroundStyle(Palette.ink)
+
+            Text("あと 32 km で浜名湖に着くんだ。")
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(Palette.muted)
+
+            Text("旅に戻る")
+                .font(.caption.weight(.heavy))
+                .foregroundStyle(Palette.card)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, Spacing.small)
+                .background(Palette.teal, in: Capsule())
+                .padding(.top, 4)
+
+            Text(secondaryButton(for: strictness))
+                .font(.caption.weight(.heavy))
+                .foregroundStyle(secondaryInk)
+        }
+        .padding(Spacing.medium)
+        .frame(maxWidth: 240)
+        .background(Palette.paper, in: .rect(cornerRadius: 16))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(Palette.paperDeep, lineWidth: 1.5)
+        }
+        .frame(maxWidth: .infinity)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("止めた画面の見え方")
+        .accessibilityValue(detail(for: strictness))
+    }
+
     func stamp(_ item: Strictness) -> some View {
         let isSelected = strictness == item
         let border = isSelected ? Palette.sun : Palette.paperDeep
@@ -98,6 +149,22 @@ private extension SettingsStrictness {
         case .gentle: "止めたアプリを 1 分だけ開けます"
         case .normal: "10 秒待つと開けます"
         case .strict: "旅が終わるまで開けません"
+        }
+    }
+
+    func secondaryButton(for item: Strictness) -> String {
+        switch item {
+        case .gentle: "1 分だけ開く"
+        case .normal: "10 秒待って開く"
+        case .strict: "開くボタンは出ません"
+        }
+    }
+
+    func example(for item: Strictness) -> String {
+        switch item {
+        case .gentle: "例：連絡を待つ日に。開いても 1 分で、また止まります。"
+        case .normal: "例：つい SNS を開いてしまう時に。10 秒待つ間に、本当に要るか考えられます。"
+        case .strict: "例：試験の前や寝る前に。旅が終わるまで、どうやっても開けません。"
         }
     }
 

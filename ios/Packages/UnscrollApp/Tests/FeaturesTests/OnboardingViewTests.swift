@@ -9,6 +9,6 @@ struct OnboardingViewTests {
         let database = try AppDatabase.inMemory()
         let model = OnboardingModel(database: database, settings: SettingsModel(database: database))
 
-        _ = OnboardingView(model: model) {}.body
+        _ = OnboardingView(model: model) { _ in }.body
     }
 }

@@ -95,7 +95,8 @@ private extension HourBars {
                     if isPeak {
                         bubble(Int(hours[hour] / 60))
                             .fixedSize()
-                            .alignmentGuide(.top) { $0[.bottom] + 2 }
+                            .frame(height: 0, alignment: .bottom)
+                            .offset(y: -2)
                     }
                 }
         } else {

@@ -51,9 +51,6 @@ public struct JourneyMapView: View {
 
             model.refresh()
         }
-        .refreshable {
-            model.refresh()
-        }
         .sheet(item: $picker) { picker in
             JourneyPickerSheet(model: picker) {
                 self.picker = nil

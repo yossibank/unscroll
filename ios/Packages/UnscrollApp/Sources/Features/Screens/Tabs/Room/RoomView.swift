@@ -43,9 +43,6 @@ public struct RoomView: View {
 
             model.refresh()
         }
-        .refreshable {
-            model.refresh()
-        }
         .task {
             await blink()
         }
@@ -132,7 +129,7 @@ private extension RoomView {
             )
 
             UsageReportView()
-                .frame(height: 748)
+                .frame(height: 792)
         }
         .roundedCard()
     }

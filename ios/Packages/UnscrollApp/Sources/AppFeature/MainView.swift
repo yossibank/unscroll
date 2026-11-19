@@ -75,7 +75,14 @@ public struct MainView: View {
         .tint(Palette.teal)
         .preferredColorScheme(.light)
         .fullScreenCover(isPresented: showsOnboarding) {
-            OnboardingView(model: OnboardingModel(database: database, settings: settings)) {
+            OnboardingView(model: OnboardingModel(
+                database: database,
+                settings: settings
+            )) { startsPractice in
+                if startsPractice {
+                    room.startPracticeTrip()
+                }
+
                 room.refresh()
                 settings.refresh()
                 needsOnboarding = false

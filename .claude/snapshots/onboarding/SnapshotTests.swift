@@ -66,7 +66,7 @@ private extension SnapshotTests {
 
             return Case(name: "onboarding-\(target.rawValue)", size: page) {
                 AnyView(
-                    OnboardingView(model: model) {}
+                    OnboardingView(model: model) { _ in }
                         .padding(.top, 54)
                         .padding(.bottom, 24)
                 )
