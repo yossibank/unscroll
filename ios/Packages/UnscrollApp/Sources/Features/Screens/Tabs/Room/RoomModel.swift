@@ -27,6 +27,7 @@ public final class RoomModel {
     public private(set) var finishedArrivals: [Arrival] = []
     public private(set) var decoratedArrivals: [Arrival] = []
     public private(set) var arrivals: [Arrival] = []
+    public private(set) var practiceArrivals: [Arrival] = []
     public private(set) var isAuthorized = false
     public private(set) var hasSelection = false
 
@@ -85,6 +86,14 @@ public extension RoomModel {
         kilometersToNext == nil ? 3 : 2
     }
 
+    var decorPostcards: [Landmark] {
+        practiceArrivals.map(\.landmark) + journey.landmarks.dropFirst()
+    }
+
+    var tripJourney: Journey {
+        progress?.activeTrip?.isPractice == true ? .practice : journey
+    }
+
     var hungPostcards: [Landmark] {
         decoratedArrivals.suffix(postcardLimit).map(\.landmark)
     }
@@ -121,6 +130,10 @@ public extension RoomModel {
         return progress?.kilometers ?? kilometers
     }
 
+    func isArrived(_ landmark: Landmark) -> Bool {
+        (arrivals + practiceArrivals).contains { $0.landmark == landmark }
+    }
+
     func makeJourneyPicker() -> JourneyPickerModel {
         JourneyPickerModel(database: database, now: now)
     }
@@ -147,6 +160,7 @@ public extension RoomModel {
         updateFinishedArrivals()
         decoratedArrivals = (try? database.decoratedArrivals()) ?? []
         arrivals = (try? database.arrivals(journeyID: journey.id)) ?? []
+        practiceArrivals = (try? database.arrivals(journeyID: Journey.practice.id)) ?? []
     }
 
     func setDecorated(

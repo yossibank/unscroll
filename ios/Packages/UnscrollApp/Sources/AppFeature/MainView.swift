@@ -31,9 +31,17 @@ public struct MainView: View {
 
     public var body: some View {
         TabView(selection: $tab) {
-            RoomView(model: room, settings: settings)
-                .tag(Tab.room)
-                .toolbarVisibility(.hidden, for: .tabBar)
+            RoomView(
+                model: room,
+                settings: settings,
+                onOpenAlbum: {
+                    postcardAlbum.refresh()
+                    postcardAlbum.show(room.journey.id)
+                    tab = .album
+                }
+            )
+            .tag(Tab.room)
+            .toolbarVisibility(.hidden, for: .tabBar)
 
             JourneyMapView(
                 model: journeyMap,

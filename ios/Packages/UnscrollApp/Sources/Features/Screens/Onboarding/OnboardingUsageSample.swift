@@ -46,7 +46,7 @@ struct OnboardingUsageSample: View {
 
             bars
 
-            VStack(spacing: 6) {
+            HStack(spacing: Spacing.medium) {
                 ForEach(Self.apps, id: \.name) { app in
                     appRow(app)
                 }

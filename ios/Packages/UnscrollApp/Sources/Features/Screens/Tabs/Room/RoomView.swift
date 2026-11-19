@@ -13,12 +13,17 @@ public struct RoomView: View {
 
     @Environment(\.scenePhase) private var scenePhase
 
+    private let onOpenAlbum: () -> Void
+
     public init(
         model: RoomModel,
-        settings: SettingsModel
+        settings: SettingsModel,
+        onOpenAlbum: @escaping () -> Void = {}
     ) {
         _model = State(initialValue: model)
         _settings = State(initialValue: settings)
+
+        self.onOpenAlbum = onOpenAlbum
     }
 
     public var body: some View {
@@ -107,44 +112,78 @@ public struct RoomView: View {
 
 private extension RoomView {
     var topBar: some View {
-        HStack(spacing: Spacing.small) {
-            Button {
-                picker = model.makeJourneyPicker()
-            } label: {
-                TagPill(
-                    model.journey.name,
-                    systemImage: "arrow.triangle.swap",
-                    tint: Palette.tealDeep,
-                    wash: Palette.tealSoft
-                )
-            }
-            .buttonStyle(.plain)
-            .disabled(isOnTrip)
-            .frame(minHeight: 44)
-            .accessibilityHint("道のりを変える")
+        VStack(spacing: 4) {
+            journeyButton
 
+            HStack(spacing: Spacing.small) {
+                postcardButton
+
+                Spacer(minLength: 0)
+
+                decorButton
+            }
+        }
+    }
+
+    var journeyButton: some View {
+        let ink = isOnTrip ? Palette.muted : Palette.tealDeep
+
+        return Button {
+            picker = model.makeJourneyPicker()
+        } label: {
+            HStack(spacing: Spacing.small) {
+                Image(systemName: "arrow.triangle.swap")
+                    .font(.footnote.weight(.heavy))
+
+                Text(model.journey.name)
+                    .font(.subheadline.weight(.heavy))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                Spacer(minLength: 0)
+
+                if !isOnTrip {
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.heavy))
+                }
+            }
+            .foregroundStyle(ink)
+            .padding(.horizontal, Spacing.medium)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .background(Palette.tealSoft, in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .disabled(isOnTrip)
+        .accessibilityHint("道のりを変える")
+    }
+
+    var postcardButton: some View {
+        Button(action: onOpenAlbum) {
             TagPill(
                 postcardCount,
                 systemImage: "envelope.fill",
                 tint: Palette.coralDeep,
                 wash: Palette.coralSoft
             )
-
-            Spacer(minLength: 0)
-
-            Button {
-                isDecorShown = true
-            } label: {
-                TagPill(
-                    "模様替え",
-                    systemImage: "paintbrush.fill",
-                    tint: Palette.plumDeep,
-                    wash: Palette.plumSoft
-                )
-            }
-            .buttonStyle(.plain)
-            .frame(minHeight: 44)
         }
+        .buttonStyle(.plain)
+        .frame(minHeight: 44)
+        .accessibilityHint("絵はがき帳を開く")
+    }
+
+    var decorButton: some View {
+        Button {
+            isDecorShown = true
+        } label: {
+            TagPill(
+                "模様替え",
+                systemImage: "paintbrush.fill",
+                tint: Palette.plumDeep,
+                wash: Palette.plumSoft
+            )
+        }
+        .buttonStyle(.plain)
+        .frame(minHeight: 44)
     }
 
     var usageCard: some View {

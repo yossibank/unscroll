@@ -30,7 +30,7 @@ public struct OnboardingView: View {
                     .id(model.page)
                     .transition(pageTransition)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .frame(maxWidth: .infinity, minHeight: 0, maxHeight: .infinity, alignment: .top)
             .contentShape(.rect)
             .gesture(swipe)
 

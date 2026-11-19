@@ -139,7 +139,7 @@ private extension RoomDecorSheet {
             .foregroundStyle(Palette.muted)
 
             LazyVGrid(columns: columns(3), spacing: Spacing.small + 4) {
-                ForEach(model.journey.landmarks.dropFirst(), id: \.name) { landmark in
+                ForEach(model.decorPostcards, id: \.name) { landmark in
                     postcardButton(landmark)
                 }
             }
@@ -181,7 +181,7 @@ private extension RoomDecorSheet {
     }
 
     func postcardButton(_ landmark: Landmark) -> some View {
-        let isArrived = model.arrivals.contains { $0.landmark == landmark }
+        let isArrived = model.isArrived(landmark)
         let order = model.hungPostcards.firstIndex(of: landmark)
 
         return Button {

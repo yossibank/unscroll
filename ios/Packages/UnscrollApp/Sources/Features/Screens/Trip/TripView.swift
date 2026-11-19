@@ -52,7 +52,7 @@ private extension TripView {
                         .position(x: size.width / 2, y: size.height * TripScenery.roadLine - 48)
                 }
 
-                if let remark = model.journey
+                if let remark = model.tripJourney
                     .nextLandmark(after: model.kilometers(at: context.date))?.remark {
                     bubble(remark)
                         .position(x: size.width * 0.4, y: size.height * 0.3)
@@ -166,7 +166,7 @@ private extension TripView {
                     .foregroundStyle(Palette.teal)
                     .tracking(2)
 
-                route(at: now)
+                route(trip, at: now)
 
                 HStack(alignment: .firstTextBaseline, spacing: Spacing.small) {
                     Text(countdown(remaining))
@@ -201,7 +201,7 @@ private extension TripView {
                     )
 
                     TagPill(
-                        distanceToNext(at: now),
+                        distanceToNext(trip, at: now),
                         systemImage: "flag.fill",
                         tint: Palette.tealDeep,
                         wash: Palette.tealSoft
@@ -217,10 +217,18 @@ private extension TripView {
         .shadow(color: Palette.shadow, radius: 12, y: 8)
     }
 
-    func route(at now: Date) -> some View {
+    func route(
+        _ trip: Trip,
+        at now: Date
+    ) -> some View {
         let total = model.kilometers(at: now)
-        let start = model.journey.landmarks.last { $0.kilometer <= total }
-        let next = model.journey.nextLandmark(after: total)
+        let journey = model.tripJourney
+        let start = trip.isPractice
+            ? journey.landmarks.first
+            : journey.landmarks.last { $0.kilometer <= total }
+        let next = trip.isPractice
+            ? journey.landmarks.last
+            : journey.nextLandmark(after: total)
 
         return HStack(spacing: Spacing.small) {
             Text(start?.name ?? "")
@@ -258,15 +266,28 @@ private extension TripView {
     }
 
     func sceneryLandmark(at now: Date) -> Landmark? {
+        guard model.progress?.activeTrip?.isPractice != true else {
+            return Journey.tokyoSightseeing.landmarks.first
+        }
+
         let total = model.kilometers(at: now)
         return model.journey.nextLandmark(after: total) ?? model.journey.landmarks.last
     }
 
-    func distanceToNext(at now: Date) -> String {
+    func distanceToNext(
+        _ trip: Trip,
+        at now: Date
+    ) -> String {
         let total = model.kilometers(at: now)
+        let journey = model.tripJourney
 
-        guard let landmark = model.journey.nextLandmark(after: total) else {
-            return "\(model.journey.landmarks.last?.name ?? "")に着きました"
+        if trip.isPractice {
+            let seconds = max(0, Int(ceil(trip.plannedEnd.timeIntervalSince(now))))
+            return "\(journey.landmarks.last?.name ?? "")まで あと \(seconds) 秒"
+        }
+
+        guard let landmark = journey.nextLandmark(after: total) else {
+            return "\(journey.landmarks.last?.name ?? "")に着きました"
         }
 
         return "\(landmark.name)まで \((landmark.kilometer - total).formatted()) km"
