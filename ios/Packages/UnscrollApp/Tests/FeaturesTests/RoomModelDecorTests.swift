@@ -11,7 +11,7 @@ struct RoomModelDecorTests {
 
     @Test
     func keepsLookAfterRelaunch() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         let defaults = makeDefaults()
         let model = RoomModel(database: database, defaults: defaults, now: { fixedNow })
 
@@ -23,7 +23,7 @@ struct RoomModelDecorTests {
 
     @Test
     func startsWithPlasterAndWood() throws {
-        let model = try RoomModel(database: AppDatabase.inMemory(), defaults: makeDefaults())
+        let model = try RoomModel(database: makeDatabase(), defaults: makeDefaults())
 
         #expect(model.look == RoomLook(wall: .plaster, floor: .wood))
     }
@@ -108,8 +108,15 @@ struct RoomModelDecorTests {
 }
 
 private extension RoomModelDecorTests {
-    func makeModel(now: @escaping @MainActor () -> Date) throws -> RoomModel {
+    func makeDatabase() throws -> AppDatabase {
         let database = try AppDatabase.inMemory()
+        try database.selectJourney("tokaido", at: Date(timeIntervalSince1970: 0))
+
+        return database
+    }
+
+    func makeModel(now: @escaping @MainActor () -> Date) throws -> RoomModel {
+        let database = try makeDatabase()
         _ = try database.startTrip(minutes: 300, at: fixedNow.addingTimeInterval(-310 * 60))
         let model = RoomModel(database: database, defaults: makeDefaults(), now: now)
         model.refresh()

@@ -76,9 +76,14 @@ private extension SnapshotTests {
         return RoomModel(database: database, defaults: defaults, now: { now })
     }
 
-    static func page(_ model: RoomModel) -> some View {
+    static func page(
+        _ model: RoomModel,
+        settings: SettingsModel
+    ) -> some View {
         VStack(spacing: Spacing.medium) {
             RoomPhoto(model: model, pose: .walk) {}
+
+            AppSetTags(model: settings) {}
 
             RoomTicket(model: model)
         }
@@ -96,9 +101,10 @@ private extension SnapshotTests {
 
         return try states.map { name, minutes, isOnTrip in
             let model = try model(name: name, minutes: minutes, isOnTrip: isOnTrip)
+            let settings = try SettingsModel(database: AppDatabase.inMemory())
 
             return Case(name: "room-tab-\(name)", size: page) {
-                AnyView(page(model))
+                AnyView(page(model, settings: settings))
             }
         }
     }

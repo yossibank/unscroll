@@ -33,4 +33,31 @@ public extension AppDatabase {
             }
         }
     }
+
+    func recordPracticeArrivals(at now: Date) throws {
+        guard let station = Journey.practiceStation else {
+            return
+        }
+
+        try writer.write { db in
+            let trips = try Trip
+                .filter(sql: "journeyID = ?", arguments: [Journey.practice.id])
+                .fetchAll(db)
+
+            for trip in trips where !trip.isActive(at: now) && trip.isCompleted {
+                let arrival = Arrival(
+                    landmark: station,
+                    tripID: trip.id,
+                    arrivedAt: trip.plannedEnd
+                )
+
+                try arrival.insert(db, onConflict: .ignore)
+
+                try db.execute(
+                    sql: "update arrival set journeyID = ? where landmarkName = ?",
+                    arguments: [Journey.practice.id, station.name]
+                )
+            }
+        }
+    }
 }

@@ -71,7 +71,10 @@ private extension CompanionPickerForm {
                     )
                 }
             }
+            .id(model.species)
+            .transition(.opacity)
         }
+        .animation(.easeOut(duration: 0.2), value: model.species)
         .roundedCard()
     }
 

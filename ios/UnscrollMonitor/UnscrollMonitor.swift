@@ -40,7 +40,11 @@ private extension UnscrollMonitor {
     ) {
         switch activity.rawValue {
         case ScreenTimeShared.focusActivityName:
-            FocusShield.endTrip()
+            let message = FocusShield.endTripIfFinished(at: .now)
+                ? "旅：終わった"
+                : "旅：次の旅が続いているので止めたまま"
+
+            EventLog.append(message)
 
         case ScreenTimeShared.unlockActivityName:
             let result = FocusShield.reshieldIfTripContinues(

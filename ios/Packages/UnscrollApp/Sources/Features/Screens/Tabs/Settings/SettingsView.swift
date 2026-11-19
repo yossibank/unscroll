@@ -98,9 +98,10 @@ private extension SettingsView {
 
             setupStep(
                 number: 1,
-                title: "Screen Time を許可する",
+                title: "スクリーンタイムを許可する",
                 isDone: model.isAuthorized,
-                actionTitle: "許可する"
+                actionTitle: "許可する",
+                isLoading: model.isRequestingAuthorization
             ) {
                 Task {
                     await model.requestAuthorization()
@@ -141,10 +142,13 @@ private extension SettingsView {
 
             SettingsRule()
 
-            SettingsRow(title: "Screen Time の許可", systemImage: "hourglass", tint: Palette.sky) {
+            SettingsRow(title: "スクリーンタイムの許可", systemImage: "hourglass", tint: Palette.sky) {
                 if model.isAuthorized {
                     Label("許可あり", systemImage: "checkmark.circle.fill")
                         .foregroundStyle(Palette.teal)
+                } else if model.isRequestingAuthorization {
+                    ProgressView()
+                        .tint(Palette.teal)
                 } else {
                     Button("許可する") {
                         Task {
@@ -161,7 +165,7 @@ private extension SettingsView {
         let opacity = model.isTripActive ? 0.5 : 1
 
         return SettingsPage("外しにくさ", tint: Palette.sun) {
-            SettingsStrictness(strictness: $model.strictness)
+            SettingsStrictness(strictness: $model.strictness, companion: model.companion)
                 .padding(.top, 4)
                 .disabled(model.isTripActive)
                 .opacity(opacity)
@@ -212,6 +216,7 @@ private extension SettingsView {
         title: String,
         isDone: Bool,
         actionTitle: String,
+        isLoading: Bool = false,
         action: @escaping () -> Void
     ) -> some View {
         let mark = isDone ? "✓" : "\(number)"
@@ -235,13 +240,24 @@ private extension SettingsView {
             Spacer(minLength: 0)
 
             if !isDone {
-                Button(actionTitle, action: action)
-                    .font(.caption.weight(.heavy))
-                    .foregroundStyle(.white)
-                    .padding(.horizontal, Spacing.small + 4)
-                    .padding(.vertical, Spacing.small)
-                    .background(Palette.coral, in: Capsule())
-                    .buttonStyle(.plain)
+                Button(action: action) {
+                    HStack(spacing: 4) {
+                        if isLoading {
+                            ProgressView()
+                                .controlSize(.mini)
+                                .tint(.white)
+                        }
+
+                        Text(actionTitle)
+                    }
+                }
+                .font(.caption.weight(.heavy))
+                .foregroundStyle(.white)
+                .padding(.horizontal, Spacing.small + 4)
+                .padding(.vertical, Spacing.small)
+                .background(Palette.coral, in: Capsule())
+                .buttonStyle(.plain)
+                .allowsHitTesting(!isLoading)
             }
         }
         .padding(Spacing.small + 4)

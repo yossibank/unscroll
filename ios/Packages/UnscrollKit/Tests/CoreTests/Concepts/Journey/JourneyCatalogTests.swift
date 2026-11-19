@@ -3,19 +3,32 @@ import Testing
 
 struct JourneyCatalogTests {
     @Test
-    func holdsSevenJourneysWithDistinctIDs() {
+    func holdsEightJourneysWithDistinctIDs() {
         let ids = Journey.all.map(\.id)
 
-        #expect(ids.count == 7)
+        #expect(ids.count == 8)
         #expect(Set(ids).count == ids.count)
     }
 
     @Test
-    func keepsNamesAndArtKeysDistinctAcrossJourneys() {
-        let landmarks = Journey.all.flatMap(\.landmarks)
+    func startsWithTokyoSightseeing() {
+        #expect(Journey.all.first == .tokyoSightseeing)
+    }
+
+    @Test
+    func keepsNamesAndArtKeysDistinctAcrossJourneysExceptTokyoStation() {
+        let landmarks = Journey.all.flatMap(\.landmarks).filter { $0.artKey != "tokyoeki" }
 
         #expect(Set(landmarks.map(\.name)).count == landmarks.count)
         #expect(Set(landmarks.map(\.artKey)).count == landmarks.count)
+    }
+
+    @Test
+    func sharesTokyoStationBetweenJourneys() {
+        let stations = Journey.all.flatMap(\.landmarks).filter { $0.artKey == "tokyoeki" }
+
+        #expect(stations.count == 2)
+        #expect(Set(stations.map(\.name)) == ["東京駅"])
     }
 
     @Test

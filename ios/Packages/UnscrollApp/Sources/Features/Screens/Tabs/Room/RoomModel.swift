@@ -27,10 +27,11 @@ public final class RoomModel {
     public private(set) var finishedArrivals: [Arrival] = []
     public private(set) var decoratedArrivals: [Arrival] = []
     public private(set) var arrivals: [Arrival] = []
+    public private(set) var practiceArrivals: [Arrival] = []
     public private(set) var isAuthorized = false
     public private(set) var hasSelection = false
 
-    public private(set) var journey = Journey.tokyoToKyoto
+    public private(set) var journey = Journey.tokyoSightseeing
 
     @ObservationIgnored private let database: AppDatabase
     @ObservationIgnored private let defaults: UserDefaults
@@ -85,6 +86,14 @@ public extension RoomModel {
         kilometersToNext == nil ? 3 : 2
     }
 
+    var decorPostcards: [Landmark] {
+        practiceArrivals.map(\.landmark) + journey.landmarks.dropFirst()
+    }
+
+    var tripJourney: Journey {
+        progress?.activeTrip?.isPractice == true ? .practice : journey
+    }
+
     var hungPostcards: [Landmark] {
         decoratedArrivals.suffix(postcardLimit).map(\.landmark)
     }
@@ -121,6 +130,14 @@ public extension RoomModel {
         return progress?.kilometers ?? kilometers
     }
 
+    func isArrived(_ landmark: Landmark) -> Bool {
+        (arrivals + practiceArrivals).contains { $0.landmark == landmark }
+    }
+
+    func makeJourneyPicker() -> JourneyPickerModel {
+        JourneyPickerModel(database: database, now: now)
+    }
+
     func acknowledgeFinishedTrip() {
         guard let finishedTrip else {
             return
@@ -133,7 +150,7 @@ public extension RoomModel {
     func refresh() {
         isAuthorized = AuthorizationCenter.shared.authorizationStatus == .approved
         hasSelection = !BlockedApps.isEmpty(BlockedApps.load())
-        journey = (try? database.currentJourney()) ?? .tokyoToKyoto
+        journey = (try? database.currentJourney()) ?? .tokyoSightseeing
         companion = try? database.companion()
         progress = try? database.journeyProgress(at: now())
 
@@ -143,6 +160,7 @@ public extension RoomModel {
         updateFinishedArrivals()
         decoratedArrivals = (try? database.decoratedArrivals()) ?? []
         arrivals = (try? database.arrivals(journeyID: journey.id)) ?? []
+        practiceArrivals = (try? database.arrivals(journeyID: Journey.practice.id)) ?? []
     }
 
     func setDecorated(
@@ -204,37 +222,19 @@ public extension RoomModel {
     }
 
     func startTrip() {
-        let minutes = selectedMinutes
-        let start = now()
-        let end = start.addingTimeInterval(TimeInterval(minutes * 60))
-        let schedule = FocusShield.schedule(from: start, to: end)
+        startTrip(minutes: selectedMinutes)
+    }
 
-        let trip: Trip
-
-        do {
-            trip = try database.startTrip(minutes: minutes, at: start)
-        } catch {
-            EventLog.append("旅：保存できない（\(error.localizedDescription)）")
-            refresh()
-            return
+    func startPracticeTrip() {
+        begin(label: "練習") { start in
+            try database.startPracticeTrip(at: start)
         }
+    }
 
-        FocusShield.startTrip(endsAt: end)
-
-        do {
-            try center.startMonitoring(
-                DeviceActivityName(ScreenTimeShared.focusActivityName),
-                during: schedule
-            )
-            EventLog.append("旅：開始（\(minutes) 分）")
-        } catch {
-            FocusShield.endTrip()
-            try? database.endTrip(trip.id, at: start)
-            defaults.set(trip.id.description, forKey: Self.acknowledgedTripKey)
-            EventLog.append("旅：見張りを始められない（\(error.localizedDescription)）")
+    func startTrip(minutes: Int) {
+        begin(label: "\(minutes) 分") { start in
+            try database.startTrip(minutes: minutes, at: start)
         }
-
-        refresh()
     }
 
     func stopTrip() {
@@ -247,7 +247,6 @@ public extension RoomModel {
         }
 
         FocusShield.endTrip()
-        center.stopMonitoring([DeviceActivityName(ScreenTimeShared.focusActivityName)])
         EventLog.append("旅：やめた")
         refresh()
     }
@@ -274,9 +273,45 @@ private extension RoomModel {
         }
     }
 
+    func begin(
+        label: String,
+        save: (Date) throws -> Trip
+    ) {
+        let start = now()
+        let trip: Trip
+
+        do {
+            trip = try save(start)
+        } catch {
+            EventLog.append("旅：保存できない（\(error.localizedDescription)）")
+            refresh()
+            return
+        }
+
+        let schedule = FocusShield.schedule(from: start, to: trip.plannedEnd)
+
+        FocusShield.startTrip(endsAt: trip.plannedEnd)
+
+        do {
+            try center.startMonitoring(
+                DeviceActivityName(ScreenTimeShared.focusActivityName),
+                during: schedule
+            )
+            EventLog.append("旅：開始（\(label)）")
+        } catch {
+            FocusShield.endTrip()
+            try? database.endTrip(trip.id, at: start)
+            defaults.set(trip.id.description, forKey: Self.acknowledgedTripKey)
+            EventLog.append("旅：見張りを始められない（\(error.localizedDescription)）")
+        }
+
+        refresh()
+    }
+
     func recordArrivals() {
         do {
             try database.recordArrivals(on: journey, at: now())
+            try database.recordPracticeArrivals(at: now())
         } catch {
             EventLog.append("名所：着いた記録を保存できない（\(error.localizedDescription)）")
         }

@@ -7,29 +7,22 @@ struct TodayUsageView: View {
     let usage: TodayUsage
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.medium) {
-                UsageHeadline(usage: usage)
+        VStack(alignment: .leading, spacing: Spacing.medium) {
+            UsageHeadline(usage: usage)
 
-                facts
+            facts
 
-                flow
+            flow
 
-                if !usage.apps.isEmpty {
-                    UsageAppList(usage: usage, sort: sort)
-                }
+            UsageAppList(usage: usage, sort: sort)
 
-                if !usage.categories.isEmpty {
-                    categories
-                }
+            categories
 
-                JourneyNote(usage: usage)
-            }
-            .fontDesign(.rounded)
-            .foregroundStyle(Palette.ink)
-            .frame(maxWidth: .infinity, alignment: .topLeading)
+            JourneyNote(usage: usage)
         }
-        .scrollBounceBehavior(.basedOnSize)
+        .fontDesign(.rounded)
+        .foregroundStyle(Palette.ink)
+        .dynamicTypeSize(...DynamicTypeSize.large)
         .frame(
             maxWidth: .infinity,
             maxHeight: .infinity,
@@ -39,9 +32,9 @@ struct TodayUsageView: View {
 }
 
 private extension TodayUsageView {
-    var busiestText: String? {
+    var busiestText: String {
         guard let busiest = usage.busiest else {
-            return nil
+            return "まだ記録がありません"
         }
 
         return "\(busiest.hour) 時台がいちばん（\(busiest.minutes) 分）"
@@ -78,25 +71,16 @@ private extension TodayUsageView {
         .padding(.bottom, 6)
     }
 
-    @ViewBuilder
     var flow: some View {
-        if usage.total == 0 {
-            Text("まだ記録がありません")
-                .font(.footnote.weight(.bold))
-                .foregroundStyle(Palette.muted)
-        } else {
-            VStack(alignment: .leading, spacing: Spacing.small) {
-                UsageSectionHeader("1 日の流れ", trailing: busiestText)
+        VStack(alignment: .leading, spacing: Spacing.small) {
+            UsageSectionHeader("1 日の流れ", trailing: busiestText)
 
-                HourBars(
-                    hours: usage.hours,
-                    peakHour: usage.busiest?.hour
-                )
+            HourBars(
+                hours: usage.hours,
+                peakHour: usage.busiest?.hour
+            )
 
-                if let rest = usage.longestRest {
-                    UsageRest(start: rest.start, length: rest.length)
-                }
-            }
+            UsageRest(rest: usage.longestRest)
         }
     }
 

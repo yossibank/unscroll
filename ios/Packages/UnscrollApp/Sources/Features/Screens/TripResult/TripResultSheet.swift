@@ -47,16 +47,20 @@ private extension TripResultSheet {
                         .font(.subheadline)
                         .foregroundStyle(Palette.muted)
 
-                    Text("+\(trip.kilometers(at: .now)) km")
+                    Text(gainText)
                         .font(.system(size: 48, weight: .bold, design: .rounded))
                         .foregroundStyle(Palette.teal)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
                 }
 
                 if !model.finishedArrivals.isEmpty {
                     receivedCard
                 }
 
-                routeCard
+                if !trip.isPractice {
+                    routeCard
+                }
 
                 Button("部屋に戻る") {
                     onClose()
@@ -91,7 +95,7 @@ private extension TripResultSheet {
                         .offset(x: Spacing.small, y: Spacing.large)
                 }
             }
-            .padding(.bottom, Spacing.large)
+            .padding(.bottom, Spacing.small)
         }
         .padding(.top, Spacing.small)
     }
@@ -228,7 +232,15 @@ private extension TripResultSheet {
 }
 
 private extension TripResultSheet {
+    var gainText: String {
+        trip.isPractice ? "おるす駅" : "+\(trip.kilometers(at: .now)) km"
+    }
+
     var summary: String {
+        if trip.isPractice {
+            return trip.isCompleted ? "10 秒の練習の旅、おつかれさま" : "練習の旅は、またいつでも"
+        }
+
         guard trip.endedAt != nil else {
             let hours = trip.plannedMinutes / 60
             let minutes = trip.plannedMinutes % 60

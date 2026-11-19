@@ -10,11 +10,12 @@ struct AppIcon: View {
         if let token = app.token {
             Label(token)
                 .labelStyle(.iconOnly)
-                .frame(width: 32, height: 32)
+                .scaleEffect(1.4)
+                .frame(width: 28, height: 28)
         } else {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 7)
                 .fill(tint)
-                .frame(width: 32, height: 32)
+                .frame(width: 28, height: 28)
         }
     }
 }
@@ -45,7 +46,7 @@ struct AppRow<Icon: View>: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }
-                .font(.caption.weight(.bold))
+                .font(.footnote.weight(.bold))
 
                 GeometryReader { proxy in
                     Capsule()
@@ -70,8 +71,7 @@ struct UsageAppList: View {
 
     var body: some View {
         let ranked = usage.apps.sorted { sort.value(of: $0) > sort.value(of: $1) }
-        let shown = Array(ranked.prefix(5))
-        let rest = Array(ranked.dropFirst(5))
+        let shown = Array(ranked.prefix(Self.slotCount))
         let peak = ranked.first.map { sort.value(of: $0) } ?? 0
 
         VStack(alignment: .leading, spacing: Spacing.small) {
@@ -89,8 +89,8 @@ struct UsageAppList: View {
                     }
                 }
 
-                if !rest.isEmpty {
-                    otherRow(rest, peak: peak)
+                ForEach(0..<max(Self.slotCount - shown.count, 0), id: \.self) { _ in
+                    emptyRow
                 }
             }
         }
@@ -98,26 +98,17 @@ struct UsageAppList: View {
 }
 
 private extension UsageAppList {
-    func otherRow(
-        _ rest: [AppUsage],
-        peak: Double
-    ) -> some View {
-        let sum = sort == .perPickup ? 0 : rest.reduce(0) { $0 + sort.value(of: $1) }
+    static let slotCount = 5
 
-        return AppRow(
-            name: "その他 \(rest.count) アプリ",
-            value: sort.text(sum),
-            ratio: ratio(sum, peak: peak),
-            tint: sort == .time ? Palette.muted : sort.tint
-        ) {
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Palette.paperDeep)
-                .frame(width: 32, height: 32)
-                .overlay {
-                    Text("…")
-                        .font(.caption.weight(.heavy))
-                        .foregroundStyle(Palette.muted)
-                }
+    var emptyRow: some View {
+        HStack(spacing: Spacing.small) {
+            RoundedRectangle(cornerRadius: 7)
+                .strokeBorder(Palette.paperDeep, style: StrokeStyle(lineWidth: 1.5, dash: [3, 3]))
+                .frame(width: 28, height: 28)
+
+            Capsule()
+                .fill(Palette.paperDeep.opacity(0.6))
+                .frame(height: 8)
         }
     }
 

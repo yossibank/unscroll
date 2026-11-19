@@ -36,11 +36,42 @@ public extension AppDatabase {
 
 extension AppDatabase {
     static func currentJourney(_ db: Database) throws -> Journey {
-        guard try db.tableExists("currentJourney") else {
-            return .tokyoToKyoto
+        if try db.tableExists("currentJourney"),
+           let id = try String.fetchOne(
+               db,
+               sql: "select journeyID from currentJourney where id = 1"
+           ) {
+            return Journey.with(id: id) ?? .tokyoToKyoto
         }
 
-        let id = try String.fetchOne(db, sql: "select journeyID from currentJourney where id = 1")
+        return try latestTripJourney(db)
+    }
+}
+
+private extension AppDatabase {
+    static func latestTripJourney(_ db: Database) throws -> Journey {
+        guard
+            try db.tableExists("trip"),
+            let row = try latestTripRow(db)
+        else {
+            return .tokyoSightseeing
+        }
+
+        let id: String? = row["journeyID"]
         return id.flatMap { Journey.with(id: $0) } ?? .tokyoToKyoto
+    }
+
+    static func latestTripRow(_ db: Database) throws -> Row? {
+        let hasJourney = try db.columns(in: "trip").contains { $0.name == "journeyID" }
+
+        guard hasJourney else {
+            return try Row.fetchOne(db, sql: "select * from trip order by startedAt desc limit 1")
+        }
+
+        return try Row.fetchOne(
+            db,
+            sql: "select * from trip where journeyID != ? order by startedAt desc limit 1",
+            arguments: [Journey.practice.id]
+        )
     }
 }

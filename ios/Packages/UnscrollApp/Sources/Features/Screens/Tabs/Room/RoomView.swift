@@ -4,15 +4,26 @@ import SwiftUI
 
 public struct RoomView: View {
     @State private var model: RoomModel
+    @State private var settings: SettingsModel
     @State private var isTripCoverShown = false
     @State private var isDecorShown = false
+    @State private var picker: JourneyPickerModel?
     @State private var pose = Companion.Pose.walk
     @State private var pokes = 0
 
     @Environment(\.scenePhase) private var scenePhase
 
-    public init(model: RoomModel) {
+    private let onOpenAlbum: () -> Void
+
+    public init(
+        model: RoomModel,
+        settings: SettingsModel,
+        onOpenAlbum: @escaping () -> Void = {}
+    ) {
         _model = State(initialValue: model)
+        _settings = State(initialValue: settings)
+
+        self.onOpenAlbum = onOpenAlbum
     }
 
     public var body: some View {
@@ -23,6 +34,8 @@ public struct RoomView: View {
                 RoomPhoto(model: model, pose: pose) {
                     poke()
                 }
+
+                appSets
 
                 RoomTicket(model: model)
 
@@ -35,6 +48,7 @@ public struct RoomView: View {
         .background(PaperBackdrop())
         .onAppear {
             model.refresh()
+            settings.refresh()
         }
         .onChange(of: scenePhase) { _, newPhase in
             guard newPhase == .active else {
@@ -42,9 +56,10 @@ public struct RoomView: View {
             }
 
             model.refresh()
+            settings.refresh()
         }
-        .refreshable {
-            model.refresh()
+        .onChange(of: model.progress?.activeTrip == nil) {
+            settings.refresh()
         }
         .task {
             await blink()
@@ -85,41 +100,90 @@ public struct RoomView: View {
             }
             .presentationDetents([.medium, .large])
         }
+        .sheet(item: $picker) { picker in
+            JourneyPickerSheet(model: picker) {
+                self.picker = nil
+                model.refresh()
+            }
+            .presentationDetents([.large])
+        }
     }
 }
 
 private extension RoomView {
     var topBar: some View {
-        HStack(spacing: Spacing.small) {
-            TagPill(
-                model.journey.name,
-                systemImage: "map.fill",
-                tint: Palette.tealDeep,
-                wash: Palette.tealSoft
-            )
+        VStack(spacing: 4) {
+            journeyButton
 
+            HStack(spacing: Spacing.small) {
+                postcardButton
+
+                Spacer(minLength: 0)
+
+                decorButton
+            }
+        }
+    }
+
+    var journeyButton: some View {
+        let ink = isOnTrip ? Palette.muted : Palette.tealDeep
+
+        return Button {
+            picker = model.makeJourneyPicker()
+        } label: {
+            HStack(spacing: Spacing.small) {
+                Image(systemName: "arrow.triangle.swap")
+                    .font(.footnote.weight(.heavy))
+
+                Text(model.journey.name)
+                    .font(.subheadline.weight(.heavy))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+
+                Spacer(minLength: 0)
+
+                if !isOnTrip {
+                    Image(systemName: "chevron.right")
+                        .font(.caption.weight(.heavy))
+                }
+            }
+            .foregroundStyle(ink)
+            .padding(.horizontal, Spacing.medium)
+            .frame(maxWidth: .infinity, minHeight: 44)
+            .background(Palette.tealSoft, in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .disabled(isOnTrip)
+        .accessibilityHint("道のりを変える")
+    }
+
+    var postcardButton: some View {
+        Button(action: onOpenAlbum) {
             TagPill(
                 postcardCount,
                 systemImage: "envelope.fill",
                 tint: Palette.coralDeep,
                 wash: Palette.coralSoft
             )
-
-            Spacer(minLength: 0)
-
-            Button {
-                isDecorShown = true
-            } label: {
-                TagPill(
-                    "模様替え",
-                    systemImage: "paintbrush.fill",
-                    tint: Palette.plumDeep,
-                    wash: Palette.plumSoft
-                )
-            }
-            .buttonStyle(.plain)
-            .frame(minHeight: 44)
         }
+        .buttonStyle(.plain)
+        .frame(minHeight: 44)
+        .accessibilityHint("絵はがき帳を開く")
+    }
+
+    var decorButton: some View {
+        Button {
+            isDecorShown = true
+        } label: {
+            TagPill(
+                "模様替え",
+                systemImage: "paintbrush.fill",
+                tint: Palette.plumDeep,
+                wash: Palette.plumSoft
+            )
+        }
+        .buttonStyle(.plain)
+        .frame(minHeight: 44)
     }
 
     var usageCard: some View {
@@ -132,9 +196,25 @@ private extension RoomView {
             )
 
             UsageReportView()
-                .frame(height: 748)
+                .id(settings.isAuthorized)
+                .frame(height: 792)
         }
         .roundedCard()
+    }
+
+    var appSets: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Label("止めるもの", systemImage: "hand.raised.fill")
+                .font(.caption.weight(.heavy))
+                .foregroundStyle(Palette.muted)
+                .padding(.horizontal, 4)
+
+            AppSetTags(model: settings, hidesEmpty: true) {
+                model.refresh()
+            }
+            .disabled(isOnTrip)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -156,6 +236,10 @@ private extension RoomView {
             get: { canShowResult ? model.finishedTrip : nil },
             set: { _ in }
         )
+    }
+
+    var isOnTrip: Bool {
+        model.progress?.activeTrip != nil
     }
 
     var canShowResult: Bool {

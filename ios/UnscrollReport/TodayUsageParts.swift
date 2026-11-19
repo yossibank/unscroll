@@ -54,6 +54,10 @@ extension TodayUsage {
     }
 
     var longestRest: (start: Int, length: Int)? {
+        guard total > 0 else {
+            return nil
+        }
+
         let current = Calendar.current.component(.hour, from: .now)
         var best: (start: Int, length: Int)?
         var run: (start: Int, length: Int)?
@@ -129,23 +133,24 @@ struct UsageHeadline: View {
     let usage: TodayUsage
 
     var body: some View {
-        HStack(alignment: .bottom, spacing: Spacing.small) {
+        VStack(alignment: .leading, spacing: Spacing.small) {
             UsageTotal(usage: usage)
 
-            Spacer(minLength: 0)
-
-            if let comparison = usage.comparison {
-                Label(comparison.text, systemImage: comparison.symbol)
-                    .font(.caption.weight(.heavy))
-                    .foregroundStyle(comparison.tint)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-                    .padding(.horizontal, Spacing.small)
-                    .padding(.vertical, 4)
-                    .background(comparison.tint.opacity(0.12), in: Capsule())
-                    .padding(.bottom, 4)
-            }
+            Label(comparison.text, systemImage: comparison.symbol)
+                .font(.caption.weight(.heavy))
+                .foregroundStyle(comparison.tint)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+                .padding(.horizontal, Spacing.small + 4)
+                .frame(maxWidth: .infinity, minHeight: 32, alignment: .leading)
+                .background(comparison.tint.opacity(0.12), in: .rect(cornerRadius: 12))
         }
+    }
+}
+
+private extension UsageHeadline {
+    var comparison: (text: String, symbol: String, tint: Color) {
+        usage.comparison ?? ("昨日の記録はまだありません", "clock", Palette.muted)
     }
 }
 
@@ -182,6 +187,8 @@ struct UsageSectionHeader: View {
 }
 
 struct CategoryStrip: View {
+    static let legendCount = 4
+
     let categories: [CategoryUsage]
 
     private let tints = [Palette.coral, Palette.sky, Palette.plum, Palette.sunDeep]
@@ -205,21 +212,29 @@ struct CategoryStrip: View {
                             .frame(width: max(4, (proxy.size.width - 6) * parts[index].1 / sum))
                     }
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Palette.paperDeep)
                 .clipShape(Capsule())
             }
             .frame(height: 10)
 
-            HStack(spacing: Spacing.small) {
-                ForEach(parts.indices, id: \.self) { index in
-                    HStack(spacing: 4) {
-                        Circle()
-                            .fill(tints[index % tints.count])
-                            .frame(width: 8, height: 8)
+            VStack(alignment: .leading, spacing: 4) {
+                ForEach(0..<Self.legendCount, id: \.self) { index in
+                    if index < parts.count {
+                        HStack(spacing: 4) {
+                            Circle()
+                                .fill(tints[index % tints.count])
+                                .frame(width: 8, height: 8)
 
-                        Text("\(parts[index].0) \(Int((parts[index].1 / sum * 100).rounded()))%")
+                            Text(
+                                "\(parts[index].0) \(Int((parts[index].1 / sum * 100).rounded()))%"
+                            )
                             .font(.caption2.weight(.bold))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.8)
+                        }
+                    } else {
+                        Text(index == 0 ? "まだ記録がありません" : " ")
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(Palette.muted)
                     }
                 }
             }
@@ -234,22 +249,22 @@ struct JourneyNote: View {
     var body: some View {
         let kilometers = Int(usage.total / 60) * Trip.kilometersPerMinute
 
-        if kilometers > 0 {
-            HStack(spacing: Spacing.small) {
-                Image(systemName: "figure.walk")
-                    .font(.system(size: 14, weight: .heavy))
-                    .foregroundStyle(.white)
-                    .frame(width: 28, height: 28)
-                    .background(Palette.teal, in: Circle())
+        HStack(spacing: Spacing.small) {
+            Image(systemName: "figure.walk")
+                .font(.system(size: 14, weight: .heavy))
+                .foregroundStyle(.white)
+                .frame(width: 28, height: 28)
+                .background(Palette.teal, in: Circle())
 
-                Text(usage.journeyText(kilometers))
-                    .font(.caption.weight(.bold))
-                    .foregroundStyle(Palette.tealDeep)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            .padding(Spacing.small)
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .background(Palette.tealSoft, in: .rect(cornerRadius: 16))
+            Text(usage.journeyText(kilometers))
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Palette.tealDeep)
+                .lineLimit(2)
+                .minimumScaleFactor(0.8)
+                .frame(maxWidth: .infinity, minHeight: 32, alignment: .leading)
         }
+        .padding(Spacing.small)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Palette.tealSoft, in: .rect(cornerRadius: 16))
     }
 }

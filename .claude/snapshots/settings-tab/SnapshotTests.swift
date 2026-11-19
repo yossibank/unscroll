@@ -79,7 +79,7 @@ private extension SnapshotTests {
             }
 
             SettingsPage("外しにくさ", tint: Palette.sun) {
-                SettingsStrictness(strictness: .constant(strictness))
+                SettingsStrictness(strictness: .constant(strictness), companion: companion)
                     .padding(.top, 4)
                     .opacity(isTripActive ? 0.5 : 1)
 

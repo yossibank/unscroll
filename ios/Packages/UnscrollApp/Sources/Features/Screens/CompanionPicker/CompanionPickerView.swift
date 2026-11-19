@@ -25,20 +25,14 @@ public struct CompanionPickerView: View {
                 preview
 
                 CompanionPickerForm(model: model)
-
-                Button {
-                    save()
-                } label: {
-                    Label("この相棒にする", systemImage: "pawprint.fill")
-                }
-                .buttonStyle(.pill)
-                .disabled(model.draft == nil)
-                .padding(.top, Spacing.small)
             }
             .padding(.horizontal, Spacing.medium)
             .padding(.vertical, Spacing.medium)
         }
         .scrollBounceBehavior(.basedOnSize)
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            saveBar
+        }
         .background(PaperBackdrop())
         .navigationTitle("相棒")
         .navigationBarTitleDisplayMode(.inline)
@@ -81,9 +75,54 @@ private extension CompanionPickerView {
         .clipShape(.rect(cornerRadius: RoundedCard.radius))
         .shadow(color: Palette.shadow, radius: 12, y: 8)
     }
+
+    var saveBar: some View {
+        let dot = model.isChanged ? Palette.coral : Palette.teal
+
+        return VStack(spacing: Spacing.small) {
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(dot)
+                    .frame(width: 8, height: 8)
+
+                Text(saveNote)
+                    .font(.caption.weight(.heavy))
+                    .foregroundStyle(Palette.muted)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                    .contentTransition(.opacity)
+            }
+
+            Button {
+                save()
+            } label: {
+                Label("この相棒にする", systemImage: "pawprint.fill")
+            }
+            .buttonStyle(.pill)
+            .disabled(!model.canSave)
+        }
+        .padding(.horizontal, Spacing.medium)
+        .padding(.top, Spacing.small + 4)
+        .padding(.bottom, Spacing.small)
+        .frame(maxWidth: .infinity)
+        .background(
+            Palette.card,
+            in: .rect(topLeadingRadius: 24, topTrailingRadius: 24)
+        )
+        .shadow(color: Palette.shadow, radius: 12, y: -4)
+        .animation(.snappy, value: model.isChanged)
+    }
 }
 
 private extension CompanionPickerView {
+    var saveNote: String {
+        if model.draft == nil {
+            return "名前を入れると決められます"
+        }
+
+        return model.isChanged ? "まだ決めていません" : "今の相棒です"
+    }
+
     func cheer(_ reaction: Companion.Pose) async {
         pose = reaction
 

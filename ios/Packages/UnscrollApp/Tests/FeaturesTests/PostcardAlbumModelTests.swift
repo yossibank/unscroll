@@ -9,7 +9,7 @@ struct PostcardAlbumModelTests {
 
     @Test
     func hasNoPostcardsWithoutTrips() throws {
-        let model = try PostcardAlbumModel(database: AppDatabase.inMemory(), now: { start })
+        let model = try PostcardAlbumModel(database: makeDatabase(), now: { start })
 
         #expect(model.collectedCount == 0)
         #expect(model.totalCount == 6)
@@ -20,7 +20,7 @@ struct PostcardAlbumModelTests {
 
     @Test
     func collectsPostcardAfterTrip() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         _ = try database.startTrip(minutes: 100, at: start)
         let now = start.addingTimeInterval(100 * 60)
         let model = PostcardAlbumModel(database: database, now: { now })
@@ -37,7 +37,7 @@ struct PostcardAlbumModelTests {
 
     @Test
     func waitsForTripToEndBeforeCollecting() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         _ = try database.startTrip(minutes: 120, at: start)
         let now = start.addingTimeInterval(100 * 60)
         let model = PostcardAlbumModel(database: database, now: { now })
@@ -51,7 +51,7 @@ struct PostcardAlbumModelTests {
 
     @Test
     func collectsEveryPostcardAtKyoto() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         _ = try database.startTrip(minutes: 520, at: start)
         let now = start.addingTimeInterval(520 * 60)
         let model = PostcardAlbumModel(database: database, now: { now })
@@ -62,7 +62,7 @@ struct PostcardAlbumModelTests {
 
     @Test
     func decoratesCollectedPostcard() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         _ = try database.startTrip(minutes: 100, at: start)
         let now = start.addingTimeInterval(100 * 60)
         let model = PostcardAlbumModel(database: database, now: { now })
@@ -76,5 +76,14 @@ struct PostcardAlbumModelTests {
         model.setDecorated(false, landmark: landmark)
 
         #expect(model.arrival(at: landmark)?.isDecorated == false)
+    }
+}
+
+private extension PostcardAlbumModelTests {
+    func makeDatabase() throws -> AppDatabase {
+        let database = try AppDatabase.inMemory()
+        try database.selectJourney("tokaido", at: Date(timeIntervalSince1970: 0))
+
+        return database
     }
 }

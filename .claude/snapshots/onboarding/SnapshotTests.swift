@@ -36,7 +36,7 @@ extension SnapshotTests {
 private extension SnapshotTests {
     static let directory = "__OUT__"
 
-    static let page = CGSize(width: 393, height: 852)
+    static let page = CGSize(width: 375, height: 728)
 
     static func registerFonts() {
         let fonts = URL(fileURLWithPath: #filePath)
@@ -66,7 +66,7 @@ private extension SnapshotTests {
 
             return Case(name: "onboarding-\(target.rawValue)", size: page) {
                 AnyView(
-                    OnboardingView(model: model) {}
+                    OnboardingView(model: model) { _ in }
                         .padding(.top, 54)
                         .padding(.bottom, 24)
                 )

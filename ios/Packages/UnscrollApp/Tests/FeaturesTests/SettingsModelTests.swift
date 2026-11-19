@@ -19,6 +19,55 @@ struct SettingsModelTests {
     }
 
     @Test
+    func addsRenamesAndDeletesASet() throws {
+        clearSets()
+
+        defer {
+            clearSets()
+        }
+
+        let model = try SettingsModel(database: AppDatabase.inMemory())
+        let before = model.sets.count
+
+        model.addSet(named: "  勉強中  ")
+
+        let added = try #require(model.sets.last)
+
+        #expect(model.sets.count == before + 1)
+        #expect(added.name == "勉強中")
+        #expect(model.activeSetID == added.id)
+        #expect(!model.hasSelection)
+
+        model.renameSet(added.id, to: " ")
+
+        #expect(model.sets.last?.name == "勉強中")
+
+        model.deleteSet(added.id)
+
+        #expect(model.sets.count == before)
+        #expect(model.activeSetID == model.sets.first?.id)
+    }
+
+    @Test
+    func startsWithOneUsualSetThatCannotBeDeleted() throws {
+        clearSets()
+
+        defer {
+            clearSets()
+        }
+
+        let model = try SettingsModel(database: AppDatabase.inMemory())
+        let only = try #require(model.sets.first)
+
+        #expect(model.sets.map(\.name) == ["いつもの"])
+        #expect(!model.canDeleteSet)
+
+        model.deleteSet(only.id)
+
+        #expect(model.sets.count == 1)
+    }
+
+    @Test
     func addsKilometersOfEveryJourney() throws {
         let database = try AppDatabase.inMemory()
         let start = Date.now.addingTimeInterval(-3 * 60 * 60)
@@ -31,5 +80,13 @@ struct SettingsModelTests {
         let model = SettingsModel(database: database)
 
         #expect(model.kilometersTogether == 50 * Trip.kilometersPerMinute)
+    }
+}
+
+private extension SettingsModelTests {
+    func clearSets() {
+        let defaults = UserDefaults(suiteName: ScreenTimeShared.appGroup)
+        defaults?.removeObject(forKey: BlockedApps.setsKey)
+        defaults?.removeObject(forKey: BlockedApps.activeSetKey)
     }
 }

@@ -7,6 +7,7 @@ extension Trip: FetchableRecord, PersistableRecord {
         case id
         case startedAt
         case plannedMinutes
+        case isPractice
         case endedAt
     }
 
@@ -25,6 +26,7 @@ extension Trip: FetchableRecord, PersistableRecord {
             id: id,
             startedAt: row[Columns.startedAt],
             plannedMinutes: row[Columns.plannedMinutes],
+            isPractice: (row[Columns.isPractice] as Bool?) ?? false,
             endedAt: row[Columns.endedAt]
         )
     }
@@ -33,6 +35,7 @@ extension Trip: FetchableRecord, PersistableRecord {
         container[Columns.id] = id.description
         container[Columns.startedAt] = startedAt
         container[Columns.plannedMinutes] = plannedMinutes
+        container[Columns.isPractice] = isPractice
         container[Columns.endedAt] = endedAt
     }
 }

@@ -20,7 +20,7 @@ struct JourneyPickerSheet: View {
             Text("どこへ行く？")
                 .font(.title3.weight(.heavy))
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, Spacing.medium)
+                .padding(.horizontal, Spacing.large)
                 .padding(.top, Spacing.large)
                 .padding(.bottom, Spacing.small)
 
@@ -70,7 +70,8 @@ private extension JourneyPickerSheet {
             .buttonStyle(.pill)
             .disabled(!model.canConfirm)
         }
-        .padding(Spacing.medium)
+        .padding(.horizontal, Spacing.large)
+        .padding(.vertical, Spacing.medium)
         .background(
             Palette.card,
             in: .rect(topLeadingRadius: 24, topTrailingRadius: 24)

@@ -6,6 +6,7 @@ public struct BlockedAppsView: View {
     @Bindable private var model: SettingsModel
 
     @State private var isPickerPresented = false
+    @State private var isDeleteConfirming = false
 
     public init(model: SettingsModel) {
         _model = Bindable(model)
@@ -15,7 +16,7 @@ public struct BlockedAppsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.medium) {
                 Label(
-                    "旅の間、ここで選んだアプリを止めます。選び直すと、次の旅から変わります。",
+                    "旅の間は、選んだまとまりのアプリを止めます。部屋のきっぷの上でも替えられます。",
                     systemImage: "hand.raised.fill"
                 )
                 .font(.subheadline.weight(.bold))
@@ -26,15 +27,27 @@ public struct BlockedAppsView: View {
                     endPoint: .bottomTrailing
                 ))
 
+                AppSetTags(model: model) {}
+                    .disabled(model.isTripActive)
+
                 selectedCard
 
                 Button {
                     isPickerPresented = true
                 } label: {
-                    Label("アプリを選ぶ", systemImage: "plus.app.fill")
+                    Label(pickerTitle, systemImage: "plus.app.fill")
                 }
                 .buttonStyle(.pill)
                 .disabled(isPickerDisabled)
+
+                if model.canDeleteSet {
+                    Button("このまとまりを消す", systemImage: "trash", role: .destructive) {
+                        isDeleteConfirming = true
+                    }
+                    .font(.footnote.weight(.heavy))
+                    .foregroundStyle(Palette.coralDeep)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                }
 
                 if model.isTripActive {
                     Text("旅の途中は選び直せません")
@@ -53,8 +66,20 @@ public struct BlockedAppsView: View {
             model.refresh()
         }
         .familyActivityPicker(isPresented: $isPickerPresented, selection: $model.selection)
-        .onChange(of: model.selection) {
-            model.saveSelection()
+        .sheet(isPresented: $isDeleteConfirming) {
+            AppSetDeleteSheet(
+                name: model.activeSetName,
+                summary: model.selectionSummary,
+                onDelete: {
+                    deleteActiveSet()
+                    isDeleteConfirming = false
+                },
+                onCancel: {
+                    isDeleteConfirming = false
+                }
+            )
+            .presentationDetents([.height(360)])
+            .presentationCornerRadius(28)
         }
     }
 }
@@ -63,7 +88,7 @@ private extension BlockedAppsView {
     var selectedCard: some View {
         VStack(alignment: .leading, spacing: Spacing.small + 4) {
             CardLabel(
-                "選んでいるアプリ",
+                model.activeSetName,
                 systemImage: "app.badge.fill",
                 tint: Palette.teal,
                 wash: Palette.tealSoft
@@ -97,11 +122,23 @@ private extension BlockedAppsView {
 }
 
 private extension BlockedAppsView {
+    var pickerTitle: String {
+        model.hasSelection ? "アプリを変える" : "アプリを選ぶ"
+    }
+
     var isPickerDisabled: Bool {
         model.isTripActive || !model.isAuthorized
     }
 
     var isEmpty: Bool {
         model.selection.applicationTokens.isEmpty && model.selection.categoryTokens.isEmpty
+    }
+
+    func deleteActiveSet() {
+        guard let id = model.activeSetID else {
+            return
+        }
+
+        model.deleteSet(id)
     }
 }

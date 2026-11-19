@@ -31,9 +31,17 @@ public struct MainView: View {
 
     public var body: some View {
         TabView(selection: $tab) {
-            RoomView(model: room)
-                .tag(Tab.room)
-                .toolbarVisibility(.hidden, for: .tabBar)
+            RoomView(
+                model: room,
+                settings: settings,
+                onOpenAlbum: {
+                    postcardAlbum.refresh()
+                    postcardAlbum.show(room.journey.id)
+                    tab = .album
+                }
+            )
+            .tag(Tab.room)
+            .toolbarVisibility(.hidden, for: .tabBar)
 
             JourneyMapView(
                 model: journeyMap,
@@ -75,7 +83,14 @@ public struct MainView: View {
         .tint(Palette.teal)
         .preferredColorScheme(.light)
         .fullScreenCover(isPresented: showsOnboarding) {
-            OnboardingView(model: OnboardingModel(database: database, settings: settings)) {
+            OnboardingView(model: OnboardingModel(
+                database: database,
+                settings: settings
+            )) { startsPractice in
+                if startsPractice {
+                    room.startPracticeTrip()
+                }
+
                 room.refresh()
                 settings.refresh()
                 needsOnboarding = false

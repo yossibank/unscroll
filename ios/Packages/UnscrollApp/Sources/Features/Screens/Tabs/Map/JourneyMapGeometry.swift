@@ -13,6 +13,7 @@ struct JourneyMapGeometry {
 
 extension JourneyMapGeometry {
     static let all: [String: JourneyMapGeometry] = [
+        "tokyoSightseeing": .tokyoSightseeing,
         "tokaido": .tokaido,
         "tohokuShinkansen": .tohokuShinkansen,
         "okinawa": .okinawa,

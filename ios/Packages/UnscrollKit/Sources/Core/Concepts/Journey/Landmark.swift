@@ -22,6 +22,6 @@ public struct Landmark: Hashable, Sendable {
 
 public extension Landmark {
     static func named(_ name: String) -> Landmark? {
-        Journey.all.lazy.flatMap(\.landmarks).first { $0.name == name }
+        (Journey.all + [.practice]).lazy.flatMap(\.landmarks).first { $0.name == name }
     }
 }

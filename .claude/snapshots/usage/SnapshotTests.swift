@@ -36,6 +36,8 @@ private extension SnapshotTests {
 
     static let card = CGSize(width: 361, height: 504)
 
+    static let tall = CGSize(width: 361, height: 900)
+
     static var busy: TodayUsage {
         var hours = Array(repeating: TimeInterval(0), count: 24)
         hours[7] = 12 * 60
@@ -98,7 +100,12 @@ private extension SnapshotTests {
             firstPickup: nil,
             yesterdayTotal: 5 * 60,
             categories: [
-                CategoryUsage(id: "SNS", name: "SNS", duration: 10 * 60)
+                CategoryUsage(id: "SNS", name: "SNS", duration: 6 * 60),
+                CategoryUsage(
+                    id: "仕事効率化とファイナンス",
+                    name: "仕事効率化とファイナンス",
+                    duration: 4 * 60
+                )
             ]
         )
     }
@@ -120,29 +127,14 @@ private extension SnapshotTests {
 
     static func cases() -> [Case] {
         [
-            Case(name: "usage-busy-hours", size: card) {
-                SnapshotTab.index = 0
-                return AnyView(TodayUsageView(usage: busy))
+            Case(name: "usage-busy", size: tall) {
+                AnyView(TodayUsageView(usage: busy))
             },
-            Case(name: "usage-busy-apps", size: card) {
-                SnapshotTab.index = 1
-                return AnyView(TodayUsageView(usage: busy))
+            Case(name: "usage-light", size: tall) {
+                AnyView(TodayUsageView(usage: light))
             },
-            Case(name: "usage-busy-categories", size: card) {
-                SnapshotTab.index = 2
-                return AnyView(TodayUsageView(usage: busy))
-            },
-            Case(name: "usage-light-hours", size: card) {
-                SnapshotTab.index = 0
-                return AnyView(TodayUsageView(usage: light))
-            },
-            Case(name: "usage-empty-hours", size: card) {
-                SnapshotTab.index = 0
-                return AnyView(TodayUsageView(usage: empty))
-            },
-            Case(name: "usage-empty-apps", size: card) {
-                SnapshotTab.index = 1
-                return AnyView(TodayUsageView(usage: empty))
+            Case(name: "usage-empty", size: tall) {
+                AnyView(TodayUsageView(usage: empty))
             }
         ]
     }

@@ -57,7 +57,7 @@ struct ShieldSnapshotTests {
 
         #expect(loaded.companion == companion)
         #expect(loaded.letter(at: later).title == "\(companion.name)より")
-        #expect(loaded.letter(at: later).body.contains("旅はあと 40 分。"))
+        #expect(loaded.letter(at: later).body.hasPrefix("旅はあと 40 分\n"))
     }
 
     @Test

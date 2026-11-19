@@ -51,16 +51,13 @@ public struct JourneyMapView: View {
 
             model.refresh()
         }
-        .refreshable {
-            model.refresh()
-        }
         .sheet(item: $picker) { picker in
             JourneyPickerSheet(model: picker) {
                 self.picker = nil
                 model.refresh()
                 onJourneyChanged()
             }
-            .presentationDetents([.fraction(0.65), .large])
+            .presentationDetents([.large])
         }
     }
 }
