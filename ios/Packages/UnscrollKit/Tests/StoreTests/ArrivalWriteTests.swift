@@ -9,7 +9,7 @@ struct ArrivalWriteTests {
 
     @Test
     func addsKilometersOfEarlierTrips() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         let first = try database.startTrip(minutes: 60, at: start)
         let secondStart = start.addingTimeInterval(60 * 60)
         let second = try database.startTrip(minutes: 50, at: secondStart)
@@ -26,7 +26,7 @@ struct ArrivalWriteTests {
 
     @Test
     func recordsEarlierTripMissedBefore() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         let first = try database.startTrip(minutes: 90, at: start)
         let secondStart = start.addingTimeInterval(120 * 60)
         _ = try database.startTrip(minutes: 25, at: secondStart)
@@ -40,7 +40,7 @@ struct ArrivalWriteTests {
 
     @Test
     func doesNotDuplicateWhenCalledTwice() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         let trip = try database.startTrip(minutes: 90, at: start)
         let now = start.addingTimeInterval(90 * 60)
 
@@ -57,7 +57,7 @@ struct ArrivalWriteTests {
 
     @Test
     func listsArrivalsOfEveryTripInJourneyOrder() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         let first = try database.startTrip(minutes: 90, at: start)
         let secondStart = start.addingTimeInterval(120 * 60)
         let second = try database.startTrip(minutes: 90, at: secondStart)
@@ -72,7 +72,7 @@ struct ArrivalWriteTests {
 
     @Test
     func recordsOnlyDistanceTravelledWhenEndedEarly() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         let trip = try database.startTrip(minutes: 90, at: start)
         let endedAt = start.addingTimeInterval(60 * 60)
         try database.endTrip(trip.id, at: endedAt)
@@ -87,5 +87,14 @@ struct ArrivalWriteTests {
         let arrivals = try database.arrivals(forTrip: ended.id)
 
         #expect(arrivals.isEmpty)
+    }
+}
+
+private extension ArrivalWriteTests {
+    func makeDatabase() throws -> AppDatabase {
+        let database = try AppDatabase.inMemory()
+        try database.selectJourney(journey.id, at: start)
+
+        return database
     }
 }

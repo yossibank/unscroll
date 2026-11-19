@@ -22,7 +22,7 @@ public final class JourneyPickerModel: Identifiable {
         now: @escaping @MainActor () -> Date = { .now },
         isAvailable: (Journey) -> Bool = LandmarkArt.isAvailable(for:)
     ) {
-        let current = (try? database.currentJourney()) ?? .tokyoToKyoto
+        let current = (try? database.currentJourney()) ?? .tokyoSightseeing
 
         self.journeys = Journey.all.filter(isAvailable)
         self.currentID = current.id

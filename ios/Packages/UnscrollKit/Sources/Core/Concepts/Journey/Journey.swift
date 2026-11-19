@@ -18,6 +18,7 @@ public struct Journey: Hashable, Sendable {
 
 public extension Journey {
     static let all: [Journey] = [
+        .tokyoSightseeing,
         .tokyoToKyoto,
         .tohokuShinkansen,
         .okinawa,

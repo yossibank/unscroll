@@ -8,7 +8,7 @@ import Store
 public final class PostcardAlbumModel {
     public private(set) var arrivals: [Arrival] = []
     public private(set) var kilometers = 0
-    public private(set) var journey = Journey.tokyoToKyoto
+    public private(set) var journey = Journey.tokyoSightseeing
 
     @ObservationIgnored private let database: AppDatabase
     @ObservationIgnored private let now: @MainActor () -> Date
@@ -73,7 +73,7 @@ public extension PostcardAlbumModel {
     func refresh() {
         let date = now()
 
-        journey = (try? database.currentJourney()) ?? .tokyoToKyoto
+        journey = (try? database.currentJourney()) ?? .tokyoSightseeing
 
         do {
             try database.recordArrivals(on: journey, at: date)

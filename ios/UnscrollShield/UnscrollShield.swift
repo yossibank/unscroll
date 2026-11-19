@@ -45,7 +45,7 @@ private extension UnscrollShield {
         let companion = snapshot?.companion
         let letter = snapshot?.letter(at: now) ?? ShieldLetter(
             companionName: nil,
-            journey: .tokyoToKyoto,
+            journey: .tokyoSightseeing,
             kilometers: nil,
             remainingMinutes: nil
         )

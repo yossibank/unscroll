@@ -11,7 +11,7 @@ struct JourneyPickerModelTests {
     @Test
     func listsOnlyJourneysWithArt() throws {
         let model = try JourneyPickerModel(
-            database: AppDatabase.inMemory(),
+            database: makeDatabase(),
             now: { start },
             isAvailable: { $0.id == Journey.okinawa.id || $0.id == Journey.tokyoToKyoto.id }
         )
@@ -22,7 +22,7 @@ struct JourneyPickerModelTests {
     @Test
     func listsAllJourneysWhenAllHaveArt() throws {
         let model = try JourneyPickerModel(
-            database: AppDatabase.inMemory(),
+            database: makeDatabase(),
             now: { start },
             isAvailable: { _ in true }
         )
@@ -32,7 +32,7 @@ struct JourneyPickerModelTests {
 
     @Test
     func countsKilometersPerJourney() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         _ = try database.startTrip(minutes: 100, at: start)
 
         let now = start.addingTimeInterval(100 * 60)
@@ -45,7 +45,7 @@ struct JourneyPickerModelTests {
 
     @Test
     func refusesToChangeDuringTrip() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         _ = try database.startTrip(minutes: 100, at: start)
 
         let now = start.addingTimeInterval(10 * 60)
@@ -62,7 +62,7 @@ struct JourneyPickerModelTests {
     @Test
     func cannotConfirmCurrentJourney() throws {
         let model = try JourneyPickerModel(
-            database: AppDatabase.inMemory(),
+            database: makeDatabase(),
             now: { start },
             isAvailable: { _ in true }
         )
@@ -74,7 +74,7 @@ struct JourneyPickerModelTests {
 
     @Test
     func confirmChangesCurrentJourney() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         let model = JourneyPickerModel(
             database: database,
             now: { start },
@@ -94,5 +94,14 @@ struct JourneyPickerModelTests {
         #expect(JourneyPickerModel.focusText(kilometers: 500) == "約 8 時間")
         #expect(JourneyPickerModel.focusText(kilometers: 90) == "約 2 時間")
         #expect(JourneyPickerModel.focusText(kilometers: 59) == "約 59 分")
+    }
+}
+
+private extension JourneyPickerModelTests {
+    func makeDatabase() throws -> AppDatabase {
+        let database = try AppDatabase.inMemory()
+        try database.selectJourney("tokaido", at: Date(timeIntervalSince1970: 0))
+
+        return database
     }
 }

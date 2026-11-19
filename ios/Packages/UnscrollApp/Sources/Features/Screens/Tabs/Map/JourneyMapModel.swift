@@ -8,7 +8,7 @@ import Store
 public final class JourneyMapModel {
     public private(set) var progress: JourneyProgress?
     public private(set) var companion: Companion?
-    public private(set) var journey = Journey.tokyoToKyoto
+    public private(set) var journey = Journey.tokyoSightseeing
 
     @ObservationIgnored private let database: AppDatabase
     @ObservationIgnored private let now: @MainActor () -> Date
@@ -55,7 +55,7 @@ public extension JourneyMapModel {
     }
 
     func refresh() {
-        journey = (try? database.currentJourney()) ?? .tokyoToKyoto
+        journey = (try? database.currentJourney()) ?? .tokyoSightseeing
         progress = try? database.journeyProgress(at: now())
         companion = try? database.companion()
     }

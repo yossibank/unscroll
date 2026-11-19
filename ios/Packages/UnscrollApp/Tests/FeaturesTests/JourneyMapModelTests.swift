@@ -9,7 +9,7 @@ struct JourneyMapModelTests {
 
     @Test
     func startsAtNihonbashiWithoutTrips() throws {
-        let model = try JourneyMapModel(database: AppDatabase.inMemory(), now: { start })
+        let model = try JourneyMapModel(database: makeDatabase(), now: { start })
 
         model.refresh()
 
@@ -21,7 +21,7 @@ struct JourneyMapModelTests {
 
     @Test
     func advancesAfterTrip() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         _ = try database.startTrip(minutes: 100, at: start)
         let now = start.addingTimeInterval(100 * 60)
         let model = JourneyMapModel(database: database, now: { now })
@@ -36,7 +36,7 @@ struct JourneyMapModelTests {
 
     @Test
     func stopsAtKyotoAfterGoingPast() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         _ = try database.startTrip(minutes: 520, at: start)
         let now = start.addingTimeInterval(520 * 60)
         let model = JourneyMapModel(database: database, now: { now })
@@ -46,5 +46,14 @@ struct JourneyMapModelTests {
         #expect(model.kilometers == 500)
         #expect(model.nextLandmark == nil)
         #expect(model.progressRatio == 1)
+    }
+}
+
+private extension JourneyMapModelTests {
+    func makeDatabase() throws -> AppDatabase {
+        let database = try AppDatabase.inMemory()
+        try database.selectJourney("tokaido", at: Date(timeIntervalSince1970: 0))
+
+        return database
     }
 }
