@@ -47,15 +47,6 @@ public struct BlockedAppsView: View {
                     .font(.footnote.weight(.heavy))
                     .foregroundStyle(Palette.coralDeep)
                     .frame(maxWidth: .infinity, minHeight: 44)
-                    .confirmationDialog(
-                        "「\(model.activeSetName)」を消しますか",
-                        isPresented: $isDeleteConfirming,
-                        titleVisibility: .visible
-                    ) {
-                        Button("消す", role: .destructive) {
-                            deleteActiveSet()
-                        }
-                    }
                 }
 
                 if model.isTripActive {
@@ -75,6 +66,21 @@ public struct BlockedAppsView: View {
             model.refresh()
         }
         .familyActivityPicker(isPresented: $isPickerPresented, selection: $model.selection)
+        .sheet(isPresented: $isDeleteConfirming) {
+            AppSetDeleteSheet(
+                name: model.activeSetName,
+                summary: model.selectionSummary,
+                onDelete: {
+                    deleteActiveSet()
+                    isDeleteConfirming = false
+                },
+                onCancel: {
+                    isDeleteConfirming = false
+                }
+            )
+            .presentationDetents([.height(360)])
+            .presentationCornerRadius(28)
+        }
     }
 }
 

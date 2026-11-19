@@ -9,6 +9,7 @@ struct AppSetTags: View {
     @State private var isPickerPresented = false
     @State private var wantsPicker = false
     @State private var renamingID: UUID?
+    @State private var deletingSet: BlockedAppSet?
     @State private var nameDraft = ""
 
     var hidesEmpty = false
@@ -52,6 +53,22 @@ struct AppSetTags: View {
                 .presentationCornerRadius(28)
             }
         )
+        .sheet(item: $deletingSet) { set in
+            AppSetDeleteSheet(
+                name: set.name,
+                summary: summary(of: set),
+                onDelete: {
+                    model.deleteSet(set.id)
+                    onChange()
+                    deletingSet = nil
+                },
+                onCancel: {
+                    deletingSet = nil
+                }
+            )
+            .presentationDetents([.height(360)])
+            .presentationCornerRadius(28)
+        }
         .familyActivityPicker(isPresented: $isPickerPresented, selection: $model.selection)
         .onChange(of: model.selection) {
             model.saveSelection()
@@ -129,8 +146,7 @@ private extension AppSetTags {
 
             if model.canDeleteSet {
                 Button("消す", systemImage: "trash", role: .destructive) {
-                    model.deleteSet(set.id)
-                    onChange()
+                    deletingSet = set
                 }
             }
         }
@@ -140,6 +156,10 @@ private extension AppSetTags {
 private extension AppSetTags {
     var shownSets: [BlockedAppSet] {
         hidesEmpty ? model.sets.filter { !BlockedApps.isEmpty($0.selection) } : model.sets
+    }
+
+    func summary(of set: BlockedAppSet) -> String {
+        BlockedApps.isEmpty(set.selection) ? "未選択" : BlockedApps.summary(set.selection)
     }
 
     func startNaming(_ set: BlockedAppSet?) {
