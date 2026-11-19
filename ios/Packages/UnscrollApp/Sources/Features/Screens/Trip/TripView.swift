@@ -157,7 +157,7 @@ private extension TripView {
         TimelineView(.periodic(from: .now, by: 1)) { context in
             let now = context.date
             let remaining = max(0, Int(ceil(trip.plannedEnd.timeIntervalSince(now))))
-            let planned = Double(trip.plannedMinutes * 60)
+            let planned = trip.plannedDuration
             let elapsed = min(max(now.timeIntervalSince(trip.startedAt), 0), planned)
 
             VStack(alignment: .leading, spacing: 4) {

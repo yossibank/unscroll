@@ -121,6 +121,10 @@ public extension RoomModel {
         return progress?.kilometers ?? kilometers
     }
 
+    func makeJourneyPicker() -> JourneyPickerModel {
+        JourneyPickerModel(database: database, now: now)
+    }
+
     func acknowledgeFinishedTrip() {
         guard let finishedTrip else {
             return

@@ -371,7 +371,6 @@ private extension OnboardingView {
     var canPrimary: Bool {
         switch model.page {
         case .companion: model.companion.draft != nil
-        case .permission: !model.settings.isRequestingAuthorization
         case .apps: model.settings.hasSelection
         default: true
         }

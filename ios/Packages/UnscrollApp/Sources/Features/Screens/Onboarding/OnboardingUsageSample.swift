@@ -74,7 +74,7 @@ private extension OnboardingUsageSample {
         let tint: Color
     }
 
-    static let barHeight: CGFloat = 44
+    static let barHeight: CGFloat = 28
     static let peakHour = 21
 
     static let minutes: [Double] = [
@@ -91,8 +91,7 @@ private extension OnboardingUsageSample {
 
     static let apps = [
         App(name: "動画", minutes: 58, tint: Palette.coral),
-        App(name: "SNS", minutes: 42, tint: Palette.sky),
-        App(name: "ゲーム", minutes: 21, tint: Palette.plum)
+        App(name: "SNS", minutes: 42, tint: Palette.sky)
     ]
 
     var total: some View {

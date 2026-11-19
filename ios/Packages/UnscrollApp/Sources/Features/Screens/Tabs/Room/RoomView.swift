@@ -7,6 +7,7 @@ public struct RoomView: View {
     @State private var settings: SettingsModel
     @State private var isTripCoverShown = false
     @State private var isDecorShown = false
+    @State private var picker: JourneyPickerModel?
     @State private var pose = Companion.Pose.walk
     @State private var pokes = 0
 
@@ -94,18 +95,33 @@ public struct RoomView: View {
             }
             .presentationDetents([.medium, .large])
         }
+        .sheet(item: $picker) { picker in
+            JourneyPickerSheet(model: picker) {
+                self.picker = nil
+                model.refresh()
+            }
+            .presentationDetents([.large])
+        }
     }
 }
 
 private extension RoomView {
     var topBar: some View {
         HStack(spacing: Spacing.small) {
-            TagPill(
-                model.journey.name,
-                systemImage: "map.fill",
-                tint: Palette.tealDeep,
-                wash: Palette.tealSoft
-            )
+            Button {
+                picker = model.makeJourneyPicker()
+            } label: {
+                TagPill(
+                    model.journey.name,
+                    systemImage: "arrow.triangle.swap",
+                    tint: Palette.tealDeep,
+                    wash: Palette.tealSoft
+                )
+            }
+            .buttonStyle(.plain)
+            .disabled(isOnTrip)
+            .frame(minHeight: 44)
+            .accessibilityHint("道のりを変える")
 
             TagPill(
                 postcardCount,

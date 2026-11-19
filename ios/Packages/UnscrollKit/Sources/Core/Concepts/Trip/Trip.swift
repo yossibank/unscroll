@@ -28,9 +28,12 @@ public extension Trip {
     static let kilometersPerMinute = 1
     static let practiceSeconds: TimeInterval = 10
 
+    var plannedDuration: TimeInterval {
+        isPractice ? Self.practiceSeconds : TimeInterval(plannedMinutes * 60)
+    }
+
     var plannedEnd: Date {
-        let seconds = isPractice ? Self.practiceSeconds : TimeInterval(plannedMinutes * 60)
-        return startedAt.addingTimeInterval(seconds)
+        startedAt.addingTimeInterval(plannedDuration)
     }
 
     var isCompleted: Bool {

@@ -257,7 +257,7 @@ private extension SettingsView {
                 .padding(.vertical, Spacing.small)
                 .background(Palette.coral, in: Capsule())
                 .buttonStyle(.plain)
-                .disabled(isLoading)
+                .allowsHitTesting(!isLoading)
             }
         }
         .padding(Spacing.small + 4)

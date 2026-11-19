@@ -36,7 +36,7 @@ extension SnapshotTests {
 private extension SnapshotTests {
     static let directory = "__OUT__"
 
-    static let page = CGSize(width: 393, height: 852)
+    static let page = CGSize(width: 375, height: 812)
 
     static func registerFonts() {
         let fonts = URL(fileURLWithPath: #filePath)
