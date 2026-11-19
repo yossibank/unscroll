@@ -305,14 +305,14 @@ private extension RoomModel {
         }
 
         let schedule = FocusShield.schedule(from: start, to: trip.plannedEnd)
+        let name = ScreenTimeShared.focusActivityName(tripID: trip.id.description)
+        let oldWatches = center.activities.filter { ScreenTimeShared.isFocusActivity($0.rawValue) }
 
+        center.stopMonitoring(oldWatches)
         FocusShield.startTrip(endsAt: trip.plannedEnd)
 
         do {
-            try center.startMonitoring(
-                DeviceActivityName(ScreenTimeShared.focusActivityName),
-                during: schedule
-            )
+            try center.startMonitoring(DeviceActivityName(name), during: schedule)
             EventLog.append("旅：開始（\(label)）")
         } catch {
             FocusShield.endTrip()
