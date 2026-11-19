@@ -267,7 +267,7 @@ private extension TripView {
 
     func sceneryLandmark(at now: Date) -> Landmark? {
         guard model.progress?.activeTrip?.isPractice != true else {
-            return Journey.tokyoSightseeing.landmarks.first
+            return Journey.practiceStation
         }
 
         let total = model.kilometers(at: now)
