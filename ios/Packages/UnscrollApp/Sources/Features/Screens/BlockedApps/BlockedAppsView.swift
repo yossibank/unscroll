@@ -6,6 +6,7 @@ public struct BlockedAppsView: View {
     @Bindable private var model: SettingsModel
 
     @State private var isPickerPresented = false
+    @State private var isDeleteConfirming = false
 
     public init(model: SettingsModel) {
         _model = Bindable(model)
@@ -38,6 +39,24 @@ public struct BlockedAppsView: View {
                 }
                 .buttonStyle(.pill)
                 .disabled(isPickerDisabled)
+
+                if model.canDeleteSet {
+                    Button("このまとまりを消す", systemImage: "trash", role: .destructive) {
+                        isDeleteConfirming = true
+                    }
+                    .font(.footnote.weight(.heavy))
+                    .foregroundStyle(Palette.coralDeep)
+                    .frame(maxWidth: .infinity, minHeight: 44)
+                    .confirmationDialog(
+                        "「\(model.activeSetName)」を消しますか",
+                        isPresented: $isDeleteConfirming,
+                        titleVisibility: .visible
+                    ) {
+                        Button("消す", role: .destructive) {
+                            deleteActiveSet()
+                        }
+                    }
+                }
 
                 if model.isTripActive {
                     Text("旅の途中は選び直せません")
@@ -107,5 +126,13 @@ private extension BlockedAppsView {
 
     var isEmpty: Bool {
         model.selection.applicationTokens.isEmpty && model.selection.categoryTokens.isEmpty
+    }
+
+    func deleteActiveSet() {
+        guard let id = model.activeSetID else {
+            return
+        }
+
+        model.deleteSet(id)
     }
 }

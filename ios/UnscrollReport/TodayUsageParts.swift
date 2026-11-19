@@ -259,8 +259,9 @@ struct JourneyNote: View {
             Text(usage.journeyText(kilometers))
                 .font(.caption.weight(.bold))
                 .foregroundStyle(Palette.tealDeep)
-                .lineLimit(2, reservesSpace: true)
+                .lineLimit(2)
                 .minimumScaleFactor(0.8)
+                .frame(maxWidth: .infinity, minHeight: 32, alignment: .leading)
         }
         .padding(Spacing.small)
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -49,6 +49,25 @@ struct SettingsModelTests {
     }
 
     @Test
+    func startsWithOneUsualSetThatCannotBeDeleted() throws {
+        clearSets()
+
+        defer {
+            clearSets()
+        }
+
+        let model = try SettingsModel(database: AppDatabase.inMemory())
+        let only = try #require(model.sets.first)
+
+        #expect(model.sets.map(\.name) == ["いつもの"])
+        #expect(!model.canDeleteSet)
+
+        model.deleteSet(only.id)
+
+        #expect(model.sets.count == 1)
+    }
+
+    @Test
     func addsKilometersOfEveryJourney() throws {
         let database = try AppDatabase.inMemory()
         let start = Date.now.addingTimeInterval(-3 * 60 * 60)

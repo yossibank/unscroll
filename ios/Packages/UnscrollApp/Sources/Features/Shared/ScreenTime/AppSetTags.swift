@@ -127,7 +127,7 @@ private extension AppSetTags {
                 startNaming(set)
             }
 
-            if model.sets.count > 1 {
+            if model.canDeleteSet {
                 Button("消す", systemImage: "trash", role: .destructive) {
                     model.deleteSet(set.id)
                     onChange()

@@ -14,7 +14,7 @@ enum BlockedApps {
     static let setsKey = "screenTime.sets"
     static let activeSetKey = "screenTime.activeSet"
 
-    private static let defaultSetNames = ["SNS", "動画", "寝る前"]
+    private static let defaultSetName = "いつもの"
 
     private static var defaults: UserDefaults? {
         UserDefaults(suiteName: ScreenTimeShared.appGroup)
@@ -37,15 +37,7 @@ enum BlockedApps {
             return sets
         }
 
-        let current = load()
-
-        return defaultSetNames.enumerated().map { index, name in
-            BlockedAppSet(
-                id: UUID(),
-                name: name,
-                selection: index == 0 ? current : FamilyActivitySelection()
-            )
-        }
+        return [BlockedAppSet(id: UUID(), name: defaultSetName, selection: load())]
     }
 
     static func loadActiveSetID(in sets: [BlockedAppSet]) -> UUID? {

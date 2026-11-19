@@ -62,6 +62,10 @@ public extension SettingsModel {
         sets.count < BlockedApps.maxSetCount && !isTripActive
     }
 
+    var canDeleteSet: Bool {
+        sets.count > 1 && !isTripActive
+    }
+
     func makeCompanionPicker() -> CompanionPickerModel {
         CompanionPickerModel(database: database)
     }
@@ -146,10 +150,7 @@ public extension SettingsModel {
     }
 
     func deleteSet(_ id: UUID) {
-        guard
-            sets.count > 1,
-            !isTripActive
-        else {
+        guard canDeleteSet else {
             return
         }
 
