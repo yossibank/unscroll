@@ -237,7 +237,7 @@ private extension OnboardingView {
                     companion: model.settings.companion,
                     look: RoomLook(defaults: .standard),
                     pose: .walk,
-                    window: Journey.tokyoToKyoto.nextLandmark(after: 0),
+                    window: Journey.practiceStation,
                     postcards: [],
                     nextRemaining: nil,
                     souvenirs: [],
