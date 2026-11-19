@@ -16,6 +16,13 @@ struct SnapshotTests {
         let trip = try Self.model(name: "trip", elapsed: 40, length: 90)
         let result = try Self.model(name: "result", elapsed: 300, length: 240)
         let finished = try #require(result.finishedTrip)
+        let walked = try Self.model(
+            name: "walked",
+            elapsed: 61,
+            length: 60,
+            journey: .tokyoSightseeing
+        )
+        let walkedTrip = try #require(walked.finishedTrip)
 
         try Self.write(TripView(model: trip), to: "trip-active.png")
 
@@ -29,6 +36,12 @@ struct SnapshotTests {
             TripResultSheet(trip: finished, model: result) {}
                 .fixedSize(horizontal: false, vertical: true),
             to: "trip-result.png"
+        )
+
+        try Self.write(
+            TripResultSheet(trip: walkedTrip, model: walked) {}
+                .fixedSize(horizontal: false, vertical: true),
+            to: "trip-result-walked.png"
         )
     }
 }
@@ -55,7 +68,8 @@ private extension SnapshotTests {
     static func model(
         name: String,
         elapsed: Int,
-        length: Int
+        length: Int,
+        journey: Journey = .worldHeritage
     ) throws -> RoomModel {
         let database = try AppDatabase.inMemory()
         let suite = "trip-\(name)"
@@ -70,7 +84,7 @@ private extension SnapshotTests {
         defaults.set("", forKey: "room.acknowledgedTripID")
 
         try database.saveCompanion(companion)
-        _ = try database.selectJourney(Journey.worldHeritage.id, at: start.addingTimeInterval(-60))
+        _ = try database.selectJourney(journey.id, at: start.addingTimeInterval(-60))
         _ = try database.startTrip(minutes: length, at: start)
 
         return RoomModel(database: database, defaults: defaults, now: { now })

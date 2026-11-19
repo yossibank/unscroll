@@ -3,6 +3,8 @@ import DesignSystem
 import SwiftUI
 
 public struct TripResultSheet: View {
+    @State private var picker: JourneyPickerModel?
+
     private let trip: Trip
     private let model: RoomModel
     private let onClose: () -> Void
@@ -20,6 +22,13 @@ public struct TripResultSheet: View {
     public var body: some View {
         NavigationStack {
             content
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("閉じる", systemImage: "xmark") {
+                            onClose()
+                        }
+                    }
+                }
                 .navigationDestination(for: Landmark.self) { landmark in
                     if let arrival = model.finishedArrivals
                         .first(where: { $0.landmark == landmark }) {
@@ -28,6 +37,14 @@ public struct TripResultSheet: View {
                         }
                     }
                 }
+        }
+        .sheet(item: $picker) { picker in
+            JourneyPickerSheet(model: picker) {
+                self.picker = nil
+                model.refresh()
+                onClose()
+            }
+            .presentationDetents([.large])
         }
     }
 }
@@ -58,7 +75,9 @@ private extension TripResultSheet {
                     receivedCard
                 }
 
-                if !trip.isPractice {
+                if !trip.isPractice, model.nextLandmark == nil {
+                    finishedCard
+                } else if !trip.isPractice {
                     routeCard
                 }
 
@@ -168,6 +187,38 @@ private extension TripResultSheet {
                 legend("この旅", color: Palette.coral)
                 legend("これまで", color: Palette.teal)
             }
+        }
+        .padding(Spacing.medium)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Palette.card)
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .shadow(color: Palette.shadow, radius: 12, y: 8)
+    }
+
+    var finishedCard: some View {
+        VStack(alignment: .leading, spacing: Spacing.medium) {
+            HStack(alignment: .center, spacing: Spacing.medium) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(model.journey.name)
+                        .font(.headline.weight(.heavy))
+                        .foregroundStyle(Palette.ink)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.8)
+
+                    Text("を歩ききった！")
+                        .font(.subheadline.weight(.bold))
+                        .foregroundStyle(Palette.muted)
+                }
+
+                Spacer()
+
+                FinishStamp()
+            }
+
+            Button("次の道のりを選ぶ") {
+                picker = model.makeJourneyPicker()
+            }
+            .buttonStyle(.pill)
         }
         .padding(Spacing.medium)
         .frame(maxWidth: .infinity, alignment: .leading)
