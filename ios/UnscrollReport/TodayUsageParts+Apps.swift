@@ -10,12 +10,12 @@ struct AppIcon: View {
         if let token = app.token {
             Label(token)
                 .labelStyle(.iconOnly)
-                .scaleEffect(2)
-                .frame(width: 40, height: 40)
+                .scaleEffect(1.4)
+                .frame(width: 28, height: 28)
         } else {
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: 7)
                 .fill(tint)
-                .frame(width: 40, height: 40)
+                .frame(width: 28, height: 28)
         }
     }
 }
@@ -107,9 +107,9 @@ private extension UsageAppList {
 
     var emptyRow: some View {
         HStack(spacing: Spacing.small) {
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: 7)
                 .strokeBorder(Palette.paperDeep, style: StrokeStyle(lineWidth: 1.5, dash: [3, 3]))
-                .frame(width: 40, height: 40)
+                .frame(width: 28, height: 28)
 
             Capsule()
                 .fill(Palette.paperDeep.opacity(0.6))
@@ -129,9 +129,9 @@ private extension UsageAppList {
             ratio: ratio(sum, peak: peak),
             tint: sort == .time ? Palette.muted : sort.tint
         ) {
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: 7)
                 .fill(Palette.paperDeep)
-                .frame(width: 40, height: 40)
+                .frame(width: 28, height: 28)
                 .overlay {
                     Text("…")
                         .font(.caption.weight(.heavy))

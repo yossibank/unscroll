@@ -65,7 +65,7 @@ private extension SettingsStrictness {
         }
         .padding(Spacing.medium)
         .frame(maxWidth: 240)
-        .background(Palette.ink.opacity(0.18), in: .rect(cornerRadius: 16))
+        .background(Palette.ink.opacity(0.06), in: .rect(cornerRadius: 16))
         .frame(maxWidth: .infinity)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("止めた画面の見え方")
