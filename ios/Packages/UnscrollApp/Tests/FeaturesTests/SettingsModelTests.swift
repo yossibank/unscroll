@@ -20,6 +20,12 @@ struct SettingsModelTests {
 
     @Test
     func addsRenamesAndDeletesASet() throws {
+        clearSets()
+
+        defer {
+            clearSets()
+        }
+
         let model = try SettingsModel(database: AppDatabase.inMemory())
         let before = model.sets.count
 
@@ -55,5 +61,13 @@ struct SettingsModelTests {
         let model = SettingsModel(database: database)
 
         #expect(model.kilometersTogether == 50 * Trip.kilometersPerMinute)
+    }
+}
+
+private extension SettingsModelTests {
+    func clearSets() {
+        let defaults = UserDefaults(suiteName: ScreenTimeShared.appGroup)
+        defaults?.removeObject(forKey: BlockedApps.setsKey)
+        defaults?.removeObject(forKey: BlockedApps.activeSetKey)
     }
 }

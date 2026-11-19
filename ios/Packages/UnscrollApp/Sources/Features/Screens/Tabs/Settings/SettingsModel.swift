@@ -114,7 +114,7 @@ public extension SettingsModel {
 
         let set = BlockedAppSet(
             id: UUID(),
-            name: trimmedName(name, fallback: "セット \(sets.count + 1)"),
+            name: trimmedName(name, fallback: "組 \(sets.count + 1)"),
             selection: FamilyActivitySelection()
         )
 

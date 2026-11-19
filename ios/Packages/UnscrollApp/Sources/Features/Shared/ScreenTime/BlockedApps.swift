@@ -11,9 +11,9 @@ struct BlockedAppSet: Codable, Equatable, Identifiable {
 @MainActor
 enum BlockedApps {
     static let maxSetCount = 5
+    static let setsKey = "screenTime.sets"
+    static let activeSetKey = "screenTime.activeSet"
 
-    private static let setsKey = "screenTime.sets"
-    private static let activeSetKey = "screenTime.activeSet"
     private static let defaultSetNames = ["SNS", "動画", "寝る前"]
 
     private static var defaults: UserDefaults? {
