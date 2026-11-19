@@ -19,6 +19,7 @@ public final class SettingsModel {
     public private(set) var companion: Companion?
     public private(set) var activeSetID: UUID?
     public private(set) var isAuthorized = false
+    public private(set) var isRequestingAuthorization = false
     public private(set) var isTripActive = false
     public private(set) var kilometersTogether = 0
     public private(set) var logLines: [String] = []
@@ -74,6 +75,16 @@ public extension SettingsModel {
     }
 
     func requestAuthorization() async {
+        guard !isRequestingAuthorization else {
+            return
+        }
+
+        isRequestingAuthorization = true
+
+        defer {
+            isRequestingAuthorization = false
+        }
+
         do {
             try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
             EventLog.append("許可：取れた")

@@ -16,9 +16,7 @@ struct TodayUsageView: View {
 
             UsageAppList(usage: usage, sort: sort)
 
-            if !usage.categories.isEmpty {
-                categories
-            }
+            categories
 
             JourneyNote(usage: usage)
         }
@@ -82,9 +80,7 @@ private extension TodayUsageView {
                 peakHour: usage.busiest?.hour
             )
 
-            if let rest = usage.longestRest {
-                UsageRest(start: rest.start, length: rest.length)
-            }
+            UsageRest(rest: usage.longestRest)
         }
     }
 

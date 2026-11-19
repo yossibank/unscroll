@@ -63,7 +63,7 @@ struct SettingsRule: View {
 
         SettingsRule()
 
-        Text("Screen Time の許可")
+        Text("スクリーンタイムの許可")
     }
     .padding()
     .background(PaperBackdrop())

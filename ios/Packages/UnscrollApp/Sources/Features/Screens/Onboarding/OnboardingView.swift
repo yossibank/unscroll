@@ -155,9 +155,9 @@ private extension OnboardingView {
 
     var permissionPage: some View {
         VStack(alignment: .leading, spacing: Spacing.large) {
-            JournalTitle("Screen Time の許可", note: "旅の間だけ、アプリを止めるために使います")
+            JournalTitle("スクリーンタイムの許可", note: "旅の間だけ、アプリを止めるために使います")
 
-            SettingsPage("Screen Time で使うこと", tint: Palette.sky) {
+            SettingsPage("スクリーンタイムで使うこと", tint: Palette.sky) {
                 Image(systemName: model.settings.isAuthorized ? "checkmark" : "hourglass")
                     .font(.system(size: 40, weight: .bold))
                     .foregroundStyle(.white)
@@ -203,7 +203,7 @@ private extension OnboardingView {
                 .disabled(!model.settings.isAuthorized)
 
                 if !model.settings.isAuthorized {
-                    Text("Screen Time を許可すると選べます")
+                    Text("スクリーンタイムを許可すると選べます")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(Palette.muted)
                         .padding(.horizontal, Spacing.small)
@@ -262,8 +262,17 @@ private extension OnboardingView {
         let laterOpacity = showsLater ? 1.0 : 0
 
         return VStack(spacing: 4) {
-            Button(primaryTitle) {
+            Button {
                 primaryAction()
+            } label: {
+                HStack(spacing: Spacing.small) {
+                    if model.settings.isRequestingAuthorization {
+                        ProgressView()
+                            .tint(.white)
+                    }
+
+                    Text(primaryTitle)
+                }
             }
             .buttonStyle(.pill)
             .disabled(!canPrimary)
@@ -341,10 +350,18 @@ private extension OnboardingView {
     var primaryTitle: String {
         switch model.page {
         case .usage: "旅の支度をする"
-        case .permission: model.settings.isAuthorized ? "次へ" : "許可する"
+        case .permission: permissionTitle
         case .practice: "練習の旅に出る"
         default: "次へ"
         }
+    }
+
+    var permissionTitle: String {
+        if model.settings.isRequestingAuthorization {
+            return "許可を待っています"
+        }
+
+        return model.settings.isAuthorized ? "次へ" : "許可する"
     }
 
     var laterTitle: String {
@@ -354,7 +371,7 @@ private extension OnboardingView {
     var canPrimary: Bool {
         switch model.page {
         case .companion: model.companion.draft != nil
-        case .permission: !model.isRequesting
+        case .permission: !model.settings.isRequestingAuthorization
         case .apps: model.settings.hasSelection
         default: true
         }

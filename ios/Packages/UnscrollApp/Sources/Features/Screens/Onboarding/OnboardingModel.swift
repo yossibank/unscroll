@@ -7,7 +7,6 @@ import Store
 @Observable
 public final class OnboardingModel {
     public private(set) var page = Page.travel
-    public private(set) var isRequesting = false
 
     public let companion: CompanionPickerModel
     public let settings: SettingsModel
@@ -99,14 +98,8 @@ public extension OnboardingModel {
     }
 
     func requestAuthorization() async -> Bool {
-        guard !isRequesting else {
+        guard !settings.isRequestingAuthorization else {
             return false
-        }
-
-        isRequesting = true
-
-        defer {
-            isRequesting = false
         }
 
         await settings.requestAuthorization()

@@ -71,8 +71,7 @@ struct UsageAppList: View {
 
     var body: some View {
         let ranked = usage.apps.sorted { sort.value(of: $0) > sort.value(of: $1) }
-        let shown = Array(ranked.prefix(5))
-        let rest = Array(ranked.dropFirst(5))
+        let shown = Array(ranked.prefix(Self.slotCount))
         let peak = ranked.first.map { sort.value(of: $0) } ?? 0
 
         VStack(alignment: .leading, spacing: Spacing.small) {
@@ -90,11 +89,7 @@ struct UsageAppList: View {
                     }
                 }
 
-                if !rest.isEmpty {
-                    otherRow(rest, peak: peak)
-                }
-
-                ForEach(0..<emptySlots(shown: shown, rest: rest), id: \.self) { _ in
+                ForEach(0..<max(Self.slotCount - shown.count, 0), id: \.self) { _ in
                     emptyRow
                 }
             }
@@ -103,7 +98,7 @@ struct UsageAppList: View {
 }
 
 private extension UsageAppList {
-    static let slotCount = 6
+    static let slotCount = 5
 
     var emptyRow: some View {
         HStack(spacing: Spacing.small) {
@@ -115,37 +110,6 @@ private extension UsageAppList {
                 .fill(Palette.paperDeep.opacity(0.6))
                 .frame(height: 8)
         }
-    }
-
-    func otherRow(
-        _ rest: [AppUsage],
-        peak: Double
-    ) -> some View {
-        let sum = sort == .perPickup ? 0 : rest.reduce(0) { $0 + sort.value(of: $1) }
-
-        return AppRow(
-            name: "その他 \(rest.count) アプリ",
-            value: sort.text(sum),
-            ratio: ratio(sum, peak: peak),
-            tint: sort == .time ? Palette.muted : sort.tint
-        ) {
-            RoundedRectangle(cornerRadius: 7)
-                .fill(Palette.paperDeep)
-                .frame(width: 28, height: 28)
-                .overlay {
-                    Text("…")
-                        .font(.caption.weight(.heavy))
-                        .foregroundStyle(Palette.muted)
-                }
-        }
-    }
-
-    func emptySlots(
-        shown: [AppUsage],
-        rest: [AppUsage]
-    ) -> Int {
-        let filled = shown.count + (rest.isEmpty ? 0 : 1)
-        return max(Self.slotCount - filled, 0)
     }
 
     func tint(at index: Int) -> Color {
