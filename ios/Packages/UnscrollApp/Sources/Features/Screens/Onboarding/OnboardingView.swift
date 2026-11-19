@@ -230,9 +230,9 @@ private extension OnboardingView {
 
     var practicePage: some View {
         VStack(alignment: .leading, spacing: Spacing.large) {
-            JournalTitle("練習の旅に出てみよう", note: "1 分だけ、旅の流れを試せます")
+            JournalTitle("練習の旅に出てみよう", note: "10 秒だけ、旅の流れを試せます")
 
-            TapedPhoto(caption: "1 分で 1 km、いっしょに歩きます", tilt: 1.5) {
+            TapedPhoto(caption: "10 秒で、おるす駅までいっしょに歩きます", tilt: 1.5) {
                 RoomScene(
                     companion: model.settings.companion,
                     look: RoomLook(defaults: .standard),
@@ -253,7 +253,7 @@ private extension OnboardingView {
 
                 SettingsRule()
 
-                promise("1 分たつと旅が終わり、アプリが元に戻ります")
+                promise("10 秒で旅が終わり、おるす駅の絵はがきとおみやげが届きます")
             }
         }
     }

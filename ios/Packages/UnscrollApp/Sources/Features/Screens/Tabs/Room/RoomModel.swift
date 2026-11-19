@@ -64,7 +64,6 @@ public extension RoomModel {
     #endif
 
     static let tripStep = 5
-    static let practiceMinutes = 1
 
     var tripEndsAt: Date? {
         progress?.activeTrip?.plannedEnd
@@ -209,40 +208,15 @@ public extension RoomModel {
     }
 
     func startPracticeTrip() {
-        startTrip(minutes: Self.practiceMinutes)
+        begin(label: "練習") { start in
+            try database.startPracticeTrip(at: start)
+        }
     }
 
     func startTrip(minutes: Int) {
-        let start = now()
-        let end = start.addingTimeInterval(TimeInterval(minutes * 60))
-        let schedule = FocusShield.schedule(from: start, to: end)
-
-        let trip: Trip
-
-        do {
-            trip = try database.startTrip(minutes: minutes, at: start)
-        } catch {
-            EventLog.append("旅：保存できない（\(error.localizedDescription)）")
-            refresh()
-            return
+        begin(label: "\(minutes) 分") { start in
+            try database.startTrip(minutes: minutes, at: start)
         }
-
-        FocusShield.startTrip(endsAt: end)
-
-        do {
-            try center.startMonitoring(
-                DeviceActivityName(ScreenTimeShared.focusActivityName),
-                during: schedule
-            )
-            EventLog.append("旅：開始（\(minutes) 分）")
-        } catch {
-            FocusShield.endTrip()
-            try? database.endTrip(trip.id, at: start)
-            defaults.set(trip.id.description, forKey: Self.acknowledgedTripKey)
-            EventLog.append("旅：見張りを始められない（\(error.localizedDescription)）")
-        }
-
-        refresh()
     }
 
     func stopTrip() {
@@ -282,9 +256,45 @@ private extension RoomModel {
         }
     }
 
+    func begin(
+        label: String,
+        save: (Date) throws -> Trip
+    ) {
+        let start = now()
+        let trip: Trip
+
+        do {
+            trip = try save(start)
+        } catch {
+            EventLog.append("旅：保存できない（\(error.localizedDescription)）")
+            refresh()
+            return
+        }
+
+        let schedule = FocusShield.schedule(from: start, to: trip.plannedEnd)
+
+        FocusShield.startTrip(endsAt: trip.plannedEnd)
+
+        do {
+            try center.startMonitoring(
+                DeviceActivityName(ScreenTimeShared.focusActivityName),
+                during: schedule
+            )
+            EventLog.append("旅：開始（\(label)）")
+        } catch {
+            FocusShield.endTrip()
+            try? database.endTrip(trip.id, at: start)
+            defaults.set(trip.id.description, forKey: Self.acknowledgedTripKey)
+            EventLog.append("旅：見張りを始められない（\(error.localizedDescription)）")
+        }
+
+        refresh()
+    }
+
     func recordArrivals() {
         do {
             try database.recordArrivals(on: journey, at: now())
+            try database.recordPracticeArrivals(at: now())
         } catch {
             EventLog.append("名所：着いた記録を保存できない（\(error.localizedDescription)）")
         }
