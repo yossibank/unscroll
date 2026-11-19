@@ -92,4 +92,32 @@ struct CompanionPickerModelTests {
 
         #expect(model.draft == saved)
     }
+
+    @Test
+    func canSaveOnlyAfterChangingSavedCompanion() throws {
+        let database = try AppDatabase.inMemory()
+        let saved = try #require(Companion(species: .tanuki, coat: .white, name: "ふく"))
+        try database.saveCompanion(saved)
+
+        let model = CompanionPickerModel(database: database)
+
+        #expect(!model.isChanged)
+        #expect(!model.canSave)
+
+        model.select(.gray)
+
+        #expect(model.isChanged)
+        #expect(model.canSave)
+
+        #expect(model.save())
+        #expect(!model.isChanged)
+    }
+
+    @Test
+    func canSaveWhenNoCompanionIsSaved() throws {
+        let model = try CompanionPickerModel(database: AppDatabase.inMemory())
+
+        #expect(model.isChanged)
+        #expect(model.canSave)
+    }
 }

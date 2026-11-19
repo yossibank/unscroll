@@ -9,6 +9,7 @@ public final class CompanionPickerModel {
     public private(set) var species: Companion.Species
     public private(set) var coat: Companion.Coat
     public private(set) var name: String
+    public private(set) var saved: Companion?
 
     @ObservationIgnored private var isNameEdited: Bool
     @ObservationIgnored private let database: AppDatabase
@@ -20,6 +21,7 @@ public final class CompanionPickerModel {
         self.species = species
         self.coat = current?.coat ?? species.coats[0]
         self.name = current?.name ?? species.defaultName
+        self.saved = current
         self.isNameEdited = current != nil
         self.database = database
     }
@@ -32,6 +34,14 @@ public extension CompanionPickerModel {
 
     var preview: Companion? {
         draft ?? Companion(species: species, coat: coat, name: species.defaultName)
+    }
+
+    var isChanged: Bool {
+        draft != saved
+    }
+
+    var canSave: Bool {
+        draft != nil && isChanged
     }
 
     var isNameTooLong: Bool {
@@ -72,6 +82,7 @@ public extension CompanionPickerModel {
 
         do {
             try database.saveCompanion(draft)
+            saved = draft
             return true
         } catch {
             EventLog.append("相棒：保存できない（\(error.localizedDescription)）")
