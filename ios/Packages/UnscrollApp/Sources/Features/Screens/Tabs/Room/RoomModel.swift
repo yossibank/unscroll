@@ -30,7 +30,7 @@ public final class RoomModel {
     public private(set) var isAuthorized = false
     public private(set) var hasSelection = false
 
-    public private(set) var journey = Journey.tokyoToKyoto
+    public private(set) var journey = Journey.tokyoSightseeing
 
     @ObservationIgnored private let database: AppDatabase
     @ObservationIgnored private let defaults: UserDefaults
@@ -134,7 +134,7 @@ public extension RoomModel {
     func refresh() {
         isAuthorized = AuthorizationCenter.shared.authorizationStatus == .approved
         hasSelection = !BlockedApps.isEmpty(BlockedApps.load())
-        journey = (try? database.currentJourney()) ?? .tokyoToKyoto
+        journey = (try? database.currentJourney()) ?? .tokyoSightseeing
         companion = try? database.companion()
         progress = try? database.journeyProgress(at: now())
 

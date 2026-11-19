@@ -8,7 +8,7 @@ import Testing
 struct TripResultSheetTests {
     @Test
     func makesBodyForPlannedAndEndedTrips() throws {
-        let model = try RoomModel(database: AppDatabase.inMemory())
+        let model = try RoomModel(database: makeDatabase())
         let start = Date(timeIntervalSince1970: 1_000_000)
         let planned = Trip(startedAt: start, plannedMinutes: 25)
         let ended = Trip(
@@ -23,7 +23,7 @@ struct TripResultSheetTests {
 
     @Test
     func makesBodyWithArrivals() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         let defaults = UserDefaults(suiteName: UUID().uuidString) ?? .standard
         let model = RoomModel(database: database, defaults: defaults)
         let start = Date.now.addingTimeInterval(-100 * 60)
@@ -34,5 +34,14 @@ struct TripResultSheetTests {
         #expect(model.finishedArrivals.count == 1)
 
         _ = TripResultSheet(trip: trip, model: model, onClose: {}).body
+    }
+}
+
+private extension TripResultSheetTests {
+    func makeDatabase() throws -> AppDatabase {
+        let database = try AppDatabase.inMemory()
+        try database.selectJourney("tokaido", at: Date(timeIntervalSince1970: 0))
+
+        return database
     }
 }

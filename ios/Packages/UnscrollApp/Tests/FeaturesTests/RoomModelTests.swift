@@ -10,7 +10,7 @@ struct RoomModelTests {
 
     @Test
     func decoratesArrivalFromFinishedTrip() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         _ = try database.startTrip(minutes: 90, at: fixedNow.addingTimeInterval(-100 * 60))
         let model = RoomModel(database: database, defaults: makeDefaults(), now: { fixedNow })
         let landmark = model.journey.landmarks[1]
@@ -25,7 +25,7 @@ struct RoomModelTests {
 
     @Test
     func listsArrivalsWithoutDecorating() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         _ = try database.startTrip(minutes: 90, at: fixedNow.addingTimeInterval(-100 * 60))
         let model = RoomModel(database: database, defaults: makeDefaults(), now: { fixedNow })
 
@@ -37,7 +37,7 @@ struct RoomModelTests {
 
     @Test
     func showsActiveTrip() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         _ = try database.startTrip(minutes: 25, at: fixedNow.addingTimeInterval(-5 * 60))
         let model = RoomModel(database: database, defaults: makeDefaults(), now: { fixedNow })
 
@@ -51,7 +51,7 @@ struct RoomModelTests {
     @Test
     func hasNoEndWithoutTrip() throws {
         let model = try RoomModel(
-            database: AppDatabase.inMemory(),
+            database: makeDatabase(),
             defaults: makeDefaults(),
             now: { fixedNow }
         )
@@ -63,7 +63,7 @@ struct RoomModelTests {
 
     @Test
     func savesSelectedMinutes() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         let defaults = makeDefaults()
         let model = RoomModel(database: database, defaults: defaults, now: { fixedNow })
 
@@ -80,7 +80,7 @@ struct RoomModelTests {
         defaults.set(33, forKey: "room.selectedMinutes")
 
         let model = try RoomModel(
-            database: AppDatabase.inMemory(),
+            database: makeDatabase(),
             defaults: defaults,
             now: { fixedNow }
         )
@@ -94,7 +94,7 @@ struct RoomModelTests {
         defaults.set(300, forKey: "room.selectedMinutes")
 
         let model = try RoomModel(
-            database: AppDatabase.inMemory(),
+            database: makeDatabase(),
             defaults: defaults,
             now: { fixedNow }
         )
@@ -104,7 +104,7 @@ struct RoomModelTests {
 
     @Test
     func notesLandmarkForLength() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         let start = fixedNow.addingTimeInterval(-100 * 60)
         let trip = try database.startTrip(minutes: 90, at: start)
         try database.endTrip(trip.id, at: start.addingTimeInterval(62 * 60))
@@ -119,7 +119,7 @@ struct RoomModelTests {
 
     @Test
     func showsFinishedTripOnceUntilAcknowledged() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         let defaults = makeDefaults()
         let model = RoomModel(database: database, defaults: defaults, now: { fixedNow })
 
@@ -143,7 +143,7 @@ struct RoomModelTests {
 
     @Test
     func showsArrivalsOfFinishedTrip() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         let model = RoomModel(database: database, defaults: makeDefaults(), now: { fixedNow })
 
         let start = fixedNow.addingTimeInterval(-100 * 60)
@@ -166,7 +166,7 @@ struct RoomModelTests {
 
     @Test
     func skipsExistingTripOnFirstLaunch() throws {
-        let database = try AppDatabase.inMemory()
+        let database = try makeDatabase()
         _ = try database.startTrip(minutes: 25, at: fixedNow.addingTimeInterval(-60 * 60))
 
         let model = RoomModel(database: database, defaults: makeDefaults(), now: { fixedNow })
@@ -178,5 +178,12 @@ struct RoomModelTests {
 private extension RoomModelTests {
     func makeDefaults() -> UserDefaults {
         UserDefaults(suiteName: UUID().uuidString) ?? .standard
+    }
+
+    func makeDatabase() throws -> AppDatabase {
+        let database = try AppDatabase.inMemory()
+        try database.selectJourney("tokaido", at: Date(timeIntervalSince1970: 0))
+
+        return database
     }
 }

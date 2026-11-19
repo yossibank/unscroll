@@ -68,6 +68,7 @@ struct DecorationWriteTests {
 private extension DecorationWriteTests {
     func makeDatabase(minutes: Int) throws -> AppDatabase {
         let database = try AppDatabase.inMemory()
+        try database.selectJourney(journey.id, at: start)
         _ = try database.startTrip(minutes: minutes, at: start)
         try database.recordArrivals(
             on: journey,

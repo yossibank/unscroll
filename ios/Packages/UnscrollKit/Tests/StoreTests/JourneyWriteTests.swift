@@ -8,8 +8,48 @@ struct JourneyWriteTests {
     private let start = Date(timeIntervalSince1970: 1_000_000)
 
     @Test
-    func defaultsToTokyoToKyoto() throws {
+    func defaultsToTokyoSightseeing() throws {
         let database = try AppDatabase.inMemory()
+
+        #expect(try database.currentJourney() == .tokyoSightseeing)
+    }
+
+    @Test
+    func defaultsToLatestTripJourney() throws {
+        let database = try AppDatabase.inMemory()
+
+        try database.writer.write { db in
+            try db.execute(
+                sql: """
+                insert into trip (id, startedAt, plannedMinutes, endedAt, journeyID)
+                values ('6B9C2E70-F402-4F5C-8568-FE996A89AC79', ?, 10, ?, 'tokaido'),
+                       ('7C0D3F81-0513-4A6D-9679-0FA07B9ABD8A', ?, 10, ?, 'okinawa')
+                """,
+                arguments: [
+                    start,
+                    start.addingTimeInterval(10 * 60),
+                    start.addingTimeInterval(60 * 60),
+                    start.addingTimeInterval(70 * 60)
+                ]
+            )
+        }
+
+        #expect(try database.currentJourney() == .okinawa)
+    }
+
+    @Test
+    func defaultsToTokyoToKyotoForUnknownTripJourney() throws {
+        let database = try AppDatabase.inMemory()
+
+        try database.writer.write { db in
+            try db.execute(
+                sql: """
+                insert into trip (id, startedAt, plannedMinutes, endedAt, journeyID)
+                values ('6B9C2E70-F402-4F5C-8568-FE996A89AC79', ?, 10, ?, 'unknown')
+                """,
+                arguments: [start, start.addingTimeInterval(10 * 60)]
+            )
+        }
 
         #expect(try database.currentJourney() == .tokyoToKyoto)
     }
@@ -31,7 +71,7 @@ struct JourneyWriteTests {
         let isSelected = try database.selectJourney("unknown", at: start)
 
         #expect(!isSelected)
-        #expect(try database.currentJourney() == .tokyoToKyoto)
+        #expect(try database.currentJourney() == .tokyoSightseeing)
     }
 
     @Test
@@ -42,7 +82,7 @@ struct JourneyWriteTests {
         let isSelected = try database.selectJourney("okinawa", at: start.addingTimeInterval(60))
 
         #expect(!isSelected)
-        #expect(try database.currentJourney() == .tokyoToKyoto)
+        #expect(try database.currentJourney() == .tokyoSightseeing)
     }
 
     @Test
@@ -51,6 +91,7 @@ struct JourneyWriteTests {
         let secondStart = start.addingTimeInterval(60 * 60)
         let now = secondStart.addingTimeInterval(60 * 60)
 
+        try database.selectJourney("tokaido", at: start)
         _ = try database.startTrip(minutes: 25, at: start)
         try database.selectJourney("okinawa", at: secondStart.addingTimeInterval(-60))
         _ = try database.startTrip(minutes: 10, at: secondStart)
@@ -92,6 +133,7 @@ struct JourneyWriteTests {
         let secondStart = start.addingTimeInterval(120 * 60)
         let now = secondStart.addingTimeInterval(60 * 60)
 
+        try database.selectJourney("tokaido", at: start)
         _ = try database.startTrip(minutes: 100, at: start)
         try database.recordArrivals(on: .tokyoToKyoto, at: secondStart)
         try database.selectJourney("okinawa", at: secondStart)
