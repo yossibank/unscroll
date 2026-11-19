@@ -247,7 +247,6 @@ public extension RoomModel {
         }
 
         FocusShield.endTrip()
-        center.stopMonitoring([DeviceActivityName(ScreenTimeShared.focusActivityName)])
         EventLog.append("旅：やめた")
         refresh()
     }

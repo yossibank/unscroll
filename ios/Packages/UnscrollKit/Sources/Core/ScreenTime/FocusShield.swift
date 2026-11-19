@@ -34,6 +34,10 @@ public enum FocusShield {
         Strictness.saved(forKey: Strictness.tripKey, in: defaults)
     }
 
+    private static var focusName: DeviceActivityName {
+        DeviceActivityName(ScreenTimeShared.focusActivityName)
+    }
+
     private static var unlockName: DeviceActivityName {
         DeviceActivityName(ScreenTimeShared.unlockActivityName)
     }
@@ -73,7 +77,18 @@ public enum FocusShield {
         clearPress()
         store.clearAllSettings()
 
-        DeviceActivityCenter().stopMonitoring([unlockName])
+        DeviceActivityCenter().stopMonitoring([unlockName, focusName])
+    }
+
+    public static func endTripIfFinished(at now: Date) -> Bool {
+        let end = defaults?.object(forKey: ScreenTimeShared.focusEndsAtKey) as? Date
+
+        guard FocusEnd.hasEnded(endsAt: end, at: now) else {
+            return false
+        }
+
+        endTrip()
+        return true
     }
 
     public static func isWaiting(
