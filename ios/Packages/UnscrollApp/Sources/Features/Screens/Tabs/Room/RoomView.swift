@@ -43,6 +43,7 @@ public struct RoomView: View {
         .background(PaperBackdrop())
         .onAppear {
             model.refresh()
+            settings.refresh()
         }
         .onChange(of: scenePhase) { _, newPhase in
             guard newPhase == .active else {
@@ -50,6 +51,10 @@ public struct RoomView: View {
             }
 
             model.refresh()
+            settings.refresh()
+        }
+        .onChange(of: model.progress?.activeTrip == nil) {
+            settings.refresh()
         }
         .task {
             await blink()
@@ -158,6 +163,7 @@ private extension RoomView {
             AppSetTags(model: settings) {
                 model.refresh()
             }
+            .disabled(isOnTrip)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -181,6 +187,10 @@ private extension RoomView {
             get: { canShowResult ? model.finishedTrip : nil },
             set: { _ in }
         )
+    }
+
+    var isOnTrip: Bool {
+        model.progress?.activeTrip != nil
     }
 
     var canShowResult: Bool {
