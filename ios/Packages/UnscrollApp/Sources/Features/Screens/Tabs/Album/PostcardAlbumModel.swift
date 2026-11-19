@@ -7,8 +7,10 @@ import Store
 @Observable
 public final class PostcardAlbumModel {
     public private(set) var arrivals: [Arrival] = []
+    public private(set) var covers: [Cover] = []
     public private(set) var kilometers = 0
     public private(set) var journey = Journey.tokyoToKyoto
+    public private(set) var shownJourneyID: String?
 
     @ObservationIgnored private let database: AppDatabase
     @ObservationIgnored private let now: @MainActor () -> Date
@@ -32,6 +34,29 @@ public extension PostcardAlbumModel {
 
         public var isCollected: Bool {
             arrival != nil
+        }
+    }
+
+    struct Cover: Hashable, Identifiable, Sendable {
+        public let journey: Journey
+        public let collectedCount: Int
+        public let kilometers: Int
+        public let isCurrent: Bool
+
+        public var id: String {
+            journey.id
+        }
+
+        public var totalCount: Int {
+            journey.landmarks.count - 1
+        }
+
+        public var isStarted: Bool {
+            kilometers > 0 || collectedCount > 0
+        }
+
+        public var art: Landmark? {
+            journey.landmarks.dropFirst().first
         }
     }
 
@@ -70,19 +95,42 @@ public extension PostcardAlbumModel {
         refresh()
     }
 
+    func show(_ journeyID: String) {
+        shownJourneyID = journeyID
+        refresh()
+    }
+
     func refresh() {
         let date = now()
-
-        journey = (try? database.currentJourney()) ?? .tokyoToKyoto
+        let current = (try? database.currentJourney()) ?? .tokyoToKyoto
 
         do {
-            try database.recordArrivals(on: journey, at: date)
+            try database.recordArrivals(on: current, at: date)
         } catch {
             EventLog.append("名所：着いた記録を保存できない（\(error.localizedDescription)）")
         }
 
-        let progress = try? database.journeyProgress(at: date)
-        kilometers = min(progress?.kilometers ?? 0, journey.totalKilometers)
+        covers = Journey.all.map { journey in
+            Cover(
+                journey: journey,
+                collectedCount: (try? database.arrivals(journeyID: journey.id))?.count ?? 0,
+                kilometers: journeyKilometers(journey, at: date),
+                isCurrent: journey.id == current.id
+            )
+        }
+
+        journey = shownJourneyID.flatMap(Journey.with(id:)) ?? current
+        kilometers = journeyKilometers(journey, at: date)
         arrivals = (try? database.arrivals(journeyID: journey.id)) ?? []
+    }
+}
+
+private extension PostcardAlbumModel {
+    func journeyKilometers(
+        _ journey: Journey,
+        at date: Date
+    ) -> Int {
+        let progress = try? database.journeyProgress(journeyID: journey.id, at: date)
+        return min(progress?.kilometers ?? 0, journey.totalKilometers)
     }
 }

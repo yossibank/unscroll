@@ -28,7 +28,9 @@ struct SettingsStrictness: View {
 
 private extension SettingsStrictness {
     var shieldSample: some View {
-        let secondaryInk = strictness == .strict ? Palette.muted : Color.white
+        let isStrict = strictness == .strict
+        let secondaryInk = isStrict ? Palette.muted : Color.white
+        let secondaryFill = isStrict ? Color.clear : Color(white: 0.71)
         let letter = ShieldLetter(companionName: companion?.name, remainingMinutes: 25)
 
         return VStack(spacing: Spacing.small) {
@@ -62,10 +64,17 @@ private extension SettingsStrictness {
             Text(secondaryButton(for: strictness))
                 .font(.caption.weight(.heavy))
                 .foregroundStyle(secondaryInk)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, Spacing.small)
+                .background(secondaryFill, in: Capsule())
         }
         .padding(Spacing.medium)
         .frame(maxWidth: 240)
-        .background(Palette.ink.opacity(0.06), in: .rect(cornerRadius: 16))
+        .background(Palette.paper, in: .rect(cornerRadius: 16))
+        .overlay {
+            RoundedRectangle(cornerRadius: 16)
+                .strokeBorder(Palette.paperDeep, lineWidth: 1)
+        }
         .frame(maxWidth: .infinity)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("止めた画面の見え方")

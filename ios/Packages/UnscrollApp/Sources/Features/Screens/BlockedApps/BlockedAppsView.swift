@@ -15,7 +15,7 @@ public struct BlockedAppsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: Spacing.medium) {
                 Label(
-                    "旅の間、選んだおるす札のアプリを止めます。札は部屋のきっぷの上でも替えられます。",
+                    "旅の間は、選んだまとまりのアプリを止めます。部屋のきっぷの上でも替えられます。",
                     systemImage: "hand.raised.fill"
                 )
                 .font(.subheadline.weight(.bold))
@@ -34,7 +34,7 @@ public struct BlockedAppsView: View {
                 Button {
                     isPickerPresented = true
                 } label: {
-                    Label("アプリを選ぶ", systemImage: "plus.app.fill")
+                    Label(pickerTitle, systemImage: "plus.app.fill")
                 }
                 .buttonStyle(.pill)
                 .disabled(isPickerDisabled)
@@ -97,6 +97,10 @@ private extension BlockedAppsView {
 }
 
 private extension BlockedAppsView {
+    var pickerTitle: String {
+        model.hasSelection ? "アプリを変える" : "アプリを選ぶ"
+    }
+
     var isPickerDisabled: Bool {
         model.isTripActive || !model.isAuthorized
     }

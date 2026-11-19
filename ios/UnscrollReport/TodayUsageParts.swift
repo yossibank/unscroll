@@ -129,10 +129,8 @@ struct UsageHeadline: View {
     let usage: TodayUsage
 
     var body: some View {
-        HStack(alignment: .bottom, spacing: Spacing.small) {
+        VStack(alignment: .leading, spacing: Spacing.small) {
             UsageTotal(usage: usage)
-
-            Spacer(minLength: 0)
 
             if let comparison = usage.comparison {
                 Label(comparison.text, systemImage: comparison.symbol)
@@ -140,10 +138,9 @@ struct UsageHeadline: View {
                     .foregroundStyle(comparison.tint)
                     .lineLimit(1)
                     .minimumScaleFactor(0.8)
-                    .padding(.horizontal, Spacing.small)
-                    .padding(.vertical, 4)
-                    .background(comparison.tint.opacity(0.12), in: Capsule())
-                    .padding(.bottom, 4)
+                    .padding(.horizontal, Spacing.small + 4)
+                    .frame(maxWidth: .infinity, minHeight: 32, alignment: .leading)
+                    .background(comparison.tint.opacity(0.12), in: .rect(cornerRadius: 12))
             }
         }
     }

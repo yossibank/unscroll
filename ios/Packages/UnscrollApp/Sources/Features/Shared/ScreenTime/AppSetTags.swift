@@ -7,15 +7,18 @@ struct AppSetTags: View {
 
     @State private var isNaming = false
     @State private var isPickerPresented = false
+    @State private var wantsPicker = false
     @State private var renamingID: UUID?
     @State private var nameDraft = ""
+
+    var hidesEmpty = false
 
     let onChange: () -> Void
 
     var body: some View {
         ScrollView(.horizontal) {
             HStack(spacing: Spacing.small) {
-                ForEach(Array(model.sets.enumerated()), id: \.element.id) { index, set in
+                ForEach(Array(shownSets.enumerated()), id: \.element.id) { index, set in
                     tag(set, index: index)
                 }
 
@@ -28,15 +31,27 @@ struct AppSetTags: View {
         }
         .scrollIndicators(.hidden)
         .scrollClipDisabled()
-        .alert(namingTitle, isPresented: $isNaming) {
-            TextField("名前", text: $nameDraft)
-
-            Button("キャンセル", role: .cancel) {}
-
-            Button("決める") {
-                commitName()
+        .sheet(
+            isPresented: $isNaming,
+            onDismiss: {
+                isPickerPresented = wantsPicker
+                wantsPicker = false
+            },
+            content: {
+                AppSetNameSheet(
+                    name: nameDraft,
+                    isRenaming: renamingID != nil,
+                    onCommit: { name in
+                        commitName(name)
+                    },
+                    onCancel: {
+                        isNaming = false
+                    }
+                )
+                .presentationDetents([.height(420)])
+                .presentationCornerRadius(28)
             }
-        }
+        )
         .familyActivityPicker(isPresented: $isPickerPresented, selection: $model.selection)
         .onChange(of: model.selection) {
             model.saveSelection()
@@ -50,7 +65,7 @@ private extension AppSetTags {
         Button {
             startNaming(nil)
         } label: {
-            Label("札を作る", systemImage: "plus")
+            Label("新しく作る", systemImage: "plus")
                 .font(.footnote.weight(.heavy))
                 .foregroundStyle(Palette.teal)
                 .padding(.leading, Spacing.medium + 4)
@@ -113,7 +128,7 @@ private extension AppSetTags {
             }
 
             if model.sets.count > 1 {
-                Button("札を外す", systemImage: "trash", role: .destructive) {
+                Button("消す", systemImage: "trash", role: .destructive) {
                     model.deleteSet(set.id)
                     onChange()
                 }
@@ -123,8 +138,8 @@ private extension AppSetTags {
 }
 
 private extension AppSetTags {
-    var namingTitle: String {
-        renamingID == nil ? "札を作る" : "名前を変える"
+    var shownSets: [BlockedAppSet] {
+        hidesEmpty ? model.sets.filter { !BlockedApps.isEmpty($0.selection) } : model.sets
     }
 
     func startNaming(_ set: BlockedAppSet?) {
@@ -133,14 +148,15 @@ private extension AppSetTags {
         isNaming = true
     }
 
-    func commitName() {
+    func commitName(_ name: String) {
         if let renamingID {
-            model.renameSet(renamingID, to: nameDraft)
-            return
+            model.renameSet(renamingID, to: name)
+        } else {
+            model.addSet(named: name)
+            onChange()
+            wantsPicker = model.isAuthorized
         }
 
-        model.addSet(named: nameDraft)
-        onChange()
-        isPickerPresented = model.isAuthorized
+        isNaming = false
     }
 }

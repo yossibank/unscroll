@@ -17,7 +17,18 @@ public struct PostcardAlbumView: View {
         NavigationStack(path: $path) {
             ScrollView {
                 VStack(alignment: .leading, spacing: Spacing.medium) {
-                    JournalTitle("絵はがき帳", note: model.journey.name)
+                    JournalTitle("絵はがき帳", note: "旅ごとに集めた絵はがき")
+
+                    PostcardAlbumCovers(covers: model.covers, shownID: model.journey.id) { id in
+                        model.show(id)
+                    }
+                    .padding(.horizontal, -Spacing.medium)
+
+                    Text(model.journey.name)
+                        .font(.title3.weight(.heavy))
+                        .foregroundStyle(Palette.ink)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.8)
 
                     PostcardStampRally(
                         entries: model.entries,

@@ -46,7 +46,7 @@ struct AppRow<Icon: View>: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }
-                .font(.subheadline.weight(.bold))
+                .font(.footnote.weight(.bold))
 
                 GeometryReader { proxy in
                     Capsule()

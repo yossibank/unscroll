@@ -153,7 +153,7 @@ private extension RoomView {
                 .foregroundStyle(Palette.muted)
                 .padding(.horizontal, 4)
 
-            AppSetTags(model: settings) {
+            AppSetTags(model: settings, hidesEmpty: true) {
                 model.refresh()
             }
             .disabled(isOnTrip)

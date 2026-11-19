@@ -57,7 +57,7 @@ public struct JourneyMapView: View {
                 model.refresh()
                 onJourneyChanged()
             }
-            .presentationDetents([.fraction(0.65), .large])
+            .presentationDetents([.large])
         }
     }
 }
