@@ -141,6 +141,7 @@ private extension RoomView {
             )
 
             UsageReportView()
+                .id(settings.isAuthorized)
                 .frame(height: 792)
         }
         .roundedCard()

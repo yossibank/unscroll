@@ -180,7 +180,7 @@ private extension OnboardingIntro {
     var message: String {
         switch page {
         case .walk:
-            "相棒は、1 分で 1 km ずつ進みます。日本の道のりを \(Journey.all.count) 本から選べます。"
+            "相棒は、1 分で 1 km ずつ進みます。日本各地の名所をめぐる道のりから、好きな旅を選べます。"
 
         case .postcard:
             "届いた絵はがきは、部屋に飾ったり、絵はがき帳で見返したりできます。"

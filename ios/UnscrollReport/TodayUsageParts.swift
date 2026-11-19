@@ -54,6 +54,10 @@ extension TodayUsage {
     }
 
     var longestRest: (start: Int, length: Int)? {
+        guard total > 0 else {
+            return nil
+        }
+
         let current = Calendar.current.component(.hour, from: .now)
         var best: (start: Int, length: Int)?
         var run: (start: Int, length: Int)?
