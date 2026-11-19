@@ -31,7 +31,7 @@ public struct MainView: View {
 
     public var body: some View {
         TabView(selection: $tab) {
-            RoomView(model: room)
+            RoomView(model: room, settings: settings)
                 .tag(Tab.room)
                 .toolbarVisibility(.hidden, for: .tabBar)
 

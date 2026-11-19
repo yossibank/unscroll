@@ -1,3 +1,4 @@
+import Core
 import DesignSystem
 import FamilyControls
 import SwiftUI
@@ -10,11 +11,11 @@ struct AppIcon: View {
         if let token = app.token {
             Label(token)
                 .labelStyle(.iconOnly)
-                .frame(width: 32, height: 32)
+                .frame(width: 40, height: 40)
         } else {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 10)
                 .fill(tint)
-                .frame(width: 32, height: 32)
+                .frame(width: 40, height: 40)
         }
     }
 }
@@ -45,7 +46,7 @@ struct AppRow<Icon: View>: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.8)
                 }
-                .font(.caption.weight(.bold))
+                .font(.subheadline.weight(.bold))
 
                 GeometryReader { proxy in
                     Capsule()
@@ -106,9 +107,9 @@ private extension UsageAppList {
 
     var emptyRow: some View {
         HStack(spacing: Spacing.small) {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 10)
                 .strokeBorder(Palette.paperDeep, style: StrokeStyle(lineWidth: 1.5, dash: [3, 3]))
-                .frame(width: 32, height: 32)
+                .frame(width: 40, height: 40)
 
             Capsule()
                 .fill(Palette.paperDeep.opacity(0.6))
@@ -128,9 +129,9 @@ private extension UsageAppList {
             ratio: ratio(sum, peak: peak),
             tint: sort == .time ? Palette.muted : sort.tint
         ) {
-            RoundedRectangle(cornerRadius: 8)
+            RoundedRectangle(cornerRadius: 10)
                 .fill(Palette.paperDeep)
-                .frame(width: 32, height: 32)
+                .frame(width: 40, height: 40)
                 .overlay {
                     Text("…")
                         .font(.caption.weight(.heavy))

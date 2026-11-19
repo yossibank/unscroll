@@ -45,13 +45,11 @@ private extension UnscrollShield {
         let companion = snapshot?.companion
         let letter = snapshot?.letter(at: now) ?? ShieldLetter(
             companionName: nil,
-            journey: .tokyoToKyoto,
-            kilometers: nil,
             remainingMinutes: nil
         )
 
         let secondary = secondaryLabel(for: target).map {
-            ShieldConfiguration.Label(text: $0, color: teal)
+            ShieldConfiguration.Label(text: $0, color: .white)
         }
 
         return ShieldConfiguration(

@@ -91,7 +91,7 @@ private extension TripResultSheet {
                         .offset(x: Spacing.small, y: Spacing.large)
                 }
             }
-            .padding(.bottom, Spacing.large)
+            .padding(.bottom, Spacing.small)
         }
         .padding(.top, Spacing.small)
     }

@@ -6,8 +6,10 @@ import Testing
 struct RoomViewTests {
     @Test
     func makesBody() throws {
-        let model = try RoomModel(database: AppDatabase.inMemory())
+        let database = try AppDatabase.inMemory()
+        let model = RoomModel(database: database)
+        let settings = SettingsModel(database: database)
 
-        _ = RoomView(model: model).body
+        _ = RoomView(model: model, settings: settings).body
     }
 }

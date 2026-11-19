@@ -1,10 +1,10 @@
+import Core
 import DesignSystem
 import SwiftUI
 
 struct TodayUsageView: View {
-    @State private var sort = UsageSort.time
-
     let usage: TodayUsage
+    let sort: UsageSort
 
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.medium) {
@@ -48,21 +48,21 @@ private extension TodayUsageView {
                 "\(usage.pickups) 回",
                 note: "手に取った",
                 sort: .pickups,
-                selection: $sort
+                selection: sort
             )
 
             UsageSortButton(
                 usage.perPickup ?? "-",
                 note: "1 回あたり",
                 sort: .perPickup,
-                selection: $sort
+                selection: sort
             )
 
             UsageSortButton(
                 "\(usage.notifications) 件",
                 note: "通知",
                 sort: .notifications,
-                selection: $sort
+                selection: sort
             )
 
             UsageFact(

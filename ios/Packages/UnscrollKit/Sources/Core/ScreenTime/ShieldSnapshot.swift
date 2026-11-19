@@ -83,8 +83,6 @@ public extension ShieldSnapshot {
     func letter(at now: Date) -> ShieldLetter {
         ShieldLetter(
             companionName: companion?.name,
-            journey: journey,
-            kilometers: kilometers(at: now),
             remainingMinutes: trip.remainingMinutes(at: now)
         )
     }

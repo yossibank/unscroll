@@ -1,12 +1,6 @@
+import Core
 import DesignSystem
 import SwiftUI
-
-enum UsageSort: Equatable {
-    case time
-    case pickups
-    case perPickup
-    case notifications
-}
 
 extension UsageSort {
     var tint: Color {
@@ -42,15 +36,6 @@ extension UsageSort {
         case .pickups: "手に取った回数が多いアプリ"
         case .perPickup: "1 回が長いアプリ"
         case .notifications: "通知が多いアプリ"
-        }
-    }
-
-    var accessibilityLabel: String {
-        switch self {
-        case .time: "使った時間で並べる"
-        case .pickups: "手に取った回数で並べる"
-        case .perPickup: "1 回あたりの時間で並べる"
-        case .notifications: "通知の数で並べる"
         }
     }
 
@@ -131,38 +116,31 @@ struct UsageFact: View {
 }
 
 struct UsageSortButton: View {
-    @Binding var selection: UsageSort
-
     let value: String
     let note: String
     let sort: UsageSort
+    let selection: UsageSort
 
     init(
         _ value: String,
         note: String,
         sort: UsageSort,
-        selection: Binding<UsageSort>
+        selection: UsageSort
     ) {
         self.value = value
         self.note = note
         self.sort = sort
-        _selection = selection
+        self.selection = selection
     }
 
     var body: some View {
-        Button {
-            selection = isSelected ? .time : sort
-        } label: {
-            label
-                .background { face }
-                .offset(y: isSelected ? 5 : 0)
-        }
-        .buttonStyle(.plain)
-        .background(alignment: .top) { thickness }
-        .animation(.spring(duration: 0.25, bounce: 0.3), value: isSelected)
-        .accessibilityLabel("\(note) \(value)")
-        .accessibilityHint(sort.accessibilityLabel)
-        .accessibilityAddTraits(isSelected ? .isSelected : [])
+        label
+            .background { face }
+            .offset(y: isSelected ? 5 : 0)
+            .background(alignment: .top) { thickness }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel("\(note) \(value)")
+            .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 }
 
@@ -187,12 +165,11 @@ private extension UsageSortButton {
                 .font(.system(size: 9, weight: .bold))
                 .foregroundStyle(isSelected ? Palette.card.opacity(0.85) : Palette.muted)
 
-            Label(
-                isSelected ? "並べ中" : "並べる",
-                systemImage: isSelected ? "checkmark" : "arrow.up.arrow.down"
-            )
-            .font(.system(size: 9, weight: .heavy))
-            .foregroundStyle(isSelected ? Palette.card.opacity(0.85) : sort.deep)
+            if isSelected {
+                Label("並べ中", systemImage: "checkmark")
+                    .font(.system(size: 9, weight: .heavy))
+                    .foregroundStyle(Palette.card.opacity(0.85))
+            }
         }
         .foregroundStyle(isSelected ? Palette.card : Palette.ink)
         .padding(Spacing.small)

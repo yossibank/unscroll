@@ -4,15 +4,21 @@ import SwiftUI
 
 public struct RoomView: View {
     @State private var model: RoomModel
+    @State private var settings: SettingsModel
     @State private var isTripCoverShown = false
     @State private var isDecorShown = false
     @State private var pose = Companion.Pose.walk
     @State private var pokes = 0
+    @State private var sort = UsageSort.time
 
     @Environment(\.scenePhase) private var scenePhase
 
-    public init(model: RoomModel) {
+    public init(
+        model: RoomModel,
+        settings: SettingsModel
+    ) {
         _model = State(initialValue: model)
+        _settings = State(initialValue: settings)
     }
 
     public var body: some View {
@@ -23,6 +29,8 @@ public struct RoomView: View {
                 RoomPhoto(model: model, pose: pose) {
                     poke()
                 }
+
+                appSets
 
                 RoomTicket(model: model)
 
@@ -128,10 +136,30 @@ private extension RoomView {
                 wash: Palette.skySoft
             )
 
-            UsageReportView()
-                .frame(height: 792)
+            CapsulePicker(UsageSort.allCases, selection: $sort) { item in
+                sortTitle(item)
+            }
+            .frame(maxWidth: .infinity)
+
+            UsageReportView(sort: sort)
+                .frame(height: 840)
+                .allowsHitTesting(false)
         }
         .roundedCard()
+    }
+
+    var appSets: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            Label("止めるもの", systemImage: "hand.raised.fill")
+                .font(.caption.weight(.heavy))
+                .foregroundStyle(Palette.muted)
+                .padding(.horizontal, 4)
+
+            AppSetTags(model: settings) {
+                model.refresh()
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -157,6 +185,15 @@ private extension RoomView {
 
     var canShowResult: Bool {
         model.progress?.activeTrip == nil && !isTripCoverShown
+    }
+
+    func sortTitle(_ sort: UsageSort) -> String {
+        switch sort {
+        case .time: "時間"
+        case .pickups: "回数"
+        case .perPickup: "1 回あたり"
+        case .notifications: "通知"
+        }
     }
 
     func poke() {

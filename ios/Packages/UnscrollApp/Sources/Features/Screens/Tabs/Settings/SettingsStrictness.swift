@@ -5,6 +5,8 @@ import SwiftUI
 struct SettingsStrictness: View {
     @Binding var strictness: Strictness
 
+    let companion: Companion?
+
     var body: some View {
         VStack(alignment: .leading, spacing: Spacing.medium) {
             HStack(spacing: Spacing.small) {
@@ -26,22 +28,30 @@ struct SettingsStrictness: View {
 
 private extension SettingsStrictness {
     var shieldSample: some View {
-        let secondaryInk = strictness == .strict ? Palette.muted : Palette.teal
+        let secondaryInk = strictness == .strict ? Palette.muted : Color.white
+        let letter = ShieldLetter(companionName: companion?.name, remainingMinutes: 25)
 
         return VStack(spacing: Spacing.small) {
-            Image(systemName: "envelope.open.fill")
-                .font(.title3)
-                .foregroundStyle(Palette.teal)
+            if let companion {
+                CompanionSticker(companion: companion, pose: .wave, size: 56, breathes: false)
+            } else {
+                Image(systemName: "envelope.open.fill")
+                    .font(.title)
+                    .foregroundStyle(Palette.teal)
+                    .frame(height: 56)
+            }
 
-            Text("旅先からの手紙")
+            Text(letter.title)
                 .font(.footnote.weight(.heavy))
                 .foregroundStyle(Palette.ink)
 
-            Text("あと 32 km で浜名湖に着くんだ。")
+            Text(letter.body)
                 .font(.caption2.weight(.bold))
                 .foregroundStyle(Palette.muted)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
 
-            Text("旅に戻る")
+            Text(letter.primaryButton)
                 .font(.caption.weight(.heavy))
                 .foregroundStyle(Palette.card)
                 .frame(maxWidth: .infinity)
@@ -55,11 +65,7 @@ private extension SettingsStrictness {
         }
         .padding(Spacing.medium)
         .frame(maxWidth: 240)
-        .background(Palette.paper, in: .rect(cornerRadius: 16))
-        .overlay {
-            RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(Palette.paperDeep, lineWidth: 1.5)
-        }
+        .background(Palette.ink.opacity(0.18), in: .rect(cornerRadius: 16))
         .frame(maxWidth: .infinity)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("止めた画面の見え方")
@@ -180,7 +186,7 @@ private extension SettingsStrictness {
 #Preview {
     @Previewable @State var strictness = Strictness.normal
 
-    SettingsStrictness(strictness: $strictness)
+    SettingsStrictness(strictness: $strictness, companion: nil)
         .padding()
         .background(PaperBackdrop())
 }

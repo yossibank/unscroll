@@ -161,7 +161,7 @@ private extension SettingsView {
         let opacity = model.isTripActive ? 0.5 : 1
 
         return SettingsPage("外しにくさ", tint: Palette.sun) {
-            SettingsStrictness(strictness: $model.strictness)
+            SettingsStrictness(strictness: $model.strictness, companion: model.companion)
                 .padding(.top, 4)
                 .disabled(model.isTripActive)
                 .opacity(opacity)

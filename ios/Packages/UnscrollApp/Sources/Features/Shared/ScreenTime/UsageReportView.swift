@@ -3,7 +3,11 @@ import DeviceActivity
 import SwiftUI
 
 public struct UsageReportView: View {
-    public init() {}
+    private let sort: UsageSort
+
+    public init(sort: UsageSort) {
+        self.sort = sort
+    }
 
     public var body: some View {
         DeviceActivityReport(reportContext, filter: filter)
@@ -12,7 +16,7 @@ public struct UsageReportView: View {
 
 private extension UsageReportView {
     var reportContext: DeviceActivityReport.Context {
-        DeviceActivityReport.Context(ScreenTimeShared.reportContextName)
+        DeviceActivityReport.Context(sort.reportContextName)
     }
 
     var filter: DeviceActivityFilter {
