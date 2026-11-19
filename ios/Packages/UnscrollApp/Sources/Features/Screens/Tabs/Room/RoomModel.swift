@@ -154,6 +154,7 @@ public extension RoomModel {
         companion = try? database.companion()
         progress = try? database.journeyProgress(at: now())
 
+        endLeftOverShield()
         saveShieldSnapshot()
         recordArrivals()
         updateFinishedTrip()
@@ -256,6 +257,21 @@ private extension RoomModel {
     static let selectedMinutesKey = "room.selectedMinutes"
     static let acknowledgedTripKey = "room.acknowledgedTripID"
     static let hangStep: TimeInterval = 0.01
+
+    func endLeftOverShield() {
+        let isLeftOver = FocusEnd.isLeftOver(
+            endsAt: FocusShield.tripEndsAt,
+            hasActiveTrip: progress?.activeTrip != nil,
+            at: now()
+        )
+
+        guard isLeftOver else {
+            return
+        }
+
+        FocusShield.endTrip()
+        EventLog.append("旅：残っていた止める設定を外した")
+    }
 
     func saveShieldSnapshot() {
         let snapshot = ShieldSnapshot(

@@ -34,8 +34,8 @@ public enum FocusShield {
         Strictness.saved(forKey: Strictness.tripKey, in: defaults)
     }
 
-    private static var focusName: DeviceActivityName {
-        DeviceActivityName(ScreenTimeShared.focusActivityName)
+    public static var tripEndsAt: Date? {
+        FocusEndFile.shared?.read()
     }
 
     private static var unlockName: DeviceActivityName {
@@ -62,7 +62,12 @@ public enum FocusShield {
     }
 
     public static func startTrip(endsAt end: Date) {
-        defaults?.set(end, forKey: ScreenTimeShared.focusEndsAtKey)
+        do {
+            try FocusEndFile.shared?.write(end)
+        } catch {
+            EventLog.append("旅：終わりの時刻を保存できない（\(error.localizedDescription)）")
+        }
+
         defaults?.set(strictness.rawValue, forKey: Strictness.tripKey)
 
         clearPress()
@@ -70,20 +75,19 @@ public enum FocusShield {
     }
 
     public static func endTrip() {
-        defaults?.removeObject(forKey: ScreenTimeShared.focusEndsAtKey)
+        FocusEndFile.shared?.remove()
+
         defaults?.removeObject(forKey: ShieldUnlock.openUntilKey)
         defaults?.removeObject(forKey: Strictness.tripKey)
         ShieldSnapshot.clear(defaults: defaults)
         clearPress()
         store.clearAllSettings()
 
-        DeviceActivityCenter().stopMonitoring([unlockName, focusName])
+        DeviceActivityCenter().stopMonitoring([unlockName])
     }
 
     public static func endTripIfFinished(at now: Date) -> Bool {
-        let end = defaults?.object(forKey: ScreenTimeShared.focusEndsAtKey) as? Date
-
-        guard FocusEnd.hasEnded(endsAt: end, at: now) else {
+        guard FocusEnd.hasEnded(endsAt: tripEndsAt, at: now) else {
             return false
         }
 
@@ -146,7 +150,7 @@ public enum FocusShield {
         let limit = openUntil.addingTimeInterval(-reshieldToleranceSeconds)
 
         guard
-            let end = defaults?.object(forKey: ScreenTimeShared.focusEndsAtKey) as? Date,
+            let end = tripEndsAt,
             now < end
         else {
             return .tripEnded
