@@ -9,7 +9,6 @@ public struct RoomView: View {
     @State private var isDecorShown = false
     @State private var pose = Companion.Pose.walk
     @State private var pokes = 0
-    @State private var sort = UsageSort.time
 
     @Environment(\.scenePhase) private var scenePhase
 
@@ -141,14 +140,8 @@ private extension RoomView {
                 wash: Palette.skySoft
             )
 
-            CapsulePicker(UsageSort.allCases, selection: $sort) { item in
-                sortTitle(item)
-            }
-            .frame(maxWidth: .infinity)
-
-            UsageReportView(sort: sort)
+            UsageReportView()
                 .frame(height: 840)
-                .allowsHitTesting(false)
         }
         .roundedCard()
     }
@@ -195,15 +188,6 @@ private extension RoomView {
 
     var canShowResult: Bool {
         model.progress?.activeTrip == nil && !isTripCoverShown
-    }
-
-    func sortTitle(_ sort: UsageSort) -> String {
-        switch sort {
-        case .time: "時間"
-        case .pickups: "回数"
-        case .perPickup: "1 回あたり"
-        case .notifications: "通知"
-        }
     }
 
     func poke() {

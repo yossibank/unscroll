@@ -128,13 +128,13 @@ private extension SnapshotTests {
     static func cases() -> [Case] {
         [
             Case(name: "usage-busy", size: tall) {
-                AnyView(TodayUsageView(usage: busy, sort: .time))
+                AnyView(TodayUsageView(usage: busy))
             },
             Case(name: "usage-light", size: tall) {
-                AnyView(TodayUsageView(usage: light, sort: .pickups))
+                AnyView(TodayUsageView(usage: light))
             },
             Case(name: "usage-empty", size: tall) {
-                AnyView(TodayUsageView(usage: empty, sort: .time))
+                AnyView(TodayUsageView(usage: empty))
             }
         ]
     }

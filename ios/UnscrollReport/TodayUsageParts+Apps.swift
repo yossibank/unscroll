@@ -1,4 +1,3 @@
-import Core
 import DesignSystem
 import FamilyControls
 import SwiftUI
@@ -11,6 +10,7 @@ struct AppIcon: View {
         if let token = app.token {
             Label(token)
                 .labelStyle(.iconOnly)
+                .scaleEffect(2)
                 .frame(width: 40, height: 40)
         } else {
             RoundedRectangle(cornerRadius: 10)
