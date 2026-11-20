@@ -60,6 +60,19 @@ python3 -I scripts/map-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Reso
 
 アプリと拡張が共有する名前・記録・止め方・外しにくさ・手紙の文は、Core の `ScreenTime/` にある。止め方は Screen Time の API を使うので、iOS だけで組む。
 
+## 📂 ストアのファイル
+
+App Store に出すものは、次の場所に置く。
+
+| 場所 | 中身 |
+| --- | --- |
+| `store/ja/` | 日本語の掲載情報 |
+| `store/screenshots/raw/` | 6.9 インチのシミュレーターで撮った元の画面 |
+| `store/screenshots/6.9/` | ストアに出す画像 |
+| `.claude/snapshots/store/` | `raw/` の画面に見出しを重ね、`6.9/` の画像を描く |
+| `PrivacyInfo.xcprivacy` | アプリと 4 つの拡張のそれぞれに置く |
+| unscroll-support | サポートとプライバシーポリシーのページ。別のリポジトリで、GitHub Pages で出す |
+
 ## 🔧 権限と署名
 
 Family Controls の権限を、アプリと 4 つの拡張に付けている。
