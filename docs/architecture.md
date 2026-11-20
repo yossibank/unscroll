@@ -68,8 +68,8 @@ App Store に出すものは、次の場所に置く。
 | --- | --- |
 | `store/ja/` | 日本語の掲載情報 |
 | `store/screenshots/raw/` | 6.9 インチのシミュレーターで撮った元の画面 |
-| `store/screenshots/6.9/` | ストアに出す画像 |
-| `.claude/snapshots/store/` | `raw/` の画面に見出しを重ね、`6.9/` の画像を描く |
+| `store/screenshots/6.9/`・`6.3/` | ストアに出す画像。6.3 は 6.9 を 1206×2622 に縮めたもの |
+| `.claude/snapshots/store/` | `raw/` の画面に見出しを重ね、`6.9/` と `6.3/` の画像を描く |
 | `PrivacyInfo.xcprivacy` | アプリと 4 つの拡張のそれぞれに置く |
 | unscroll-support | サポートとプライバシーポリシーのページ。別のリポジトリで、GitHub Pages で出す |
 

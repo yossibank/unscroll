@@ -125,11 +125,43 @@ private extension SnapshotTests {
         renderer.isOpaque = true
         renderer.proposedSize = ProposedViewSize(size)
 
-        let image = try #require(renderer.uiImage)
-        let data = try #require(image.pngData())
-        let url = URL(fileURLWithPath: directory).appending(path: "\(name).png")
+        let image = try #require(renderer.cgImage)
+        let data = try #require(UIImage(cgImage: image).pngData())
 
-        try data.write(to: url)
+        try data.write(to: output("6.9", name))
+        try writeSmall(image, to: name)
+    }
+
+    static func writeSmall(
+        _ image: CGImage,
+        to name: String
+    ) throws {
+        let context = try #require(
+            CGContext(
+                data: nil,
+                width: 1206,
+                height: 2622,
+                bitsPerComponent: 8,
+                bytesPerRow: 0,
+                space: CGColorSpace(name: CGColorSpace.sRGB) ?? CGColorSpaceCreateDeviceRGB(),
+                bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue
+            )
+        )
+
+        context.interpolationQuality = .high
+        context.draw(image, in: CGRect(x: 0, y: 0, width: 1206, height: 2622))
+
+        let small = try #require(context.makeImage())
+        let data = try #require(UIImage(cgImage: small).pngData())
+
+        try data.write(to: output("6.3", name))
+    }
+
+    static func output(
+        _ folder: String,
+        _ name: String
+    ) -> URL {
+        URL(fileURLWithPath: directory).appending(path: "\(folder)_\(name).png")
     }
 }
 
