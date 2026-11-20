@@ -67,6 +67,7 @@ App Store に出すものは、次の場所に置く。
 | 場所 | 中身 |
 | --- | --- |
 | `store/ja/` | 日本語の掲載情報 |
+| `store/app-review.txt` | 審査の「App Review に関する情報」に写す英語の説明 |
 | `store/screenshots/raw/` | 6.9 インチのシミュレーターで撮った元の画面 |
 | `store/screenshots/6.9/`・`6.3/` | ストアに出す画像。6.3 は 6.9 を 1206×2622 に縮めたもの |
 | `.claude/snapshots/store/` | `raw/` の画面に見出しを重ね、`6.9/` と `6.3/` の画像を描く |

@@ -1,0 +1,29 @@
+1. Screen recording
+The attached recording (app_review.mp4) was captured on a physical iPhone running the latest iOS. It starts from launching the app on the Home Screen and shows: the welcome screens, choosing a companion, allowing Screen Time access, choosing the apps to pause, the 10-second practice trip (opening a paused app shows the shield, and the trip ends with a postcard), starting a real trip from the Room tab, and the trip result.
+- The app has no account registration or login, so there is no account deletion flow.
+- The app has no user-generated content, social features, or sharing, so content reporting/blocking does not apply.
+- The app has no in-app purchases.
+
+2. Purpose and target audience
+Orusu Maho (おるすマホ) is a digital wellbeing app for people in Japan who want to spend less time on social media, short videos, and games. The user "leaves the phone at home" for a chosen time, and while the phone is put down, a pixel-art companion travels across Japan: 1 minute of focus moves the companion 1 km. Reaching a landmark delivers a postcard and a local souvenir that decorate the companion's room. During a trip, the apps the user selected are paused with Apple's Screen Time API. The app has no ads.
+
+3. How to use the main features
+No login or sample files are required.
+- Launch the app and follow the welcome screens. Tap "許可する" to allow Screen Time access (Family Controls, individual authorization), then tap "止めるアプリを選ぶ" to choose apps to pause.
+- Tap "練習の旅に出る" to try a 10-second practice trip. Opening a paused app during the trip shows the shield screen with a letter from the companion. The setup can be skipped with "あとで設定する" or "練習せずにはじめる".
+- Room tab: choose a length (15 minutes to 2 hours, or 5 to 180 minutes with the slider) and tap "旅に出る". The chosen apps are paused until the trip ends. A trip can be ended early with "旅を切り上げる"; the distance walked so far is kept.
+- Settings > 外しにくさ (how hard to unlock): "やさしい" opens a paused app for 1 minute, "ふつう" opens it after waiting 10 seconds, and "きびしい" keeps it paused until the trip ends.
+- Map tab: the current journey and the next landmark. Postcards tab: collected postcards. "道のりを変える" switches between journeys.
+- The Room tab also shows today's screen time (DeviceActivityReport). This is drawn by iOS on the device; the app cannot read or send the usage data.
+
+4. External services
+- Apple Screen Time API (FamilyControls, ManagedSettings, DeviceActivity): choosing apps, pausing them during a trip, ending the pause, and showing today's usage. All data stays on the device.
+- Google Forms: the contact form opened from Settings (opens in the browser; only the device model, iOS version and app version are pre-filled).
+- App Store: the "write a review" link in Settings.
+The app does not make any network requests and we do not operate any server. No AI services, analytics, advertising, data providers, or third-party authentication are used.
+
+5. Regional differences
+The app is distributed only in Japan, and its features and content are the same for all users.
+
+6. Regulated industry / third-party material
+Not applicable. The app is not a medical or health app and does not diagnose or treat any condition. All illustrations and journeys were created for this app; it contains no protected third-party material.
