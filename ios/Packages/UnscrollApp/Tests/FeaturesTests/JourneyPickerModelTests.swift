@@ -90,6 +90,42 @@ struct JourneyPickerModelTests {
     }
 
     @Test
+    func showsOpenJourneysFirst() throws {
+        let model = try JourneyPickerModel(
+            database: makeDatabase(),
+            now: { start },
+            isAvailable: { _ in true }
+        )
+
+        #expect(model.filter == .open)
+        #expect(model.shownJourneys == Journey.all)
+        #expect(model.count(.finished) == 0)
+    }
+
+    @Test
+    func sortsFinishedJourneysApart() throws {
+        let database = try makeDatabase()
+        let journey = Journey.tokyoSightseeing
+        try database.selectJourney(journey.id, at: start)
+        _ = try database.startTrip(minutes: journey.totalKilometers, at: start)
+
+        let now = start.addingTimeInterval(Double(journey.totalKilometers) * 60)
+        let model = JourneyPickerModel(database: database, now: { now }, isAvailable: { _ in true })
+
+        #expect(model.isFinished(journey))
+        #expect(!model.shownJourneys.contains(journey))
+
+        model.filter = .finished
+
+        #expect(model.shownJourneys == [journey])
+        #expect(model.count(.open) == Journey.all.count - 1)
+
+        model.filter = .all
+
+        #expect(model.shownJourneys == Journey.all)
+    }
+
+    @Test
     func describesFocusTime() {
         #expect(JourneyPickerModel.focusText(kilometers: 500) == "約 8 時間")
         #expect(JourneyPickerModel.focusText(kilometers: 90) == "約 2 時間")

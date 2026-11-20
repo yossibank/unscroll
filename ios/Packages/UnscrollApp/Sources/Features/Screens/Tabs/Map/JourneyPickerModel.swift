@@ -13,6 +13,7 @@ public final class JourneyPickerModel: Identifiable {
     public private(set) var kilometersByID: [String: Int] = [:]
 
     public var selectedID: String
+    public var filter = Filter.open
 
     @ObservationIgnored private let database: AppDatabase
     @ObservationIgnored private let now: @MainActor () -> Date
@@ -36,6 +37,24 @@ public final class JourneyPickerModel: Identifiable {
 }
 
 public extension JourneyPickerModel {
+    enum Filter: CaseIterable, Sendable {
+        case all
+        case open
+        case finished
+
+        public var title: String {
+            switch self {
+            case .all: "すべて"
+            case .open: "未完了"
+            case .finished: "完了"
+            }
+        }
+    }
+
+    var shownJourneys: [Journey] {
+        journeys.filter { matches($0, filter) }
+    }
+
     var selectedJourney: Journey {
         Journey.with(id: selectedID) ?? .tokyoToKyoto
     }
@@ -62,6 +81,14 @@ public extension JourneyPickerModel {
         journey.id == currentID
     }
 
+    func isFinished(_ journey: Journey) -> Bool {
+        kilometers(of: journey) >= journey.totalKilometers
+    }
+
+    func count(_ filter: Filter) -> Int {
+        journeys.count { matches($0, filter) }
+    }
+
     func refresh() {
         let date = now()
         let current = try? database.journeyProgress(journeyID: currentID, at: date)
@@ -86,5 +113,18 @@ public extension JourneyPickerModel {
 
         currentID = selectedID
         return true
+    }
+}
+
+private extension JourneyPickerModel {
+    func matches(
+        _ journey: Journey,
+        _ filter: Filter
+    ) -> Bool {
+        switch filter {
+        case .all: true
+        case .open: !isFinished(journey)
+        case .finished: isFinished(journey)
+        }
     }
 }

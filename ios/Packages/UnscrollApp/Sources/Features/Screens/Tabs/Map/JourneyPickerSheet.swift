@@ -24,10 +24,26 @@ struct JourneyPickerSheet: View {
                 .padding(.top, Spacing.large)
                 .padding(.bottom, Spacing.small)
 
+            Picker("絞り込み", selection: $model.filter) {
+                ForEach(JourneyPickerModel.Filter.allCases, id: \.self) { filter in
+                    Text(filterTitle(filter))
+                }
+            }
+            .pickerStyle(.segmented)
+            .padding(.horizontal, Spacing.medium)
+            .padding(.bottom, Spacing.small)
+
             ScrollView {
                 VStack(spacing: Spacing.small + 4) {
-                    ForEach(model.journeys, id: \.id) { journey in
+                    ForEach(model.shownJourneys, id: \.id) { journey in
                         card(journey)
+                    }
+
+                    if model.shownJourneys.isEmpty {
+                        Text(emptyText)
+                            .font(.subheadline.weight(.bold))
+                            .foregroundStyle(Palette.muted)
+                            .padding(.top, Spacing.large)
                     }
                 }
                 .padding(.horizontal, Spacing.medium)
@@ -104,7 +120,7 @@ private extension JourneyPickerSheet {
 
                     Spacer()
 
-                    Text("\(journey.totalKilometers) km")
+                    Text(kilometerText(journey))
                         .font(.subheadline.weight(.heavy))
                         .foregroundStyle(Palette.tealDeep)
                         .monospacedDigit()
@@ -152,6 +168,13 @@ private extension JourneyPickerSheet {
                     .frame(minHeight: 24)
                     .background(Palette.card, in: Capsule())
                     .padding(Spacing.small)
+            }
+        }
+        .overlay(alignment: .bottomTrailing) {
+            if model.isFinished(journey) {
+                FinishStamp()
+                    .padding(.trailing, Spacing.large + Spacing.small)
+                    .padding(.bottom, 4)
             }
         }
         .overlay(alignment: .topTrailing) {
@@ -207,6 +230,13 @@ private extension JourneyPickerSheet {
 }
 
 private extension JourneyPickerSheet {
+    var emptyText: String {
+        switch model.filter {
+        case .finished: "まだ歩ききった道のりはありません"
+        case .all, .open: "すべての道のりを歩ききりました"
+        }
+    }
+
     func summary(_ journey: Journey) -> String {
         let focus = JourneyPickerModel.focusText(kilometers: journey.totalKilometers)
         return "\(journey.totalKilometers.formatted()) km・\(focus)の集中"
@@ -215,6 +245,19 @@ private extension JourneyPickerSheet {
     func detail(_ journey: Journey) -> String {
         let focus = JourneyPickerModel.focusText(kilometers: journey.totalKilometers)
         return "名所 \(journey.landmarks.count)・\(focus)"
+    }
+
+    func filterTitle(_ filter: JourneyPickerModel.Filter) -> String {
+        guard filter != .all else {
+            return filter.title
+        }
+
+        return "\(filter.title) \(model.count(filter))"
+    }
+
+    func kilometerText(_ journey: Journey) -> String {
+        let total = "\(journey.totalKilometers.formatted()) km"
+        return model.isFinished(journey) ? "✓ \(total)" : total
     }
 
     func currentText(_ journey: Journey) -> String {

@@ -54,12 +54,23 @@ private extension SnapshotTests {
 
         all.selectedID = Journey.okinawa.id
 
+        let finished = JourneyPickerModel(
+            database: database,
+            now: { now },
+            isAvailable: { _ in true }
+        )
+
+        finished.filter = .all
+
         return [
             Case(name: "picker-one", size: sheet) {
                 AnyView(JourneyPickerSheet(model: one) {})
             },
             Case(name: "picker-all", size: sheet) {
                 AnyView(JourneyPickerSheet(model: all) {})
+            },
+            Case(name: "picker-finished", size: sheet) {
+                AnyView(JourneyPickerSheet(model: finished) {})
             }
         ]
     }
