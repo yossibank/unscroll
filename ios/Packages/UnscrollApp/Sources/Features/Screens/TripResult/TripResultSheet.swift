@@ -41,8 +41,8 @@ public struct TripResultSheet: View {
         .sheet(item: $picker) { picker in
             JourneyPickerSheet(model: picker) {
                 self.picker = nil
-                model.refresh()
                 onClose()
+                model.refresh()
             }
             .presentationDetents([.large])
         }
