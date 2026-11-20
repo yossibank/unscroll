@@ -5,7 +5,7 @@ The attached recording (app_review.mp4) was captured on a physical iPhone runnin
 - The app has no in-app purchases.
 
 2. Purpose and target audience
-Orusu Maho (おるすマホ) is a digital wellbeing app for people in Japan who want to spend less time on social media, short videos, and games. The user "leaves the phone at home" for a chosen time, and while the phone is put down, a pixel-art companion travels across Japan: 1 minute of focus moves the companion 1 km. Reaching a landmark delivers a postcard and a local souvenir that decorate the companion's room. During a trip, the apps the user selected are paused with Apple's Screen Time API. The app has no ads.
+Orusu Maho (おるすマホ) is a digital wellbeing app for Japanese-speaking people who want to spend less time on social media, short videos, and games. The user "leaves the phone at home" for a chosen time, and while the phone is put down, a pixel-art companion travels across Japan: 1 minute of focus moves the companion 1 km. Reaching a landmark delivers a postcard and a local souvenir that decorate the companion's room. During a trip, the apps the user selected are paused with Apple's Screen Time API. The app has no ads.
 
 3. How to use the main features
 No login or sample files are required.
@@ -23,7 +23,7 @@ No login or sample files are required.
 The app does not make any network requests and we do not operate any server. No AI services, analytics, advertising, data providers, or third-party authentication are used.
 
 5. Regional differences
-The app is distributed only in Japan, and its features and content are the same for all users.
+The app is distributed in Japan and the United States. The app is in Japanese only, and its features and content are the same in every region.
 
 6. Regulated industry / third-party material
 Not applicable. The app is not a medical or health app and does not diagnose or treat any condition. All illustrations and journeys were created for this app; it contains no protected third-party material.
