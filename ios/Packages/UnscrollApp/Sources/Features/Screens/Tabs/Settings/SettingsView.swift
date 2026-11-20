@@ -6,6 +6,7 @@ public struct SettingsView: View {
     @State private var model: SettingsModel
     @State private var path: [Route] = []
 
+    @Environment(\.openURL) private var openURL
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.tabBarHidden) private var tabBarHidden
 
@@ -34,6 +35,14 @@ public struct SettingsView: View {
                     blockedAppsPage
 
                     strictnessPage
+
+                    aboutPage
+
+                    Text("おるすマホ \(SettingsLink.appVersion)")
+                        .font(.caption2.weight(.medium))
+                        .monospacedDigit()
+                        .foregroundStyle(Palette.muted)
+                        .frame(maxWidth: .infinity)
 
                     #if DEBUG
                     prototypePage
@@ -180,6 +189,36 @@ private extension SettingsView {
         }
     }
 
+    var aboutPage: some View {
+        SettingsPage("このアプリについて", tint: Palette.teal) {
+            Button {
+                open(SettingsLink.contact())
+            } label: {
+                SettingsRow(title: "お問い合わせ", systemImage: "envelope.fill", tint: Palette.teal) {
+                    outLink
+                }
+            }
+            .buttonStyle(.plain)
+
+            SettingsRule()
+
+            Button {
+                open(SettingsLink.review)
+            } label: {
+                SettingsRow(title: "レビューを書く", systemImage: "star.fill", tint: Palette.sun) {
+                    outLink
+                }
+            }
+            .buttonStyle(.plain)
+        }
+    }
+
+    var outLink: some View {
+        Image(systemName: "arrow.up.right")
+            .font(.footnote.weight(.heavy))
+            .foregroundStyle(Palette.muted.opacity(0.6))
+    }
+
     #if DEBUG
     var prototypePage: some View {
         SettingsPage("試作の記録（開発の版だけ）", tint: Palette.muted) {
@@ -262,5 +301,15 @@ private extension SettingsView {
         }
         .padding(Spacing.small + 4)
         .background(.white, in: .rect(cornerRadius: 20))
+    }
+}
+
+private extension SettingsView {
+    func open(_ url: URL?) {
+        guard let url else {
+            return
+        }
+
+        openURL(url)
     }
 }

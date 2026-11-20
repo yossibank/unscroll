@@ -36,7 +36,7 @@ extension SnapshotTests {
 private extension SnapshotTests {
     static let directory = "__OUT__"
 
-    static let page = CGSize(width: 393, height: 852)
+    static let page = CGSize(width: 393, height: 1180)
 
     static func registerFonts() {
         let fonts = URL(fileURLWithPath: #filePath)
@@ -91,6 +91,24 @@ private extension SnapshotTests {
                         .padding(.top, 4)
                 }
             }
+
+            SettingsPage("このアプリについて", tint: Palette.teal) {
+                SettingsRow(title: "お問い合わせ", systemImage: "envelope.fill", tint: Palette.teal) {
+                    Image(systemName: "arrow.up.right")
+                }
+
+                SettingsRule()
+
+                SettingsRow(title: "レビューを書く", systemImage: "star.fill", tint: Palette.sun) {
+                    Image(systemName: "arrow.up.right")
+                }
+            }
+
+            Text("おるすマホ 1.0.0")
+                .font(.caption2.weight(.medium))
+                .monospacedDigit()
+                .foregroundStyle(Palette.muted)
+                .frame(maxWidth: .infinity)
         }
         .padding(.horizontal, Spacing.medium)
         .padding(.top, 60)
