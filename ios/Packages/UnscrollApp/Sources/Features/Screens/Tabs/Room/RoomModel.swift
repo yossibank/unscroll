@@ -154,6 +154,7 @@ public extension RoomModel {
         companion = try? database.companion()
         progress = try? database.journeyProgress(at: now())
 
+        endLeftOverShield()
         saveShieldSnapshot()
         recordArrivals()
         updateFinishedTrip()
@@ -257,6 +258,21 @@ private extension RoomModel {
     static let acknowledgedTripKey = "room.acknowledgedTripID"
     static let hangStep: TimeInterval = 0.01
 
+    func endLeftOverShield() {
+        let isLeftOver = FocusEnd.isLeftOver(
+            endsAt: FocusShield.tripEndsAt,
+            hasActiveTrip: progress?.activeTrip != nil,
+            at: now()
+        )
+
+        guard isLeftOver else {
+            return
+        }
+
+        FocusShield.endTrip()
+        EventLog.append("旅：残っていた止める設定を外した")
+    }
+
     func saveShieldSnapshot() {
         let snapshot = ShieldSnapshot(
             companion: companion,
@@ -289,14 +305,14 @@ private extension RoomModel {
         }
 
         let schedule = FocusShield.schedule(from: start, to: trip.plannedEnd)
+        let name = ScreenTimeShared.focusActivityName(tripID: trip.id.description)
+        let oldWatches = center.activities.filter { ScreenTimeShared.isFocusActivity($0.rawValue) }
 
-        FocusShield.startTrip(endsAt: trip.plannedEnd)
+        FocusShield.startTrip(endsAt: trip.plannedEnd, activity: name)
+        center.stopMonitoring(oldWatches)
 
         do {
-            try center.startMonitoring(
-                DeviceActivityName(ScreenTimeShared.focusActivityName),
-                during: schedule
-            )
+            try center.startMonitoring(DeviceActivityName(name), during: schedule)
             EventLog.append("旅：開始（\(label)）")
         } catch {
             FocusShield.endTrip()
