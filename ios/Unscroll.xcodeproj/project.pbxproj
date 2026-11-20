@@ -66,14 +66,12 @@
 		};
 		78875DF13079D500005422E3 /* Embed ExtensionKit Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
 			dstPath = "$(EXTENSIONS_FOLDER_PATH)";
-			dstSubfolderSpec = 16;
+			dstSubfolder = Product;
 			files = (
 				78875DC13079D500005422E3 /* UnscrollReportExtension.appex in Embed ExtensionKit Extensions */,
 			);
 			name = "Embed ExtensionKit Extensions";
-			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
 
@@ -206,8 +204,8 @@
 		78875D2B3079D362005422E3 = {
 			isa = PBXGroup;
 			children = (
-				78875D363079D362005422E3 /* Unscroll */,
 				78875D353079D362005422E3 /* Products */,
+				78875D363079D362005422E3 /* Unscroll */,
 				78875DB83079D500005422E3 /* UnscrollMonitor */,
 				78875DC73079D500005422E3 /* UnscrollReport */,
 				78875DD63079D500005422E3 /* UnscrollShield */,
@@ -615,6 +613,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Unscroll/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "おるすマホ";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
@@ -654,6 +653,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Unscroll/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "おるすマホ";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDefault;
