@@ -48,15 +48,6 @@ struct SettingsPage<Content: View>: View {
     }
 }
 
-struct SettingsRule: View {
-    var body: some View {
-        Rectangle()
-            .fill(Palette.paperDeep)
-            .frame(height: 1)
-            .padding(.horizontal, Spacing.small)
-    }
-}
-
 #Preview {
     SettingsPage("旅で止めるもの", tint: Palette.coral) {
         Text("止めるアプリ")

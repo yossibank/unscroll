@@ -171,7 +171,7 @@ public extension RoomModel {
         do {
             try database.setDecorated(isDecorated, landmark: landmark, at: now())
         } catch {
-            EventLog.append("絵はがき：飾れない（\(error.localizedDescription)）")
+            EventLog.append("絵はがき：飾れない（\(error.localizedDescription)）", at: now())
         }
 
         updateFinishedArrivals()
@@ -215,7 +215,7 @@ public extension RoomModel {
                 try database.setDecorated(true, landmark: landmark, at: time)
             }
         } catch {
-            EventLog.append("絵はがき：飾りを替えられない（\(error.localizedDescription)）")
+            EventLog.append("絵はがき：飾りを替えられない（\(error.localizedDescription)）", at: now())
         }
 
         updateFinishedArrivals()
@@ -243,12 +243,12 @@ public extension RoomModel {
             do {
                 try database.endTrip(trip.id, at: now())
             } catch {
-                EventLog.append("旅：終わりを保存できない（\(error.localizedDescription)）")
+                EventLog.append("旅：終わりを保存できない（\(error.localizedDescription)）", at: now())
             }
         }
 
         FocusShield.endTrip()
-        EventLog.append("旅：やめた")
+        EventLog.append("旅：やめた", at: now())
         refresh()
     }
 }
@@ -270,7 +270,7 @@ private extension RoomModel {
         }
 
         FocusShield.endTrip()
-        EventLog.append("旅：残っていた止める設定を外した")
+        EventLog.append("旅：残っていた止める設定を外した", at: now())
     }
 
     func saveShieldSnapshot() {
@@ -299,7 +299,7 @@ private extension RoomModel {
         do {
             trip = try save(start)
         } catch {
-            EventLog.append("旅：保存できない（\(error.localizedDescription)）")
+            EventLog.append("旅：保存できない（\(error.localizedDescription)）", at: start)
             refresh()
             return
         }
@@ -308,17 +308,17 @@ private extension RoomModel {
         let name = ScreenTimeShared.focusActivityName(tripID: trip.id.description)
         let oldWatches = center.activities.filter { ScreenTimeShared.isFocusActivity($0.rawValue) }
 
-        FocusShield.startTrip(endsAt: trip.plannedEnd, activity: name)
+        FocusShield.startTrip(endsAt: trip.plannedEnd, activity: name, at: start)
         center.stopMonitoring(oldWatches)
 
         do {
             try center.startMonitoring(DeviceActivityName(name), during: schedule)
-            EventLog.append("旅：開始（\(label)）")
+            EventLog.append("旅：開始（\(label)）", at: start)
         } catch {
             FocusShield.endTrip()
             try? database.endTrip(trip.id, at: start)
             defaults.set(trip.id.description, forKey: Self.acknowledgedTripKey)
-            EventLog.append("旅：見張りを始められない（\(error.localizedDescription)）")
+            EventLog.append("旅：見張りを始められない（\(error.localizedDescription)）", at: start)
         }
 
         refresh()
@@ -329,7 +329,7 @@ private extension RoomModel {
             try database.recordArrivals(on: journey, at: now())
             try database.recordPracticeArrivals(at: now())
         } catch {
-            EventLog.append("名所：着いた記録を保存できない（\(error.localizedDescription)）")
+            EventLog.append("名所：着いた記録を保存できない（\(error.localizedDescription)）", at: now())
         }
     }
 

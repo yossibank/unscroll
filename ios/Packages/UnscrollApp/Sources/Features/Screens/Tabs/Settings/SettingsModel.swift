@@ -91,9 +91,9 @@ public extension SettingsModel {
 
         do {
             try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
-            EventLog.append("許可：取れた")
+            EventLog.append("許可：取れた", at: .now)
         } catch {
-            EventLog.append("許可：取れない（\(error.localizedDescription)）")
+            EventLog.append("許可：取れない（\(error.localizedDescription)）", at: .now)
         }
 
         refresh()
@@ -176,9 +176,9 @@ public extension SettingsModel {
                 during: schedule,
                 events: makeUsageEvents()
             )
-            EventLog.append("区切り：見張りを始めた（\(ScreenTimeShared.usageThresholdMinutes) 分）")
+            EventLog.append("区切り：見張りを始めた（\(ScreenTimeShared.usageThresholdMinutes) 分）", at: .now)
         } catch {
-            EventLog.append("区切り：見張りを始められない（\(error.localizedDescription)）")
+            EventLog.append("区切り：見張りを始められない（\(error.localizedDescription)）", at: .now)
         }
 
         refresh()

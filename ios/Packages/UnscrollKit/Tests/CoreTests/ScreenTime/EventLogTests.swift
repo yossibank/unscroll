@@ -3,12 +3,14 @@ import Foundation
 import Testing
 
 struct EventLogTests {
+    private static let fixedDate = Date(timeIntervalSince1970: 1_700_000_000)
+
     @Test
     func putsNewestLineFirst() throws {
         let defaults = try makeDefaults()
 
-        EventLog.append("1 つ目", defaults: defaults)
-        EventLog.append("2 つ目", defaults: defaults)
+        EventLog.append("1 つ目", at: Self.fixedDate, defaults: defaults)
+        EventLog.append("2 つ目", at: Self.fixedDate, defaults: defaults)
 
         let lines = EventLog.lines(defaults: defaults)
         #expect(lines.count == 2)
@@ -21,7 +23,7 @@ struct EventLogTests {
         let defaults = try makeDefaults()
 
         for index in 0...EventLog.limit {
-            EventLog.append("\(index)", defaults: defaults)
+            EventLog.append("\(index)", at: Self.fixedDate, defaults: defaults)
         }
 
         let lines = EventLog.lines(defaults: defaults)
@@ -32,7 +34,7 @@ struct EventLogTests {
     @Test
     func clearsLines() throws {
         let defaults = try makeDefaults()
-        EventLog.append("消す", defaults: defaults)
+        EventLog.append("消す", at: Self.fixedDate, defaults: defaults)
 
         EventLog.clear(defaults: defaults)
 

@@ -89,7 +89,7 @@ public extension PostcardAlbumModel {
         do {
             try database.setDecorated(isDecorated, landmark: landmark, at: now())
         } catch {
-            EventLog.append("絵はがき：飾れない（\(error.localizedDescription)）")
+            EventLog.append("絵はがき：飾れない（\(error.localizedDescription)）", at: now())
         }
 
         refresh()
@@ -107,7 +107,7 @@ public extension PostcardAlbumModel {
         do {
             try database.recordArrivals(on: current, at: date)
         } catch {
-            EventLog.append("名所：着いた記録を保存できない（\(error.localizedDescription)）")
+            EventLog.append("名所：着いた記録を保存できない（\(error.localizedDescription)）", at: now())
         }
 
         covers = Journey.all.map { journey in

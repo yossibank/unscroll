@@ -85,7 +85,7 @@ public extension CompanionPickerModel {
             saved = draft
             return true
         } catch {
-            EventLog.append("相棒：保存できない（\(error.localizedDescription)）")
+            EventLog.append("相棒：保存できない（\(error.localizedDescription)）", at: .now)
             return false
         }
     }

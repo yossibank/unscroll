@@ -2,12 +2,6 @@ import Core
 import FamilyControls
 import Foundation
 
-struct BlockedAppSet: Codable, Equatable, Identifiable {
-    let id: UUID
-    var name: String
-    var selection: FamilyActivitySelection
-}
-
 @MainActor
 enum BlockedApps {
     static let maxSetCount = 5
@@ -27,7 +21,7 @@ enum BlockedApps {
     static func save(_ selection: FamilyActivitySelection) {
         let data = try? JSONEncoder().encode(selection)
         defaults?.set(data, forKey: ScreenTimeShared.selectionKey)
-        EventLog.append("選択：\(summary(selection))")
+        EventLog.append("選択：\(summary(selection))", at: .now)
     }
 
     static func loadSets() -> [BlockedAppSet] {

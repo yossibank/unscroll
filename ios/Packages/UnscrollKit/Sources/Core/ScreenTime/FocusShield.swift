@@ -63,14 +63,15 @@ public enum FocusShield {
 
     public static func startTrip(
         endsAt end: Date,
-        activity: String
+        activity: String,
+        at now: Date
     ) {
         let entry = FocusEndFile.Entry(endsAt: end, activity: activity)
 
         do {
             try FocusEndFile.shared?.write(entry)
         } catch {
-            EventLog.append("旅：終わりの時刻を保存できない（\(error.localizedDescription)）")
+            EventLog.append("旅：終わりの時刻を保存できない（\(error.localizedDescription)）", at: now)
         }
 
         defaults?.set(strictness.rawValue, forKey: Strictness.tripKey)
@@ -264,7 +265,7 @@ public enum FocusShield {
         do {
             try center.startMonitoring(unlockName, during: schedule(from: now, to: end))
         } catch {
-            EventLog.append("止めた画面：止め直しを見張れない（\(error.localizedDescription)）")
+            EventLog.append("止めた画面：止め直しを見張れない（\(error.localizedDescription)）", at: now)
             shield(savedSelection())
         }
     }

@@ -6,21 +6,21 @@ final class UnscrollMonitor: DeviceActivityMonitor {
     override func intervalDidStart(for activity: DeviceActivityName) {
         super.intervalDidStart(for: activity)
 
-        EventLog.append("見張り：始まり（\(activity.rawValue)）")
+        EventLog.append("見張り：始まり（\(activity.rawValue)）", at: .now)
     }
 
     override func intervalDidEnd(for activity: DeviceActivityName) {
         super.intervalDidEnd(for: activity)
 
         finish(activity, checksOpenUntil: true)
-        EventLog.append("見張り：終わり（\(activity.rawValue)）")
+        EventLog.append("見張り：終わり（\(activity.rawValue)）", at: .now)
     }
 
     override func intervalWillEndWarning(for activity: DeviceActivityName) {
         super.intervalWillEndWarning(for: activity)
 
         finish(activity, checksOpenUntil: false)
-        EventLog.append("見張り：短い区切りの終わり（\(activity.rawValue)）")
+        EventLog.append("見張り：短い区切りの終わり（\(activity.rawValue)）", at: .now)
     }
 
     override func eventDidReachThreshold(
@@ -29,7 +29,7 @@ final class UnscrollMonitor: DeviceActivityMonitor {
     ) {
         super.eventDidReachThreshold(event, activity: activity)
 
-        EventLog.append("見張り：区切りに届いた（\(event.rawValue)）")
+        EventLog.append("見張り：区切りに届いた（\(event.rawValue)）", at: .now)
     }
 }
 
@@ -44,7 +44,7 @@ private extension UnscrollMonitor {
                 ? "旅：終わった"
                 : "旅：次の旅が続いているので止めたまま"
 
-            EventLog.append(message)
+            EventLog.append(message, at: .now)
 
         case ScreenTimeShared.unlockActivityName:
             let result = FocusShield.reshieldIfTripContinues(
@@ -58,7 +58,7 @@ private extension UnscrollMonitor {
             case .tripEnded: "止めた画面：旅が終わっていた"
             }
 
-            EventLog.append(message)
+            EventLog.append(message, at: .now)
 
         default:
             break

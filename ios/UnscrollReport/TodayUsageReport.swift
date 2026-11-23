@@ -4,36 +4,6 @@ import Foundation
 import ManagedSettings
 import SwiftUI
 
-struct TodayUsage: Sendable {
-    let total: TimeInterval
-    let apps: [AppUsage]
-    let hours: [TimeInterval]
-    let hourPickups: [Int]
-    let hourNotifications: [Int]
-    let pickups: Int
-    let notifications: Int
-    let firstPickup: Date?
-    let yesterdayTotal: TimeInterval?
-    let categories: [CategoryUsage]
-}
-
-struct AppUsage: Identifiable, @unchecked Sendable {
-    let id: String
-    let name: String
-    let token: ApplicationToken?
-    let duration: TimeInterval
-    let pickups: Int
-    let notifications: Int
-}
-
-struct CategoryUsage: Identifiable, Sendable {
-    static let otherName = "ほか"
-
-    let id: String
-    let name: String
-    let duration: TimeInterval
-}
-
 nonisolated struct TodayUsageReport<Content: View>: DeviceActivityReportScene {
     let context: DeviceActivityReport.Context
     let content: (TodayUsage) -> Content
