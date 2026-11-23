@@ -7,6 +7,7 @@ public struct Trip: Hashable, Sendable {
     public let startedAt: Date
     public let plannedMinutes: Int
     public let isPractice: Bool
+
     public var endedAt: Date?
 
     public init(

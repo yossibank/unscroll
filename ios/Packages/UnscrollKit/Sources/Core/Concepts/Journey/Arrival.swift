@@ -4,6 +4,7 @@ public struct Arrival: Hashable, Sendable {
     public let landmark: Landmark
     public let tripID: Trip.ID
     public let arrivedAt: Date
+
     public var decoratedAt: Date?
 
     public init(
