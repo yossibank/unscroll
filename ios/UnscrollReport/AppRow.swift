@@ -7,6 +7,7 @@ struct AppRow<Icon: View>: View {
     let value: String
     let ratio: Double
     let tint: Color
+
     @ViewBuilder let icon: Icon
 
     var body: some View {

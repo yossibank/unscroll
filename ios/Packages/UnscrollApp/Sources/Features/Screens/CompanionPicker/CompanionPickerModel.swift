@@ -12,6 +12,7 @@ public final class CompanionPickerModel {
     public private(set) var saved: Companion?
 
     @ObservationIgnored private var isNameEdited: Bool
+
     @ObservationIgnored private let database: AppDatabase
 
     public init(database: AppDatabase) {

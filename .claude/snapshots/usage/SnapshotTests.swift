@@ -26,7 +26,9 @@ extension SnapshotTests {
     struct Case {
         let name: String
         let size: CGSize
+
         var alignment: Alignment = .top
+
         let view: () -> AnyView
     }
 }
