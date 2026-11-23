@@ -6,7 +6,7 @@ public enum EventLog {
 
     public static func append(
         _ message: String,
-        at date: Date = .now,
+        at date: Date,
         defaults: UserDefaults? = UserDefaults(suiteName: ScreenTimeShared.appGroup)
     ) {
         guard let defaults else {

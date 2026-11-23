@@ -35,7 +35,7 @@ private extension UnscrollShieldAction {
     ) -> ShieldActionResponse {
         switch action {
         case .primaryButtonPressed:
-            EventLog.append("止めた画面：旅に戻る")
+            EventLog.append("止めた画面：旅に戻る", at: .now)
             return .close
 
         case .secondaryButtonPressed:
@@ -46,7 +46,7 @@ private extension UnscrollShieldAction {
             case .open: "止めた画面：1 分開いた"
             }
 
-            EventLog.append(message)
+            EventLog.append(message, at: .now)
             return .defer
 
         @unknown default:
