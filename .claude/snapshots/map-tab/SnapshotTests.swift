@@ -59,7 +59,7 @@ private extension SnapshotTests {
         let companion = try #require(
             Companion(species: .shiba, coat: Companion.Species.shiba.coats[0], name: "こむぎ")
         )
-        let now = Date.now
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
         let start = now.addingTimeInterval(-Double(minutes) * 60)
 
         try database.saveCompanion(companion)

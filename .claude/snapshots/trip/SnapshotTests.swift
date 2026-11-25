@@ -78,7 +78,7 @@ private extension SnapshotTests {
         let companion = try #require(
             Companion(species: .penguin, coat: Companion.Species.penguin.coats[0], name: "ぺんた")
         )
-        let now = Date.now
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
         let start = now.addingTimeInterval(-Double(elapsed) * 60)
 
         defaults.removePersistentDomain(forName: suite)

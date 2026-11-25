@@ -60,7 +60,7 @@ private extension SnapshotTests {
                     landmark: landmark,
                     tripID: Trip.ID(),
                     arrivedAt: Date(timeIntervalSince1970: 1_793_000_000 + Double(index) * 600_000),
-                    decoratedAt: index == 1 ? .now : nil
+                    decoratedAt: index == 1 ? Date(timeIntervalSince1970: 1_791_000_000) : nil
                 )
                 : nil
 
