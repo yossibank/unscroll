@@ -1,6 +1,6 @@
 import Core
 import FamilyControls
-@testable import Features
+@testable import FeatureModels
 import Foundation
 import Store
 import Testing
@@ -9,7 +9,7 @@ import Testing
 struct SettingsModelTests {
     @Test
     func showsUnselectedWhenNoAppsAreChosen() throws {
-        let model = try SettingsModel(database: AppDatabase.inMemory())
+        let model = try SettingsModel(parts: .system(AppDatabase.inMemory()))
 
         model.selection = FamilyActivitySelection()
 
@@ -26,7 +26,7 @@ struct SettingsModelTests {
             clearSets()
         }
 
-        let model = try SettingsModel(database: AppDatabase.inMemory())
+        let model = try SettingsModel(parts: .system(AppDatabase.inMemory()))
         let before = model.sets.count
 
         model.addSet(named: "  勉強中  ")
@@ -56,7 +56,7 @@ struct SettingsModelTests {
             clearSets()
         }
 
-        let model = try SettingsModel(database: AppDatabase.inMemory())
+        let model = try SettingsModel(parts: .system(AppDatabase.inMemory()))
         let only = try #require(model.sets.first)
 
         #expect(model.sets.map(\.name) == ["いつもの"])
@@ -77,7 +77,7 @@ struct SettingsModelTests {
         _ = try database.selectJourney(Journey.worldHeritage.id, at: start.addingTimeInterval(3600))
         _ = try database.startTrip(minutes: 20, at: start.addingTimeInterval(3660))
 
-        let model = SettingsModel(database: database)
+        let model = SettingsModel(parts: .system(database))
 
         #expect(model.kilometersTogether == 50 * Trip.kilometersPerMinute)
     }

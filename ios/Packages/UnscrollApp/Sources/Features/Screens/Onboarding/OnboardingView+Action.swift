@@ -1,3 +1,5 @@
+import Core
+import FeatureModels
 import SwiftUI
 
 extension OnboardingView {

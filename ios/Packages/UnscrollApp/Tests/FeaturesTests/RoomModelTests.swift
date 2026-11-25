@@ -1,5 +1,5 @@
 import Core
-import Features
+import FeatureModels
 import Foundation
 import Store
 import Testing
@@ -12,7 +12,7 @@ struct RoomModelTests {
     func decoratesArrivalFromFinishedTrip() throws {
         let database = try makeDatabase()
         _ = try database.startTrip(minutes: 90, at: fixedNow.addingTimeInterval(-100 * 60))
-        let model = RoomModel(database: database, defaults: makeDefaults(), now: { fixedNow })
+        let model = RoomModel(parts: .fixed(database, at: fixedNow), defaults: makeDefaults())
         let landmark = model.journey.landmarks[1]
 
         model.refresh()
@@ -27,7 +27,7 @@ struct RoomModelTests {
     func listsArrivalsWithoutDecorating() throws {
         let database = try makeDatabase()
         _ = try database.startTrip(minutes: 90, at: fixedNow.addingTimeInterval(-100 * 60))
-        let model = RoomModel(database: database, defaults: makeDefaults(), now: { fixedNow })
+        let model = RoomModel(parts: .fixed(database, at: fixedNow), defaults: makeDefaults())
 
         model.refresh()
 
@@ -39,7 +39,7 @@ struct RoomModelTests {
     func showsActiveTrip() throws {
         let database = try makeDatabase()
         _ = try database.startTrip(minutes: 25, at: fixedNow.addingTimeInterval(-5 * 60))
-        let model = RoomModel(database: database, defaults: makeDefaults(), now: { fixedNow })
+        let model = RoomModel(parts: .fixed(database, at: fixedNow), defaults: makeDefaults())
 
         model.refresh()
 
@@ -51,9 +51,8 @@ struct RoomModelTests {
     @Test
     func hasNoEndWithoutTrip() throws {
         let model = try RoomModel(
-            database: makeDatabase(),
-            defaults: makeDefaults(),
-            now: { fixedNow }
+            parts: .fixed(makeDatabase(), at: fixedNow),
+            defaults: makeDefaults()
         )
 
         model.refresh()
@@ -65,11 +64,11 @@ struct RoomModelTests {
     func savesSelectedMinutes() throws {
         let database = try makeDatabase()
         let defaults = makeDefaults()
-        let model = RoomModel(database: database, defaults: defaults, now: { fixedNow })
+        let model = RoomModel(parts: .fixed(database, at: fixedNow), defaults: defaults)
 
         model.selectedMinutes = 50
 
-        let reopened = RoomModel(database: database, defaults: defaults, now: { fixedNow })
+        let reopened = RoomModel(parts: .fixed(database, at: fixedNow), defaults: defaults)
 
         #expect(reopened.selectedMinutes == 50)
     }
@@ -80,9 +79,8 @@ struct RoomModelTests {
         defaults.set(33, forKey: "room.selectedMinutes")
 
         let model = try RoomModel(
-            database: makeDatabase(),
-            defaults: defaults,
-            now: { fixedNow }
+            parts: .fixed(makeDatabase(), at: fixedNow),
+            defaults: defaults
         )
 
         #expect(model.selectedMinutes == 25)
@@ -94,9 +92,8 @@ struct RoomModelTests {
         defaults.set(300, forKey: "room.selectedMinutes")
 
         let model = try RoomModel(
-            database: makeDatabase(),
-            defaults: defaults,
-            now: { fixedNow }
+            parts: .fixed(makeDatabase(), at: fixedNow),
+            defaults: defaults
         )
 
         #expect(model.selectedMinutes == 25)
@@ -108,7 +105,7 @@ struct RoomModelTests {
         let start = fixedNow.addingTimeInterval(-100 * 60)
         let trip = try database.startTrip(minutes: 90, at: start)
         try database.endTrip(trip.id, at: start.addingTimeInterval(62 * 60))
-        let model = RoomModel(database: database, defaults: makeDefaults(), now: { fixedNow })
+        let model = RoomModel(parts: .fixed(database, at: fixedNow), defaults: makeDefaults())
 
         #expect(model.progress?.kilometers == 62)
         #expect(model.lengthNote(for: 50) == "芦ノ湖に着く")
@@ -121,7 +118,7 @@ struct RoomModelTests {
     func showsFinishedTripOnceUntilAcknowledged() throws {
         let database = try makeDatabase()
         let defaults = makeDefaults()
-        let model = RoomModel(database: database, defaults: defaults, now: { fixedNow })
+        let model = RoomModel(parts: .fixed(database, at: fixedNow), defaults: defaults)
 
         #expect(model.finishedTrip == nil)
 
@@ -136,7 +133,7 @@ struct RoomModelTests {
 
         #expect(model.finishedTrip == nil)
 
-        let reopened = RoomModel(database: database, defaults: defaults, now: { fixedNow })
+        let reopened = RoomModel(parts: .fixed(database, at: fixedNow), defaults: defaults)
 
         #expect(reopened.finishedTrip == nil)
     }
@@ -144,7 +141,7 @@ struct RoomModelTests {
     @Test
     func showsArrivalsOfFinishedTrip() throws {
         let database = try makeDatabase()
-        let model = RoomModel(database: database, defaults: makeDefaults(), now: { fixedNow })
+        let model = RoomModel(parts: .fixed(database, at: fixedNow), defaults: makeDefaults())
 
         let start = fixedNow.addingTimeInterval(-100 * 60)
         _ = try database.startTrip(minutes: 90, at: start)
@@ -169,7 +166,7 @@ struct RoomModelTests {
         let database = try makeDatabase()
         _ = try database.startTrip(minutes: 25, at: fixedNow.addingTimeInterval(-60 * 60))
 
-        let model = RoomModel(database: database, defaults: makeDefaults(), now: { fixedNow })
+        let model = RoomModel(parts: .fixed(database, at: fixedNow), defaults: makeDefaults())
 
         #expect(model.finishedTrip == nil)
     }

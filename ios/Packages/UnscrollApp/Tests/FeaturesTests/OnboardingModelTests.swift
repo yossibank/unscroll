@@ -1,4 +1,4 @@
-@testable import Features
+@testable import FeatureModels
 import Foundation
 import Store
 import Testing
@@ -58,8 +58,8 @@ struct OnboardingModelTests {
     @Test
     func savesCompanionAndMovesOn() throws {
         let database = try AppDatabase.inMemory()
-        let settings = SettingsModel(database: database)
-        let model = OnboardingModel(database: database, settings: settings)
+        let settings = SettingsModel(parts: .system(database))
+        let model = OnboardingModel(parts: .system(database), settings: settings)
 
         model.skipIntro()
         model.saveCompanion()
@@ -77,8 +77,8 @@ struct OnboardingModelTests {
         defaults.removePersistentDomain(forName: "OnboardingModelTests")
 
         let model = OnboardingModel(
-            database: database,
-            settings: SettingsModel(database: database),
+            parts: .system(database),
+            settings: SettingsModel(parts: .system(database)),
             defaults: defaults
         )
 
@@ -104,6 +104,6 @@ struct OnboardingModelTests {
 private extension OnboardingModelTests {
     func makeModel() throws -> OnboardingModel {
         let database = try AppDatabase.inMemory()
-        return OnboardingModel(database: database, settings: SettingsModel(database: database))
+        return OnboardingModel(parts: .system(database), settings: SettingsModel(parts: .system(database)))
     }
 }

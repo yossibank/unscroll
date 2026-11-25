@@ -24,15 +24,15 @@ public final class SettingsModel {
     public private(set) var kilometersTogether = 0
     public private(set) var logLines: [String] = []
 
-    private(set) var sets: [BlockedAppSet]
+    public private(set) var sets: [BlockedAppSet]
 
-    @ObservationIgnored private let database: AppDatabase
+    @ObservationIgnored private let parts: ScreenParts
     @ObservationIgnored private let center = DeviceActivityCenter()
 
-    public init(database: AppDatabase) {
+    public init(parts: ScreenParts) {
         let sets = BlockedApps.loadSets()
 
-        self.database = database
+        self.parts = parts
         self.selection = BlockedApps.load()
         self.strictness = FocusShield.strictness
         self.sets = sets
@@ -67,14 +67,14 @@ public extension SettingsModel {
     }
 
     func makeCompanionPicker() -> CompanionPickerModel {
-        CompanionPickerModel(database: database)
+        CompanionPickerModel(parts: parts)
     }
 
     func refresh() {
-        companion = try? database.companion()
+        companion = try? parts.database.companion()
         isAuthorized = AuthorizationCenter.shared.authorizationStatus == .approved
-        isTripActive = (try? database.journeyProgress(at: .now))?.activeTrip != nil
-        kilometersTogether = totalKilometers(at: .now)
+        isTripActive = (try? parts.database.journeyProgress(at: parts.clock.now))?.activeTrip != nil
+        kilometersTogether = totalKilometers(at: parts.clock.now)
         logLines = EventLog.lines()
     }
 
@@ -91,9 +91,9 @@ public extension SettingsModel {
 
         do {
             try await AuthorizationCenter.shared.requestAuthorization(for: .individual)
-            EventLog.append("許可：取れた", at: .now)
+            EventLog.append("許可：取れた", at: parts.clock.now)
         } catch {
-            EventLog.append("許可：取れない（\(error.localizedDescription)）", at: .now)
+            EventLog.append("許可：取れない（\(error.localizedDescription)）", at: parts.clock.now)
         }
 
         refresh()
@@ -104,7 +104,7 @@ public extension SettingsModel {
             sets[index].selection = selection
         }
 
-        BlockedApps.save(selection)
+        BlockedApps.save(selection, at: parts.clock.now)
         BlockedApps.saveSets(sets, activeID: activeSetID)
         refresh()
     }
@@ -176,9 +176,9 @@ public extension SettingsModel {
                 during: schedule,
                 events: makeUsageEvents()
             )
-            EventLog.append("区切り：見張りを始めた（\(ScreenTimeShared.usageThresholdMinutes) 分）", at: .now)
+            EventLog.append("区切り：見張りを始めた（\(ScreenTimeShared.usageThresholdMinutes) 分）", at: parts.clock.now)
         } catch {
-            EventLog.append("区切り：見張りを始められない（\(error.localizedDescription)）", at: .now)
+            EventLog.append("区切り：見張りを始められない（\(error.localizedDescription)）", at: parts.clock.now)
         }
 
         refresh()
@@ -205,7 +205,7 @@ private extension SettingsModel {
 
     func totalKilometers(at now: Date) -> Int {
         Journey.all.reduce(0) { total, journey in
-            let progress = try? database.journeyProgress(journeyID: journey.id, at: now)
+            let progress = try? parts.database.journeyProgress(journeyID: journey.id, at: now)
             return total + (progress?.kilometers ?? 0)
         }
     }

@@ -1,6 +1,6 @@
 import Core
 import DesignSystem
-import Features
+import FeatureModels
 import Foundation
 import Store
 import Testing
@@ -13,39 +13,39 @@ struct RoomModelDecorTests {
     func keepsLookAfterRelaunch() throws {
         let database = try makeDatabase()
         let defaults = makeDefaults()
-        let model = RoomModel(database: database, defaults: defaults, now: { fixedNow })
+        let model = RoomModel(parts: .fixed(database, at: fixedNow), defaults: defaults)
 
         model.look = RoomLook(wall: .stars, floor: .tatami)
-        let relaunched = RoomModel(database: database, defaults: defaults, now: { fixedNow })
+        let relaunched = RoomModel(parts: .fixed(database, at: fixedNow), defaults: defaults)
 
         #expect(relaunched.look == RoomLook(wall: .stars, floor: .tatami))
     }
 
     @Test
     func startsWithPlasterAndWood() throws {
-        let model = try RoomModel(database: makeDatabase(), defaults: makeDefaults())
+        let model = try RoomModel(parts: .system(makeDatabase()), defaults: makeDefaults())
 
         #expect(model.look == RoomLook(wall: .plaster, floor: .wood))
     }
 
     @Test
     func hangsPostcardsInTappedOrder() throws {
-        var current = fixedNow
-        let model = try makeModel { current }
+        let time = MovingClock(fixedNow)
+        let model = try makeModel(clock: time.clock)
         let names = model.journey.landmarks.map(\.name)
 
         model.toggleHung(model.journey.landmarks[3])
-        current += 1
+        time.advance(by: 1)
         model.toggleHung(model.journey.landmarks[1])
 
         #expect(model.hungPostcards.map(\.name) == [names[3], names[1]])
 
-        current += 1
+        time.advance(by: 1)
         model.toggleHung(model.journey.landmarks[2])
 
         #expect(model.hungPostcards.map(\.name) == [names[1], names[2]])
 
-        current += 1
+        time.advance(by: 1)
         model.toggleHung(model.journey.landmarks[1])
 
         #expect(model.hungPostcards.map(\.name) == [names[2]])
@@ -53,13 +53,13 @@ struct RoomModelDecorTests {
 
     @Test
     func restoresOrderOfPostcards() throws {
-        var current = fixedNow
-        let model = try makeModel { current }
+        let time = MovingClock(fixedNow)
+        let model = try makeModel(clock: time.clock)
         let first = model.journey.landmarks[1]
         let third = model.journey.landmarks[3]
 
         model.hang([third, first])
-        current += 1
+        time.advance(by: 1)
         model.hang([first, third])
 
         #expect(model.hungPostcards == [first, third])
@@ -67,17 +67,17 @@ struct RoomModelDecorTests {
 
     @Test
     func restoresPostcardsBeyondString() throws {
-        var current = fixedNow
-        let model = try makeModel { current }
+        let time = MovingClock(fixedNow)
+        let model = try makeModel(clock: time.clock)
         let landmarks = Array(model.journey.landmarks[1...3])
 
         model.hang(landmarks)
-        current += 1
+        time.advance(by: 1)
         model.toggleHung(landmarks[2])
 
         #expect(model.decoratedArrivals.map(\.landmark) == [landmarks[1]])
 
-        current += 1
+        time.advance(by: 1)
         model.hang(landmarks)
 
         #expect(model.decoratedArrivals.map(\.landmark) == landmarks)
@@ -85,13 +85,13 @@ struct RoomModelDecorTests {
 
     @Test
     func keepsTappedOrderWhenClockGoesBack() throws {
-        var current = fixedNow
-        let model = try makeModel { current }
+        let time = MovingClock(fixedNow)
+        let model = try makeModel(clock: time.clock)
         let first = model.journey.landmarks[1]
         let second = model.journey.landmarks[2]
 
         model.toggleHung(first)
-        current -= 60
+        time.advance(by: -60)
         model.toggleHung(second)
 
         #expect(model.hungPostcards == [first, second])
@@ -99,7 +99,7 @@ struct RoomModelDecorTests {
 
     @Test
     func ignoresPostcardNotArrived() throws {
-        let model = try makeModel { fixedNow }
+        let model = try makeModel(clock: .fixed(fixedNow))
 
         model.toggleHung(model.journey.landmarks[4])
 
@@ -115,10 +115,10 @@ private extension RoomModelDecorTests {
         return database
     }
 
-    func makeModel(now: @escaping @MainActor () -> Date) throws -> RoomModel {
+    func makeModel(clock: ScreenClock) throws -> RoomModel {
         let database = try makeDatabase()
         _ = try database.startTrip(minutes: 300, at: fixedNow.addingTimeInterval(-310 * 60))
-        let model = RoomModel(database: database, defaults: makeDefaults(), now: now)
+        let model = RoomModel(parts: ScreenParts(database: database, clock: clock), defaults: makeDefaults())
         model.refresh()
         return model
     }

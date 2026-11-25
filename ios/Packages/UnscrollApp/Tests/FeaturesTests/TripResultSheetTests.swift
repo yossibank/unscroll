@@ -1,4 +1,5 @@
 import Core
+import FeatureModels
 import Features
 import Foundation
 import Store
@@ -8,7 +9,7 @@ import Testing
 struct TripResultSheetTests {
     @Test
     func makesBodyForPlannedAndEndedTrips() throws {
-        let model = try RoomModel(database: makeDatabase())
+        let model = try RoomModel(parts: .system(makeDatabase()))
         let start = Date(timeIntervalSince1970: 1_000_000)
         let planned = Trip(startedAt: start, plannedMinutes: 25)
         let ended = Trip(
@@ -25,7 +26,7 @@ struct TripResultSheetTests {
     func makesBodyWithArrivals() throws {
         let database = try makeDatabase()
         let defaults = UserDefaults(suiteName: UUID().uuidString) ?? .standard
-        let model = RoomModel(database: database, defaults: defaults)
+        let model = RoomModel(parts: .system(database), defaults: defaults)
         let start = Date.now.addingTimeInterval(-100 * 60)
         let trip = try database.startTrip(minutes: 90, at: start)
 

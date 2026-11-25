@@ -13,10 +13,10 @@ public final class CompanionPickerModel {
 
     @ObservationIgnored private var isNameEdited: Bool
 
-    @ObservationIgnored private let database: AppDatabase
+    @ObservationIgnored private let parts: ScreenParts
 
-    public init(database: AppDatabase) {
-        let current = try? database.companion()
+    public init(parts: ScreenParts) {
+        let current = try? parts.database.companion()
         let species = current?.species ?? .starter
 
         self.species = species
@@ -24,7 +24,7 @@ public final class CompanionPickerModel {
         self.name = current?.name ?? species.defaultName
         self.saved = current
         self.isNameEdited = current != nil
-        self.database = database
+        self.parts = parts
     }
 }
 
@@ -82,11 +82,11 @@ public extension CompanionPickerModel {
         }
 
         do {
-            try database.saveCompanion(draft)
+            try parts.database.saveCompanion(draft)
             saved = draft
             return true
         } catch {
-            EventLog.append("相棒：保存できない（\(error.localizedDescription)）", at: .now)
+            EventLog.append("相棒：保存できない（\(error.localizedDescription)）", at: parts.clock.now)
             return false
         }
     }

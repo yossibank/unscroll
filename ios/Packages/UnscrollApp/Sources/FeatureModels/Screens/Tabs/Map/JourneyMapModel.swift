@@ -10,15 +10,10 @@ public final class JourneyMapModel {
     public private(set) var companion: Companion?
     public private(set) var journey = Journey.tokyoSightseeing
 
-    @ObservationIgnored private let database: AppDatabase
-    @ObservationIgnored private let now: @MainActor () -> Date
+    @ObservationIgnored private let parts: ScreenParts
 
-    public init(
-        database: AppDatabase,
-        now: @escaping @MainActor () -> Date = { .now }
-    ) {
-        self.database = database
-        self.now = now
+    public init(parts: ScreenParts) {
+        self.parts = parts
 
         refresh()
     }
@@ -51,12 +46,12 @@ public extension JourneyMapModel {
     }
 
     func makeJourneyPicker() -> JourneyPickerModel {
-        JourneyPickerModel(database: database, now: now)
+        JourneyPickerModel(parts: parts)
     }
 
     func refresh() {
-        journey = (try? database.currentJourney()) ?? .tokyoSightseeing
-        progress = try? database.journeyProgress(at: now())
-        companion = try? database.companion()
+        journey = (try? parts.database.currentJourney()) ?? .tokyoSightseeing
+        progress = try? parts.database.journeyProgress(at: parts.clock.now)
+        companion = try? parts.database.companion()
     }
 }

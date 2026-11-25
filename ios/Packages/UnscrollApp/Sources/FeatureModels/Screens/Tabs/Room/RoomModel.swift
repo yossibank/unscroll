@@ -33,21 +33,18 @@ public final class RoomModel {
 
     public private(set) var journey = Journey.tokyoSightseeing
 
-    @ObservationIgnored private let database: AppDatabase
+    @ObservationIgnored private let parts: ScreenParts
     @ObservationIgnored private let defaults: UserDefaults
-    @ObservationIgnored private let now: @MainActor () -> Date
     @ObservationIgnored private let center = DeviceActivityCenter()
 
     public init(
-        database: AppDatabase,
-        defaults: UserDefaults = .standard,
-        now: @escaping @MainActor () -> Date = { .now }
+        parts: ScreenParts,
+        defaults: UserDefaults = .standard
     ) {
         let saved = defaults.integer(forKey: Self.selectedMinutesKey)
 
-        self.database = database
+        self.parts = parts
         self.defaults = defaults
-        self.now = now
         self.selectedMinutes = Self.isTripLength(saved) ? saved : 25
         self.look = RoomLook(defaults: defaults)
 
@@ -126,7 +123,7 @@ public extension RoomModel {
     }
 
     func kilometers(at date: Date) -> Int {
-        let progress = try? database.journeyProgress(at: date)
+        let progress = try? parts.database.journeyProgress(at: date)
         return progress?.kilometers ?? kilometers
     }
 
@@ -135,7 +132,7 @@ public extension RoomModel {
     }
 
     func makeJourneyPicker() -> JourneyPickerModel {
-        JourneyPickerModel(database: database, now: now)
+        JourneyPickerModel(parts: parts)
     }
 
     func acknowledgeFinishedTrip() {
@@ -150,18 +147,18 @@ public extension RoomModel {
     func refresh() {
         isAuthorized = AuthorizationCenter.shared.authorizationStatus == .approved
         hasSelection = !BlockedApps.isEmpty(BlockedApps.load())
-        journey = (try? database.currentJourney()) ?? .tokyoSightseeing
-        companion = try? database.companion()
-        progress = try? database.journeyProgress(at: now())
+        journey = (try? parts.database.currentJourney()) ?? .tokyoSightseeing
+        companion = try? parts.database.companion()
+        progress = try? parts.database.journeyProgress(at: parts.clock.now)
 
         endLeftOverShield()
         saveShieldSnapshot()
         recordArrivals()
         updateFinishedTrip()
         updateFinishedArrivals()
-        decoratedArrivals = (try? database.decoratedArrivals()) ?? []
-        arrivals = (try? database.arrivals(journeyID: journey.id)) ?? []
-        practiceArrivals = (try? database.arrivals(journeyID: Journey.practice.id)) ?? []
+        decoratedArrivals = (try? parts.database.decoratedArrivals()) ?? []
+        arrivals = (try? parts.database.arrivals(journeyID: journey.id)) ?? []
+        practiceArrivals = (try? parts.database.arrivals(journeyID: Journey.practice.id)) ?? []
     }
 
     func setDecorated(
@@ -169,13 +166,13 @@ public extension RoomModel {
         landmark: Landmark
     ) {
         do {
-            try database.setDecorated(isDecorated, landmark: landmark, at: now())
+            try parts.database.setDecorated(isDecorated, landmark: landmark, at: parts.clock.now)
         } catch {
-            EventLog.append("絵はがき：飾れない（\(error.localizedDescription)）", at: now())
+            EventLog.append("絵はがき：飾れない（\(error.localizedDescription)）", at: parts.clock.now)
         }
 
         updateFinishedArrivals()
-        decoratedArrivals = (try? database.decoratedArrivals()) ?? []
+        decoratedArrivals = (try? parts.database.decoratedArrivals()) ?? []
     }
 
     func toggleHung(_ landmark: Landmark) {
@@ -203,23 +200,23 @@ public extension RoomModel {
             .filter { staying.contains($0.landmark) }
             .compactMap(\.decoratedAt)
             .max()
-        let start = max(now(), latest.map { $0.addingTimeInterval(Self.hangStep) } ?? .distantPast)
+        let start = max(parts.clock.now, latest.map { $0.addingTimeInterval(Self.hangStep) } ?? .distantPast)
 
         do {
             for landmark in removed + kept.dropFirst(matching) {
-                try database.setDecorated(false, landmark: landmark, at: start)
+                try parts.database.setDecorated(false, landmark: landmark, at: start)
             }
 
             for (offset, landmark) in chosen.dropFirst(matching).enumerated() {
                 let time = start.addingTimeInterval(Double(offset) * Self.hangStep)
-                try database.setDecorated(true, landmark: landmark, at: time)
+                try parts.database.setDecorated(true, landmark: landmark, at: time)
             }
         } catch {
-            EventLog.append("絵はがき：飾りを替えられない（\(error.localizedDescription)）", at: now())
+            EventLog.append("絵はがき：飾りを替えられない（\(error.localizedDescription)）", at: parts.clock.now)
         }
 
         updateFinishedArrivals()
-        decoratedArrivals = (try? database.decoratedArrivals()) ?? []
+        decoratedArrivals = (try? parts.database.decoratedArrivals()) ?? []
     }
 
     func startTrip() {
@@ -228,27 +225,27 @@ public extension RoomModel {
 
     func startPracticeTrip() {
         begin(label: "練習") { start in
-            try database.startPracticeTrip(at: start)
+            try parts.database.startPracticeTrip(at: start)
         }
     }
 
     func startTrip(minutes: Int) {
         begin(label: "\(minutes) 分") { start in
-            try database.startTrip(minutes: minutes, at: start)
+            try parts.database.startTrip(minutes: minutes, at: start)
         }
     }
 
     func stopTrip() {
         if let trip = progress?.activeTrip {
             do {
-                try database.endTrip(trip.id, at: now())
+                try parts.database.endTrip(trip.id, at: parts.clock.now)
             } catch {
-                EventLog.append("旅：終わりを保存できない（\(error.localizedDescription)）", at: now())
+                EventLog.append("旅：終わりを保存できない（\(error.localizedDescription)）", at: parts.clock.now)
             }
         }
 
         FocusShield.endTrip()
-        EventLog.append("旅：やめた", at: now())
+        EventLog.append("旅：やめた", at: parts.clock.now)
         refresh()
     }
 }
@@ -262,7 +259,7 @@ private extension RoomModel {
         let isLeftOver = FocusEnd.isLeftOver(
             endsAt: FocusShield.tripEndsAt,
             hasActiveTrip: progress?.activeTrip != nil,
-            at: now()
+            at: parts.clock.now
         )
 
         guard isLeftOver else {
@@ -270,7 +267,7 @@ private extension RoomModel {
         }
 
         FocusShield.endTrip()
-        EventLog.append("旅：残っていた止める設定を外した", at: now())
+        EventLog.append("旅：残っていた止める設定を外した", at: parts.clock.now)
     }
 
     func saveShieldSnapshot() {
@@ -279,7 +276,7 @@ private extension RoomModel {
             journey: journey,
             totalKilometers: progress?.kilometers ?? 0,
             activeTrip: progress?.activeTrip,
-            at: now()
+            at: parts.clock.now
         )
 
         if let snapshot {
@@ -293,7 +290,7 @@ private extension RoomModel {
         label: String,
         save: (Date) throws -> Trip
     ) {
-        let start = now()
+        let start = parts.clock.now
         let trip: Trip
 
         do {
@@ -316,7 +313,7 @@ private extension RoomModel {
             EventLog.append("旅：開始（\(label)）", at: start)
         } catch {
             FocusShield.endTrip()
-            try? database.endTrip(trip.id, at: start)
+            try? parts.database.endTrip(trip.id, at: start)
             defaults.set(trip.id.description, forKey: Self.acknowledgedTripKey)
             EventLog.append("旅：見張りを始められない（\(error.localizedDescription)）", at: start)
         }
@@ -326,10 +323,10 @@ private extension RoomModel {
 
     func recordArrivals() {
         do {
-            try database.recordArrivals(on: journey, at: now())
-            try database.recordPracticeArrivals(at: now())
+            try parts.database.recordArrivals(on: journey, at: parts.clock.now)
+            try parts.database.recordPracticeArrivals(at: parts.clock.now)
         } catch {
-            EventLog.append("名所：着いた記録を保存できない（\(error.localizedDescription)）", at: now())
+            EventLog.append("名所：着いた記録を保存できない（\(error.localizedDescription)）", at: parts.clock.now)
         }
     }
 
@@ -339,7 +336,7 @@ private extension RoomModel {
             return
         }
 
-        finishedArrivals = (try? database.arrivals(forTrip: finishedTrip.id)) ?? []
+        finishedArrivals = (try? parts.database.arrivals(forTrip: finishedTrip.id)) ?? []
     }
 
     func updateFinishedTrip() {

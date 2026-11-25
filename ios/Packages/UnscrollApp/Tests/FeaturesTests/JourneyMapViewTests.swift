@@ -1,3 +1,4 @@
+import FeatureModels
 @testable import Features
 import Store
 import Testing
@@ -6,14 +7,14 @@ import Testing
 struct JourneyMapViewTests {
     @Test
     func makesBody() throws {
-        let model = try JourneyMapModel(database: AppDatabase.inMemory())
+        let model = try JourneyMapModel(parts: .system(AppDatabase.inMemory()))
 
         _ = JourneyMapView(model: model).body
     }
 
     @Test
     func makesCanvasBody() throws {
-        let model = try JourneyMapModel(database: AppDatabase.inMemory())
+        let model = try JourneyMapModel(parts: .system(AppDatabase.inMemory()))
         let geometry = try #require(JourneyMapGeometry.for(model.journey.id))
 
         _ = JourneyMapCanvas(

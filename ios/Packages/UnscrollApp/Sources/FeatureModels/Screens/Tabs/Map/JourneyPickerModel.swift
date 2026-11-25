@@ -15,22 +15,19 @@ public final class JourneyPickerModel: Identifiable {
     public var selectedID: String
     public var filter = Filter.open
 
-    @ObservationIgnored private let database: AppDatabase
-    @ObservationIgnored private let now: @MainActor () -> Date
+    @ObservationIgnored private let parts: ScreenParts
 
     public init(
-        database: AppDatabase,
-        now: @escaping @MainActor () -> Date = { .now },
+        parts: ScreenParts,
         isAvailable: (Journey) -> Bool = LandmarkArt.isAvailable(for:)
     ) {
-        let current = (try? database.currentJourney()) ?? .tokyoSightseeing
+        let current = (try? parts.database.currentJourney()) ?? .tokyoSightseeing
 
         self.journeys = Journey.all.filter(isAvailable)
         self.currentID = current.id
         self.selectedID = current.id
 
-        self.database = database
-        self.now = now
+        self.parts = parts
 
         refresh()
     }
@@ -90,13 +87,13 @@ public extension JourneyPickerModel {
     }
 
     func refresh() {
-        let date = now()
-        let current = try? database.journeyProgress(journeyID: currentID, at: date)
+        let date = parts.clock.now
+        let current = try? parts.database.journeyProgress(journeyID: currentID, at: date)
 
         isOnTrip = current?.activeTrip != nil
         kilometersByID = Dictionary(
             uniqueKeysWithValues: journeys.map { journey in
-                let progress = try? database.journeyProgress(journeyID: journey.id, at: date)
+                let progress = try? parts.database.journeyProgress(journeyID: journey.id, at: date)
                 return (journey.id, progress?.kilometers ?? 0)
             }
         )
@@ -107,7 +104,7 @@ public extension JourneyPickerModel {
             return false
         }
 
-        guard (try? database.selectJourney(selectedID, at: now())) == true else {
+        guard (try? parts.database.selectJourney(selectedID, at: parts.clock.now)) == true else {
             return false
         }
 

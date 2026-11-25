@@ -1,3 +1,4 @@
+import FeatureModels
 import Features
 import Store
 import Testing
@@ -6,7 +7,7 @@ import Testing
 struct CompanionPickerViewTests {
     @Test
     func makesBody() throws {
-        let model = try CompanionPickerModel(database: AppDatabase.inMemory())
+        let model = try CompanionPickerModel(parts: .system(AppDatabase.inMemory()))
 
         _ = CompanionPickerView(model: model).body
     }

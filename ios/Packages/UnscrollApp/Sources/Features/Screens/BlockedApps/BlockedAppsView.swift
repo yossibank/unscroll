@@ -1,5 +1,6 @@
 import DesignSystem
 import FamilyControls
+import FeatureModels
 import SwiftUI
 
 public struct BlockedAppsView: View {
