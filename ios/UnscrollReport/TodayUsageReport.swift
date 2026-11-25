@@ -14,8 +14,8 @@ nonisolated struct TodayUsageReport<Content: View>: DeviceActivityReportScene {
         let calendar = Calendar.current
         let now = Date.now
         let todayStart = calendar.startOfDay(for: now)
-        let sameTimeYesterday = calendar.date(byAdding: .day, value: -1, to: now) ?? now
-            .addingTimeInterval(-86400)
+        let dayBefore = calendar.date(byAdding: .day, value: -1, to: now)
+        let sameTimeYesterday = dayBefore ?? now.addingTimeInterval(-86400)
 
         var durations: [String: TimeInterval] = [:]
         var tokens: [String: ApplicationToken] = [:]
@@ -55,15 +55,15 @@ nonisolated struct TodayUsageReport<Content: View>: DeviceActivityReportScene {
                 }
 
                 for await category in segment.categories {
-                    let categoryName = category.category.localizedDisplayName ?? CategoryUsage
-                        .otherName
+                    let displayName = category.category.localizedDisplayName
+                    let categoryName = displayName ?? CategoryUsage.otherName
 
                     categories[categoryName, default: 0] += category.totalActivityDuration
 
                     for await app in category.applications {
                         let application = app.application
-                        let name = application.localizedDisplayName ?? application
-                            .bundleIdentifier ?? "不明"
+                        let identifier = application.bundleIdentifier ?? "不明"
+                        let name = application.localizedDisplayName ?? identifier
 
                         durations[name, default: 0] += app.totalActivityDuration
                         tokens[name] = tokens[name] ?? application.token
