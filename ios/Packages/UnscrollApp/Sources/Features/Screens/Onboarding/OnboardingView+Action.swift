@@ -20,9 +20,12 @@ extension OnboardingView {
                     return
                 }
 
-                if width < -60, model.canSwipeForward {
+                let goesForward = width < -60 && model.canSwipeForward
+                let goesBack = width > 60 && model.canGoBack
+
+                if goesForward {
                     turn(forward: true)
-                } else if width > 60, model.canGoBack {
+                } else if goesBack {
                     turn(forward: false)
                 }
             }

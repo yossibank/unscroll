@@ -60,6 +60,17 @@ python3 -I scripts/map-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Reso
 
 アプリと拡張が共有する名前・記録・止め方・外しにくさ・手紙の文は、Core の `ScreenTime/` にある。止め方は Screen Time の API を使うので、iOS だけで組む。
 
+## 🪝 設計の検査
+
+`make verify` は、claude-config のフックを、追跡しているファイルの全部にかける。
+
+| 対象 | フック | 入口 |
+| --- | --- | --- |
+| `.md` | `docs-check.py` | `make verify-docs` |
+| `.swift` | `swift-style-check.py`・`code-design-check.py` | `make verify` |
+
+今ある設計の外れは、`.claude/code-design-baseline.txt` に載せて見送る。外れを増やさず、直したら行を消す。
+
 ## 📂 ストアのファイル
 
 App Store に出すものは、次の場所に置く。

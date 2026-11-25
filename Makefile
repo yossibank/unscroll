@@ -1,4 +1,4 @@
-.PHONY: setup open format licenses build test-build test snapshot verify
+.PHONY: setup open format licenses build test-build test snapshot verify verify-docs
 
 SIMULATOR ?= $(shell scripts/find-simulator.sh)
 XCBEAUTIFY = $(shell command -v xcbeautify)
@@ -42,8 +42,14 @@ snapshot:
 	@test -n "$(SNAPSHOT)" || { echo "NG SNAPSHOT に .claude/snapshots/ の下のセットの名前を渡す"; exit 1; }
 	$(CLAUDE_CONFIG)/dotclaude/skills/ui-snapshot/scripts/render-snapshots.sh ios/Packages/UnscrollApp .claude/snapshots/$(SNAPSHOT) .build/snapshots/$(SNAPSHOT)
 
-verify:
+verify: verify-docs
+	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/swift-style-check.py || { echo "NG claude-config に swift-style-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
+	scripts/verify.sh swift-style python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/swift-style-check.py $$(git ls-files '*.swift')
 	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/code-design-check.py || { echo "NG claude-config に code-design-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
-	scripts/verify.sh code-design python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/code-design-check.py $$(git ls-files '*.swift' '*.kt')
+	scripts/verify.sh code-design python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/code-design-check.py $$(git ls-files --cached --others --exclude-standard '*.swift' '*.kt')
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/UnscrollKit
 	scripts/verify.sh app-build $(XCODEBUILD) $(ANY_SIMULATOR) build
+
+verify-docs:
+	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/docs-check.py || { echo "NG claude-config に docs-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
+	scripts/verify.sh docs-rules python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/docs-check.py $$(git ls-files '*.md')
