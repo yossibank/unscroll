@@ -1,4 +1,5 @@
 import AppFeature
+import FeatureModels
 import Store
 import Testing
 
@@ -8,6 +9,6 @@ struct MainViewTests {
     func makesBody() throws {
         let database = try AppDatabase.inMemory()
 
-        _ = MainView(database: database).body
+        _ = MainView(parts: ScreenParts(database: database, clock: .system)).body
     }
 }
