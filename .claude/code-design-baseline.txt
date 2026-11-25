@@ -1,0 +1,43 @@
+ios/Packages/UnscrollApp/Sources/AppFeature/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: dawn。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/AppFeature/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: hasGreeted。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/AppFeature/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: isLeaving。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/AppFeature/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: pose。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/AppFeature/AppLaunchView.swift: View の @State に置けるのは、モデルと layout だけにする: reveal。見た目の値は、入れ子の struct Layout にまとめる
+ios/Packages/UnscrollApp/Sources/AppFeature/MainView.swift: View の @State に置けるのは、モデルと layout だけにする: isTabBarHidden。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/AppFeature/MainView.swift: View の @State に置けるのは、モデルと layout だけにする: needsOnboarding。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/AppFeature/MainView.swift: View の @State に置けるのは、モデルと layout だけにする: tab。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/AppFeature/RootView.swift: View の @State に置けるのは、モデルと layout だけにする: isLaunching。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/AppFeature/RootView.swift: View の @State に置けるのは、モデルと layout だけにする: launchCompanion。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/AppFeature/RootView.swift: View の @State に置けるのは、モデルと layout だけにする: phase。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Screens/BlockedApps/BlockedAppsView.swift: View の @State に置けるのは、モデルと layout だけにする: isDeleteConfirming。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Screens/BlockedApps/BlockedAppsView.swift: View の @State に置けるのは、モデルと layout だけにする: isPickerPresented。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Screens/CompanionPicker/CompanionPickerModel.swift: CompanionPickerModel は DB と時計を直接持たない: database。dependencies にまとめ、値は state・input・output に分ける
+ios/Packages/UnscrollApp/Sources/Features/Screens/CompanionPicker/CompanionPickerView.swift: View の @State に置けるのは、モデルと layout だけにする: pose。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Screens/CompanionPicker/CompanionPickerView.swift: 画面で Task を始めない。モデルの口から始め、結果は state の変化で受ける。画面だけの非同期は、View でない型が Task? の保存プロパティに入れて取り消す
+ios/Packages/UnscrollApp/Sources/Features/Screens/LandmarkArrival/LandmarkArrivalView.swift: View の @State に置けるのは、モデルと layout だけにする: isDecorated。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Screens/Onboarding/OnboardingView+Action.swift: 画面で Task を始めない。モデルの口から始め、結果は state の変化で受ける。画面だけの非同期は、View でない型が Task? の保存プロパティに入れて取り消す
+ios/Packages/UnscrollApp/Sources/Features/Screens/Onboarding/OnboardingView.swift: View の @State に置けるのは、モデルと layout だけにする: isForward。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Screens/Onboarding/OnboardingView.swift: View の @State に置けるのは、モデルと layout だけにする: isPickerPresented。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Screens/Tabs/Album/PostcardAlbumModel.swift: PostcardAlbumModel は DB と時計を直接持たない: database。dependencies にまとめ、値は state・input・output に分ける
+ios/Packages/UnscrollApp/Sources/Features/Screens/Tabs/Album/PostcardAlbumView.swift: View の @State に置けるのは、モデルと layout だけにする: path。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Screens/Tabs/Map/JourneyMapModel.swift: JourneyMapModel は DB と時計を直接持たない: database。dependencies にまとめ、値は state・input・output に分ける
+ios/Packages/UnscrollApp/Sources/Features/Screens/Tabs/Map/JourneyPickerModel.swift: JourneyPickerModel は DB と時計を直接持たない: database。dependencies にまとめ、値は state・input・output に分ける
+ios/Packages/UnscrollApp/Sources/Features/Screens/Tabs/Room/RoomDecorSheet.swift: View の @State に置けるのは、モデルと layout だけにする: original。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Screens/Tabs/Room/RoomDecorSheet.swift: View の @State に置けるのは、モデルと layout だけにする: tab。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Screens/Tabs/Room/RoomModel.swift: RoomModel は DB と時計を直接持たない: database。dependencies にまとめ、値は state・input・output に分ける
+ios/Packages/UnscrollApp/Sources/Features/Screens/Tabs/Room/RoomView.swift: View の @State に置けるのは、モデルと layout だけにする: isDecorShown。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Screens/Tabs/Room/RoomView.swift: View の @State に置けるのは、モデルと layout だけにする: isTripCoverShown。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Screens/Tabs/Room/RoomView.swift: View の @State に置けるのは、モデルと layout だけにする: pokes。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Screens/Tabs/Room/RoomView.swift: View の @State に置けるのは、モデルと layout だけにする: pose。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Screens/Tabs/Settings/SettingsModel.swift: SettingsModel は DB と時計を直接持たない: database。dependencies にまとめ、値は state・input・output に分ける
+ios/Packages/UnscrollApp/Sources/Features/Screens/Tabs/Settings/SettingsView.swift: View の @State に置けるのは、モデルと layout だけにする: path。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Screens/Tabs/Settings/SettingsView.swift: 画面で Task を始めない。モデルの口から始め、結果は state の変化で受ける。画面だけの非同期は、View でない型が Task? の保存プロパティに入れて取り消す
+ios/Packages/UnscrollApp/Sources/Features/Screens/Tabs/Settings/SettingsView.swift: 画面で Task を始めない。モデルの口から始め、結果は state の変化で受ける。画面だけの非同期は、View でない型が Task? の保存プロパティに入れて取り消す
+ios/Packages/UnscrollApp/Sources/Features/Shared/ScreenTime/AppSetNameSheet.swift: View の @State に置けるのは、モデルと layout だけにする: name。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Shared/ScreenTime/AppSetTags.swift: View の @State に置けるのは、モデルと layout だけにする: deletingSet。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Shared/ScreenTime/AppSetTags.swift: View の @State に置けるのは、モデルと layout だけにする: isNaming。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Shared/ScreenTime/AppSetTags.swift: View の @State に置けるのは、モデルと layout だけにする: isPickerPresented。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Shared/ScreenTime/AppSetTags.swift: View の @State に置けるのは、モデルと layout だけにする: nameDraft。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Shared/ScreenTime/AppSetTags.swift: View の @State に置けるのは、モデルと layout だけにする: renamingID。意味のある状態は、モデルの state に移す
+ios/Packages/UnscrollApp/Sources/Features/Shared/ScreenTime/AppSetTags.swift: View の @State に置けるのは、モデルと layout だけにする: wantsPicker。意味のある状態は、モデルの state に移す
+ios/UnscrollReport/TodayUsageView.swift: View の @State に置けるのは、モデルと layout だけにする: sort。意味のある状態は、モデルの state に移す
