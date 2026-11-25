@@ -3,6 +3,20 @@
 > [!NOTE]
 > 共通の形から外れた点と、ID などおるすマホだけの事実が分かる。共通の形は claude-config の `docs/app/ios-architecture.md` にある。
 
+## 📱 画面のモデル
+
+画面のモデルは `FeatureModels` に置く。`Features` と `AppFeature` は、`Store` に依存しない。共通の形と違う所は、次のとおりである。
+
+| 点 | おるすマホの形 |
+| --- | --- |
+| DB の呼び出し | 同期で呼ぶ。モデルは、作った時に DB を読み、最初から中身を持つ |
+| 起動 | `AppModel` の `open()` は同期で、`RootView` の最初の `.task` が呼ぶ。`MainView` は、起動の画面の下で作る |
+| `FeatureModels` の依存 | `DesignSystem` にも依存する。モデルが、部屋の見た目（`RoomLook`）と、絵のある道のり（`LandmarkArt`）を読む |
+| `JourneyProgress` | 画面が読む値なので、Core に置く。DB から読む関数は、Store の `JourneyProgress+Query.swift` にある |
+| 止めるアプリの組 | `BlockedApps` と `BlockedAppSet` は、モデルが読み書きする。`FeatureModels/Shared/ScreenTime/` に置く |
+
+モデルの中身は、まだ 4 つのまとまりに分けていない。DB と時計は、`ScreenParts` のまま持つ。
+
 ## 🖥️ ドット絵
 
 相棒・名所・おみやげのドット絵は、DesignSystem の資源に置く。絵はスクリプトで描き、手で直さない。決め方は[相棒の決定](decisions/companion.md)と[名所の決定](decisions/landmark.md)にある。
@@ -68,6 +82,8 @@ python3 -I scripts/map-art.py ios/Packages/UnscrollApp/Sources/DesignSystem/Reso
 | --- | --- | --- |
 | `.md` | `docs-check.py` | `make verify-docs` |
 | `.swift` | `swift-style-check.py`・`code-design-check.py` | `make verify` |
+
+`screens-no-store` は、画面と入口の `import Store` を grep で止める。Xcode は、依存に無いモジュールの import も通す。
 
 今ある設計の外れは、`.claude/code-design-baseline.txt` に載せて見送る。外れを増やさず、直したら行を消す。
 

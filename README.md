@@ -33,7 +33,7 @@ flowchart LR
 | 部分 | 中身 |
 | --- | --- |
 | パッケージとフォルダ | [ios-architecture.md](https://github.com/yossibank/claude-config/blob/main/docs/app/ios-architecture.md)（claude-config） |
-| ドット絵・拡張・権限 | [docs/architecture.md](docs/architecture.md) |
+| 画面のモデル・ドット絵・拡張・権限 | [docs/architecture.md](docs/architecture.md) |
 
 ## 💻 実行環境
 
@@ -52,10 +52,12 @@ flowchart LR
 | 何を作るか | [docs/overview.md](docs/overview.md) |
 | 作る順番と画面 | [docs/roadmap.md](docs/roadmap.md) |
 | 共通の形から外れた構成 | [docs/architecture.md](docs/architecture.md) |
+| 複数の画面で使う仕組み | [docs/architecture-parts.md](docs/architecture-parts.md) |
 | 相棒の絵の決定 | [docs/decisions/companion.md](docs/decisions/companion.md) |
 | 名所の絵はがきとおみやげの決定 | [docs/decisions/landmark.md](docs/decisions/landmark.md) |
 | 止めた画面と外しにくさの決定 | [docs/decisions/shield.md](docs/decisions/shield.md) |
 | フォルダと依存の向き | [ios-architecture.md](https://github.com/yossibank/claude-config/blob/main/docs/app/ios-architecture.md)（claude-config） |
+| 画面の組み立て | [ios-screens.md](https://github.com/yossibank/claude-config/blob/main/docs/app/ios-screens.md)（claude-config） |
 | 作業と文書の決まり | [CLAUDE.md](CLAUDE.md) |
 | 全リポジトリ共通の決まり | [claude-config](https://github.com/yossibank/claude-config) |
 
