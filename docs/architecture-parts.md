@@ -12,9 +12,6 @@
 | --- | --- | --- |
 | `ScreenParts` | DB と時計を包んで、画面からモデルへ渡す。中の DB は `FeatureModels` だけが読む | `FeatureModels/Shared/Model/` |
 | `ScreenClock` | モデルの時計。テストでは `fixed` で止める | `FeatureModels/Shared/Model/` |
-| `ScreenPerforming` | 画面がモデルの async の関数を呼ぶ口。`perform` が `Task` を始め、画面は `Task` を書かない | `FeatureModels/Shared/Model/` |
-| `ScreenOutcome` | 保存できた・消した、の結果を 1 つ持つ。モデルの `state` に置く | `FeatureModels/Shared/Model/` |
-| `onOutcome` | 画面が `ScreenOutcome` の変化を受ける modifier | `Features/Shared/Model/` |
 
 ## 🪜 入れ物の作り方
 
