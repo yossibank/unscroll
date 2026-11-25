@@ -1,7 +1,6 @@
 import Core
 import Foundation
 import Observation
-import Store
 
 @MainActor
 @Observable
@@ -14,11 +13,11 @@ public final class OnboardingModel {
     @ObservationIgnored private let defaults: UserDefaults
 
     public init(
-        database: AppDatabase,
+        parts: ScreenParts,
         settings: SettingsModel,
         defaults: UserDefaults = .standard
     ) {
-        self.companion = CompanionPickerModel(database: database)
+        self.companion = CompanionPickerModel(parts: parts)
         self.settings = settings
         self.defaults = defaults
     }

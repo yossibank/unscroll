@@ -1,5 +1,5 @@
 import Core
-import Features
+import FeatureModels
 import Store
 import Testing
 
@@ -7,7 +7,7 @@ import Testing
 struct CompanionPickerModelTests {
     @Test
     func startsWithPenguinWhenNoCompanion() throws {
-        let model = try CompanionPickerModel(database: AppDatabase.inMemory())
+        let model = try CompanionPickerModel(parts: .system(AppDatabase.inMemory()))
 
         #expect(model.species == .penguin)
         #expect(model.coat == .gray)
@@ -16,7 +16,7 @@ struct CompanionPickerModelTests {
 
     @Test
     func resetsCoatAndNameWhenSpeciesChanges() throws {
-        let model = try CompanionPickerModel(database: AppDatabase.inMemory())
+        let model = try CompanionPickerModel(parts: .system(AppDatabase.inMemory()))
 
         model.select(.penguin)
 
@@ -27,7 +27,7 @@ struct CompanionPickerModelTests {
 
     @Test
     func keepsNameWhenSpeciesChangesAfterRename() throws {
-        let model = try CompanionPickerModel(database: AppDatabase.inMemory())
+        let model = try CompanionPickerModel(parts: .system(AppDatabase.inMemory()))
 
         model.rename("もも")
         model.select(.tanuki)
@@ -38,7 +38,7 @@ struct CompanionPickerModelTests {
 
     @Test
     func keepsLongNameButHasNoDraft() throws {
-        let model = try CompanionPickerModel(database: AppDatabase.inMemory())
+        let model = try CompanionPickerModel(parts: .system(AppDatabase.inMemory()))
 
         model.rename("あいうえおかきくけ")
 
@@ -49,7 +49,7 @@ struct CompanionPickerModelTests {
 
     @Test
     func acceptsNameAtLimit() throws {
-        let model = try CompanionPickerModel(database: AppDatabase.inMemory())
+        let model = try CompanionPickerModel(parts: .system(AppDatabase.inMemory()))
 
         model.rename(" あいうえおかきく ")
 
@@ -59,7 +59,7 @@ struct CompanionPickerModelTests {
 
     @Test
     func hasNoDraftWhenNameIsEmpty() throws {
-        let model = try CompanionPickerModel(database: AppDatabase.inMemory())
+        let model = try CompanionPickerModel(parts: .system(AppDatabase.inMemory()))
 
         model.rename("")
 
@@ -71,7 +71,7 @@ struct CompanionPickerModelTests {
     @Test
     func savesDraftToDatabase() throws {
         let database = try AppDatabase.inMemory()
-        let model = CompanionPickerModel(database: database)
+        let model = CompanionPickerModel(parts: .system(database))
         let expected = Companion(species: .penguin, coat: .king, name: "ぴぴ")
 
         model.select(.penguin)
@@ -88,7 +88,7 @@ struct CompanionPickerModelTests {
         let saved = try #require(Companion(species: .tanuki, coat: .white, name: "ふく"))
         try database.saveCompanion(saved)
 
-        let model = CompanionPickerModel(database: database)
+        let model = CompanionPickerModel(parts: .system(database))
 
         #expect(model.draft == saved)
     }
@@ -99,7 +99,7 @@ struct CompanionPickerModelTests {
         let saved = try #require(Companion(species: .tanuki, coat: .white, name: "ふく"))
         try database.saveCompanion(saved)
 
-        let model = CompanionPickerModel(database: database)
+        let model = CompanionPickerModel(parts: .system(database))
 
         #expect(!model.isChanged)
         #expect(!model.canSave)
@@ -115,7 +115,7 @@ struct CompanionPickerModelTests {
 
     @Test
     func canSaveWhenNoCompanionIsSaved() throws {
-        let model = try CompanionPickerModel(database: AppDatabase.inMemory())
+        let model = try CompanionPickerModel(parts: .system(AppDatabase.inMemory()))
 
         #expect(model.isChanged)
         #expect(model.canSave)

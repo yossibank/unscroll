@@ -1,6 +1,7 @@
 import Core
 import CoreText
 import DesignSystem
+@testable import FeatureModels
 @testable import Features
 import Store
 import SwiftUI
@@ -60,7 +61,7 @@ private extension SnapshotTests {
         let companion = try #require(
             Companion(species: .shiba, coat: Companion.Species.shiba.coats[0], name: "こむぎ")
         )
-        let now = Date.now
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
         let start = now.addingTimeInterval(-Double(minutes) * 60)
 
         defaults.removePersistentDomain(forName: "room-tab-\(name)")
@@ -73,7 +74,7 @@ private extension SnapshotTests {
             _ = try database.startTrip(minutes: length, at: start)
         }
 
-        return RoomModel(database: database, defaults: defaults, now: { now })
+        return RoomModel(parts: ScreenParts(database: database, clock: .fixed(now)), defaults: defaults)
     }
 
     static func page(
@@ -101,7 +102,7 @@ private extension SnapshotTests {
 
         return try states.map { name, minutes, isOnTrip in
             let model = try model(name: name, minutes: minutes, isOnTrip: isOnTrip)
-            let settings = try SettingsModel(database: AppDatabase.inMemory())
+            let settings = try SettingsModel(parts: ScreenParts(database: AppDatabase.inMemory(), clock: .system))
 
             return Case(name: "room-tab-\(name)", size: page) {
                 AnyView(page(model, settings: settings))

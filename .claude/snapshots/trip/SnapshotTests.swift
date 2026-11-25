@@ -1,6 +1,7 @@
 import Core
 import CoreText
 import DesignSystem
+@testable import FeatureModels
 @testable import Features
 import Store
 import SwiftUI
@@ -77,7 +78,7 @@ private extension SnapshotTests {
         let companion = try #require(
             Companion(species: .penguin, coat: Companion.Species.penguin.coats[0], name: "ぺんた")
         )
-        let now = Date.now
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
         let start = now.addingTimeInterval(-Double(elapsed) * 60)
 
         defaults.removePersistentDomain(forName: suite)
@@ -87,7 +88,7 @@ private extension SnapshotTests {
         _ = try database.selectJourney(journey.id, at: start.addingTimeInterval(-60))
         _ = try database.startTrip(minutes: length, at: start)
 
-        return RoomModel(database: database, defaults: defaults, now: { now })
+        return RoomModel(parts: ScreenParts(database: database, clock: .fixed(now)), defaults: defaults)
     }
 
     static func write(

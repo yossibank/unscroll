@@ -1,5 +1,5 @@
 import Core
-import Features
+import FeatureModels
 import Foundation
 import Store
 import Testing
@@ -11,8 +11,7 @@ struct JourneyPickerModelTests {
     @Test
     func listsOnlyJourneysWithArt() throws {
         let model = try JourneyPickerModel(
-            database: makeDatabase(),
-            now: { start },
+            parts: .fixed(makeDatabase(), at: start),
             isAvailable: { $0.id == Journey.okinawa.id || $0.id == Journey.tokyoToKyoto.id }
         )
 
@@ -22,8 +21,7 @@ struct JourneyPickerModelTests {
     @Test
     func listsAllJourneysWhenAllHaveArt() throws {
         let model = try JourneyPickerModel(
-            database: makeDatabase(),
-            now: { start },
+            parts: .fixed(makeDatabase(), at: start),
             isAvailable: { _ in true }
         )
 
@@ -36,7 +34,7 @@ struct JourneyPickerModelTests {
         _ = try database.startTrip(minutes: 100, at: start)
 
         let now = start.addingTimeInterval(100 * 60)
-        let model = JourneyPickerModel(database: database, now: { now }, isAvailable: { _ in true })
+        let model = JourneyPickerModel(parts: .fixed(database, at: now), isAvailable: { _ in true })
 
         #expect(model.kilometers(of: .tokyoToKyoto) == 100)
         #expect(model.kilometers(of: .okinawa) == 0)
@@ -49,7 +47,7 @@ struct JourneyPickerModelTests {
         _ = try database.startTrip(minutes: 100, at: start)
 
         let now = start.addingTimeInterval(10 * 60)
-        let model = JourneyPickerModel(database: database, now: { now }, isAvailable: { _ in true })
+        let model = JourneyPickerModel(parts: .fixed(database, at: now), isAvailable: { _ in true })
 
         model.selectedID = Journey.okinawa.id
 
@@ -62,8 +60,7 @@ struct JourneyPickerModelTests {
     @Test
     func cannotConfirmCurrentJourney() throws {
         let model = try JourneyPickerModel(
-            database: makeDatabase(),
-            now: { start },
+            parts: .fixed(makeDatabase(), at: start),
             isAvailable: { _ in true }
         )
 
@@ -76,8 +73,7 @@ struct JourneyPickerModelTests {
     func confirmChangesCurrentJourney() throws {
         let database = try makeDatabase()
         let model = JourneyPickerModel(
-            database: database,
-            now: { start },
+            parts: .fixed(database, at: start),
             isAvailable: { _ in true }
         )
 
@@ -92,8 +88,7 @@ struct JourneyPickerModelTests {
     @Test
     func showsOpenJourneysFirst() throws {
         let model = try JourneyPickerModel(
-            database: makeDatabase(),
-            now: { start },
+            parts: .fixed(makeDatabase(), at: start),
             isAvailable: { _ in true }
         )
 
@@ -110,7 +105,7 @@ struct JourneyPickerModelTests {
         _ = try database.startTrip(minutes: journey.totalKilometers, at: start)
 
         let now = start.addingTimeInterval(Double(journey.totalKilometers) * 60)
-        let model = JourneyPickerModel(database: database, now: { now }, isAvailable: { _ in true })
+        let model = JourneyPickerModel(parts: .fixed(database, at: now), isAvailable: { _ in true })
 
         #expect(model.isFinished(journey))
         #expect(!model.shownJourneys.contains(journey))

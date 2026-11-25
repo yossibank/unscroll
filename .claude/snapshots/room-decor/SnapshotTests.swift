@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+@testable import FeatureModels
 @testable import Features
 import Store
 import SwiftUI
@@ -48,10 +49,12 @@ private extension SnapshotTests {
         )
         let database = try AppDatabase.inMemory()
 
-        _ = try database.startTrip(minutes: 300, at: .now.addingTimeInterval(-310 * 60))
+        let now = Date(timeIntervalSince1970: 1_791_000_000)
+
+        _ = try database.startTrip(minutes: 300, at: now.addingTimeInterval(-310 * 60))
 
         let model = RoomModel(
-            database: database,
+            parts: ScreenParts(database: database, clock: .fixed(now)),
             defaults: UserDefaults(suiteName: "snapshot") ?? .standard
         )
         let journey = Journey.tokyoToKyoto

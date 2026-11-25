@@ -1,6 +1,7 @@
+import Core
 import DesignSystem
+import FeatureModels
 import Features
-import Store
 import SwiftUI
 
 public struct MainView: View {
@@ -12,20 +13,20 @@ public struct MainView: View {
     @State private var tab = Tab.room
     @State private var isTabBarHidden = false
 
-    private let database: AppDatabase
+    private let parts: ScreenParts
     private let isRevealed: Bool
 
     public init(
-        database: AppDatabase,
+        parts: ScreenParts,
         isRevealed: Bool = true
     ) {
-        _room = State(initialValue: RoomModel(database: database))
-        _journeyMap = State(initialValue: JourneyMapModel(database: database))
-        _postcardAlbum = State(initialValue: PostcardAlbumModel(database: database))
-        _settings = State(initialValue: SettingsModel(database: database))
+        _room = State(initialValue: RoomModel(parts: parts))
+        _journeyMap = State(initialValue: JourneyMapModel(parts: parts))
+        _postcardAlbum = State(initialValue: PostcardAlbumModel(parts: parts))
+        _settings = State(initialValue: SettingsModel(parts: parts))
         _needsOnboarding = State(initialValue: !OnboardingModel.isCompleted())
 
-        self.database = database
+        self.parts = parts
         self.isRevealed = isRevealed
     }
 
@@ -84,7 +85,7 @@ public struct MainView: View {
         .preferredColorScheme(.light)
         .fullScreenCover(isPresented: showsOnboarding) {
             OnboardingView(model: OnboardingModel(
-                database: database,
+                parts: parts,
                 settings: settings
             )) { startsPractice in
                 if startsPractice {

@@ -1,6 +1,7 @@
 import Core
 import DesignSystem
 import FamilyControls
+import FeatureModels
 import SwiftUI
 
 public struct OnboardingView: View {

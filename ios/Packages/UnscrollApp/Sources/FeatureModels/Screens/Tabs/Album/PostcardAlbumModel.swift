@@ -12,15 +12,10 @@ public final class PostcardAlbumModel {
     public private(set) var journey = Journey.tokyoSightseeing
     public private(set) var shownJourneyID: String?
 
-    @ObservationIgnored private let database: AppDatabase
-    @ObservationIgnored private let now: @MainActor () -> Date
+    @ObservationIgnored private let parts: ScreenParts
 
-    public init(
-        database: AppDatabase,
-        now: @escaping @MainActor () -> Date = { .now }
-    ) {
-        self.database = database
-        self.now = now
+    public init(parts: ScreenParts) {
+        self.parts = parts
 
         refresh()
     }
@@ -87,9 +82,9 @@ public extension PostcardAlbumModel {
         landmark: Landmark
     ) {
         do {
-            try database.setDecorated(isDecorated, landmark: landmark, at: now())
+            try parts.database.setDecorated(isDecorated, landmark: landmark, at: parts.clock.now)
         } catch {
-            EventLog.append("絵はがき：飾れない（\(error.localizedDescription)）", at: now())
+            EventLog.append("絵はがき：飾れない（\(error.localizedDescription)）", at: parts.clock.now)
         }
 
         refresh()
@@ -101,19 +96,19 @@ public extension PostcardAlbumModel {
     }
 
     func refresh() {
-        let date = now()
-        let current = (try? database.currentJourney()) ?? .tokyoSightseeing
+        let date = parts.clock.now
+        let current = (try? parts.database.currentJourney()) ?? .tokyoSightseeing
 
         do {
-            try database.recordArrivals(on: current, at: date)
+            try parts.database.recordArrivals(on: current, at: date)
         } catch {
-            EventLog.append("名所：着いた記録を保存できない（\(error.localizedDescription)）", at: now())
+            EventLog.append("名所：着いた記録を保存できない（\(error.localizedDescription)）", at: parts.clock.now)
         }
 
         covers = Journey.all.map { journey in
             Cover(
                 journey: journey,
-                collectedCount: (try? database.arrivals(journeyID: journey.id))?.count ?? 0,
+                collectedCount: (try? parts.database.arrivals(journeyID: journey.id))?.count ?? 0,
                 kilometers: journeyKilometers(journey, at: date),
                 isCurrent: journey.id == current.id
             )
@@ -121,7 +116,7 @@ public extension PostcardAlbumModel {
 
         journey = shownJourneyID.flatMap(Journey.with(id:)) ?? current
         kilometers = journeyKilometers(journey, at: date)
-        arrivals = (try? database.arrivals(journeyID: journey.id)) ?? []
+        arrivals = (try? parts.database.arrivals(journeyID: journey.id)) ?? []
     }
 }
 
@@ -130,7 +125,7 @@ private extension PostcardAlbumModel {
         _ journey: Journey,
         at date: Date
     ) -> Int {
-        let progress = try? database.journeyProgress(journeyID: journey.id, at: date)
+        let progress = try? parts.database.journeyProgress(journeyID: journey.id, at: date)
         return min(progress?.kilometers ?? 0, journey.totalKilometers)
     }
 }

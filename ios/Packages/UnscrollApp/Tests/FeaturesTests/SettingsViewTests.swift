@@ -1,3 +1,4 @@
+import FeatureModels
 import Features
 import Store
 import Testing
@@ -6,7 +7,7 @@ import Testing
 struct SettingsViewTests {
     @Test
     func makesBody() throws {
-        let model = try SettingsModel(database: AppDatabase.inMemory())
+        let model = try SettingsModel(parts: .system(AppDatabase.inMemory()))
 
         _ = SettingsView(model: model).body
     }

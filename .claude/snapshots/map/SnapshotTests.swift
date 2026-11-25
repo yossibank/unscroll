@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+@testable import FeatureModels
 @testable import Features
 import SwiftUI
 import Testing

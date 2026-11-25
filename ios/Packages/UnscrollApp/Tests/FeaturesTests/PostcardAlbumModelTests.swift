@@ -1,4 +1,4 @@
-import Features
+import FeatureModels
 import Foundation
 import Store
 import Testing
@@ -9,7 +9,7 @@ struct PostcardAlbumModelTests {
 
     @Test
     func hasNoPostcardsWithoutTrips() throws {
-        let model = try PostcardAlbumModel(database: makeDatabase(), now: { start })
+        let model = try PostcardAlbumModel(parts: .fixed(makeDatabase(), at: start))
 
         #expect(model.collectedCount == 0)
         #expect(model.totalCount == 6)
@@ -23,7 +23,7 @@ struct PostcardAlbumModelTests {
         let database = try makeDatabase()
         _ = try database.startTrip(minutes: 100, at: start)
         let now = start.addingTimeInterval(100 * 60)
-        let model = PostcardAlbumModel(database: database, now: { now })
+        let model = PostcardAlbumModel(parts: .fixed(database, at: now))
 
         let first = try #require(model.entries.first)
         let second = try #require(model.entries.dropFirst().first)
@@ -40,7 +40,7 @@ struct PostcardAlbumModelTests {
         let database = try makeDatabase()
         _ = try database.startTrip(minutes: 120, at: start)
         let now = start.addingTimeInterval(100 * 60)
-        let model = PostcardAlbumModel(database: database, now: { now })
+        let model = PostcardAlbumModel(parts: .fixed(database, at: now))
 
         let first = try #require(model.entries.first)
 
@@ -54,7 +54,7 @@ struct PostcardAlbumModelTests {
         let database = try makeDatabase()
         _ = try database.startTrip(minutes: 520, at: start)
         let now = start.addingTimeInterval(520 * 60)
-        let model = PostcardAlbumModel(database: database, now: { now })
+        let model = PostcardAlbumModel(parts: .fixed(database, at: now))
 
         #expect(model.collectedCount == 6)
         #expect(model.entries.allSatisfy { $0.remainingKilometers == 0 })
@@ -65,7 +65,7 @@ struct PostcardAlbumModelTests {
         let database = try makeDatabase()
         _ = try database.startTrip(minutes: 100, at: start)
         let now = start.addingTimeInterval(100 * 60)
-        let model = PostcardAlbumModel(database: database, now: { now })
+        let model = PostcardAlbumModel(parts: .fixed(database, at: now))
         let landmark = model.journey.landmarks[1]
 
         model.setDecorated(true, landmark: landmark)

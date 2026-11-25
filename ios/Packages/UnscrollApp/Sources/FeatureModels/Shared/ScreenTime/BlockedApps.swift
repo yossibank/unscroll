@@ -3,7 +3,7 @@ import FamilyControls
 import Foundation
 
 @MainActor
-enum BlockedApps {
+public enum BlockedApps {
     static let maxSetCount = 5
     static let setsKey = "screenTime.sets"
     static let activeSetKey = "screenTime.activeSet"
@@ -18,10 +18,13 @@ enum BlockedApps {
         FocusShield.savedSelection()
     }
 
-    static func save(_ selection: FamilyActivitySelection) {
+    static func save(
+        _ selection: FamilyActivitySelection,
+        at date: Date
+    ) {
         let data = try? JSONEncoder().encode(selection)
         defaults?.set(data, forKey: ScreenTimeShared.selectionKey)
-        EventLog.append("選択：\(summary(selection))", at: .now)
+        EventLog.append("選択：\(summary(selection))", at: date)
     }
 
     static func loadSets() -> [BlockedAppSet] {
@@ -49,14 +52,14 @@ enum BlockedApps {
         defaults?.set(activeID?.uuidString, forKey: activeSetKey)
     }
 
-    static func summary(_ selection: FamilyActivitySelection) -> String {
+    public static func summary(_ selection: FamilyActivitySelection) -> String {
         let apps = selection.applicationTokens.count
         let categories = selection.categoryTokens.count
         let domains = selection.webDomainTokens.count
         return "アプリ \(apps)・カテゴリ \(categories)・サイト \(domains)"
     }
 
-    static func isEmpty(_ selection: FamilyActivitySelection) -> Bool {
+    public static func isEmpty(_ selection: FamilyActivitySelection) -> Bool {
         selection.applicationTokens.isEmpty
             && selection.categoryTokens.isEmpty
             && selection.webDomainTokens.isEmpty

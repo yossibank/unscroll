@@ -1,5 +1,6 @@
 import Core
 import DesignSystem
+@testable import FeatureModels
 @testable import Features
 import Store
 import SwiftUI
@@ -42,21 +43,18 @@ private extension SnapshotTests {
         _ = try database.startTrip(minutes: 270, at: start)
 
         let one = JourneyPickerModel(
-            database: database,
-            now: { now },
+            parts: ScreenParts(database: database, clock: .fixed(now)),
             isAvailable: { $0 == .tokyoToKyoto }
         )
         let all = JourneyPickerModel(
-            database: database,
-            now: { now },
+            parts: ScreenParts(database: database, clock: .fixed(now)),
             isAvailable: { _ in true }
         )
 
         all.selectedID = Journey.okinawa.id
 
         let finished = JourneyPickerModel(
-            database: database,
-            now: { now },
+            parts: ScreenParts(database: database, clock: .fixed(now)),
             isAvailable: { _ in true }
         )
 

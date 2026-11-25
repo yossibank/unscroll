@@ -1,4 +1,4 @@
-import Features
+import FeatureModels
 import Foundation
 import Store
 import Testing
@@ -9,7 +9,7 @@ struct JourneyMapModelTests {
 
     @Test
     func startsAtNihonbashiWithoutTrips() throws {
-        let model = try JourneyMapModel(database: makeDatabase(), now: { start })
+        let model = try JourneyMapModel(parts: .fixed(makeDatabase(), at: start))
 
         model.refresh()
 
@@ -24,7 +24,7 @@ struct JourneyMapModelTests {
         let database = try makeDatabase()
         _ = try database.startTrip(minutes: 100, at: start)
         let now = start.addingTimeInterval(100 * 60)
-        let model = JourneyMapModel(database: database, now: { now })
+        let model = JourneyMapModel(parts: .fixed(database, at: now))
 
         model.refresh()
 
@@ -39,7 +39,7 @@ struct JourneyMapModelTests {
         let database = try makeDatabase()
         _ = try database.startTrip(minutes: 520, at: start)
         let now = start.addingTimeInterval(520 * 60)
-        let model = JourneyMapModel(database: database, now: { now })
+        let model = JourneyMapModel(parts: .fixed(database, at: now))
 
         model.refresh()
 
