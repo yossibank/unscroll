@@ -47,6 +47,7 @@ verify: verify-docs
 	scripts/verify.sh swift-style python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/swift-style-check.py $$(git ls-files '*.swift')
 	@test -f $(CLAUDE_CONFIG)/dotclaude/hooks/code-design-check.py || { echo "NG claude-config に code-design-check が無い: $(CLAUDE_CONFIG)"; exit 1; }
 	scripts/verify.sh code-design python3 -I $(CLAUDE_CONFIG)/dotclaude/hooks/code-design-check.py $$(git ls-files --cached --others --exclude-standard '*.swift' '*.kt')
+	scripts/verify.sh screens-no-store sh -c 'grep -rnE "^(@testable )?import Store([[:space:]]|$$)" ios/Packages/UnscrollApp/Sources/Features ios/Packages/UnscrollApp/Sources/AppFeature; test $$? -eq 1'
 	scripts/verify.sh kit-test swift test --package-path ios/Packages/UnscrollKit
 	scripts/verify.sh app-build $(XCODEBUILD) $(ANY_SIMULATOR) build
 

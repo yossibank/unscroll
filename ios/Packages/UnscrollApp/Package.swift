@@ -25,7 +25,18 @@ let package = Package(
             name: "AppFeature",
             dependencies: [
                 "DesignSystem",
+                "FeatureModels",
                 "Features",
+                .product(name: "Core", package: "UnscrollKit")
+            ],
+            swiftSettings: [
+                .enableUpcomingFeature("MemberImportVisibility")
+            ]
+        ),
+        .target(
+            name: "FeatureModels",
+            dependencies: [
+                "DesignSystem",
                 .product(name: "Core", package: "UnscrollKit"),
                 .product(name: "Store", package: "UnscrollKit")
             ]
@@ -34,8 +45,11 @@ let package = Package(
             name: "Features",
             dependencies: [
                 "DesignSystem",
-                .product(name: "Core", package: "UnscrollKit"),
-                .product(name: "Store", package: "UnscrollKit")
+                "FeatureModels",
+                .product(name: "Core", package: "UnscrollKit")
+            ],
+            swiftSettings: [
+                .enableUpcomingFeature("MemberImportVisibility")
             ]
         ),
         .target(
@@ -49,7 +63,11 @@ let package = Package(
         ),
         .testTarget(
             name: "AppFeatureTests",
-            dependencies: ["AppFeature"]
+            dependencies: [
+                "AppFeature",
+                "FeatureModels",
+                .product(name: "Store", package: "UnscrollKit")
+            ]
         ),
         .testTarget(
             name: "DesignSystemTests",
@@ -58,7 +76,9 @@ let package = Package(
         .testTarget(
             name: "FeaturesTests",
             dependencies: [
+                "FeatureModels",
                 "Features",
+                .product(name: "Core", package: "UnscrollKit"),
                 .product(name: "Store", package: "UnscrollKit")
             ]
         )
