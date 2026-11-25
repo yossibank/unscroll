@@ -1,6 +1,7 @@
 import Core
 import CoreText
 import DesignSystem
+@testable import FeatureModels
 @testable import Features
 import Store
 import SwiftUI
@@ -53,8 +54,8 @@ private extension SnapshotTests {
     static func cases() throws -> [Case] {
         try OnboardingModel.Page.allCases.map { target in
             let database = try AppDatabase.inMemory()
-            let settings = SettingsModel(database: database)
-            let model = OnboardingModel(database: database, settings: settings)
+            let settings = SettingsModel(parts: ScreenParts(database: database, clock: .system))
+            let model = OnboardingModel(parts: ScreenParts(database: database, clock: .system), settings: settings)
 
             while model.page != target {
                 if model.page == .companion {

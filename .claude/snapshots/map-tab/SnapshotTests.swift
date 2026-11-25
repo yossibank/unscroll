@@ -1,6 +1,7 @@
 import Core
 import CoreText
 import DesignSystem
+@testable import FeatureModels
 @testable import Features
 import Store
 import SwiftUI
@@ -69,7 +70,7 @@ private extension SnapshotTests {
             _ = try database.startTrip(minutes: length, at: start)
         }
 
-        return JourneyMapModel(database: database, now: { now })
+        return JourneyMapModel(parts: ScreenParts(database: database, clock: .fixed(now)))
     }
 
     static func page(_ model: JourneyMapModel) -> some View {

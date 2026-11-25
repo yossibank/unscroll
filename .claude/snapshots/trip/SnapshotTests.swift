@@ -1,6 +1,7 @@
 import Core
 import CoreText
 import DesignSystem
+@testable import FeatureModels
 @testable import Features
 import Store
 import SwiftUI
@@ -87,7 +88,7 @@ private extension SnapshotTests {
         _ = try database.selectJourney(journey.id, at: start.addingTimeInterval(-60))
         _ = try database.startTrip(minutes: length, at: start)
 
-        return RoomModel(database: database, defaults: defaults, now: { now })
+        return RoomModel(parts: ScreenParts(database: database, clock: .fixed(now)), defaults: defaults)
     }
 
     static func write(
